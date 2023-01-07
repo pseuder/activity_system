@@ -4,7 +4,10 @@ const store = createStore({
   state() {
     return {
       count: 0,
-      domainAddress: "http://localhost:3000",
+      domainAddress:
+        import.meta.env.DEV === true
+          ? "http://localhost:3000"
+          : "https://activity-system-backend.onrender.com",
     };
   },
   mutations: {
