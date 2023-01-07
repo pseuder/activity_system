@@ -33,7 +33,6 @@ function authorize() {
   AuthService.localAuth(props.title, formData, alertData).then((res) => {
     if (res) router.push("/explore");
   });
-  router.push("/explore");
 }
 
 function clickSSO(type) {

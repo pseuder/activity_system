@@ -30,7 +30,7 @@ defineEmits(["closeAlert"]);
     <div class="flex items-center justify-center text-xl">
       <info-circle-outlined />
     </div>
-    <div class="line-clamp-3 tooltip flex-grow overflow-ellipsis text-center">
+    <div class="flex-grow overflow-ellipsis text-center">
       {{ alertData.message }}
     </div>
 
