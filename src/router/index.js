@@ -20,7 +20,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory("activity_system"),
+  history: createWebHistory(""),
   routes,
 });
 
