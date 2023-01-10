@@ -9,9 +9,13 @@
   a {
     @apply text-primary cursor-pointer;
   }
+  button {
+    @apply hover:bg-todark cursor-pointer  rounded-md py-2 px-4 font-semibold text-white;
+  }
 }
 
 @layer utilities {
+  /* text */
   .text-shadow {
     text-shadow: 2px 2px 2px black;
   }
@@ -24,6 +28,14 @@
   .text-shadow-none {
     text-shadow: none;
   }
+  .text-primary {
+    color: #0d6efd;
+  }
+  .text-gray {
+    @apply text-gray-500;
+  }
+
+  /* background */
   .bg-primary {
     background-color: #0d6efd;
   }
@@ -43,6 +55,7 @@
       ),
       #dc3545;
   }
+
   .bg-todark {
     -webkit-filter: brightness(90%); /* Safari */
     filter: brightness(90%);
@@ -51,19 +64,15 @@
     -webkit-filter: brightness(105%); /* Safari */
     filter: brightness(105%);
   }
+
+  /* border */
   .border-primary {
     border-color: #0d6efd;
     border-width: 1px;
   }
-  .text-primary {
-    color: #0d6efd;
-  }
 }
 
 @layer components {
-  .btn {
-    @apply hover:bg-todark rounded-md  py-2 px-4 font-semibold text-white;
-  }
   .alert {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08), 0px 1px 2px rgba(0, 0, 0, 0.18);
     @apply hover:bg-tobright rounded-md py-2 px-4  text-black;
@@ -74,6 +83,10 @@
 
   .dropdown-item {
     @apply block w-full whitespace-nowrap bg-transparent py-2 px-4  text-base font-normal text-gray-700 hover:bg-gray-100;
+  }
+
+  .tag {
+    @apply hover:bg-todark  cursor-pointer justify-center rounded-xl bg-gray-300 px-2 py-1 text-gray-500;
   }
 }
 
