@@ -21,31 +21,33 @@ for (let i = 0; i < 5; i++) {
     enroll_time: "2022/11/01 ~ 2022/11/10",
     like: true,
     fee: 100,
-    watch: 20,
-    enrollment: 30,
+    watch: 50,
+    enrollment: 20,
   });
 }
 
 let userSetting = reactive({
   displayMode: "list",
+  selectedTag: "全部",
 });
 
-onMounted(async () => {
-  console.log(`the EXPLORE component is now mounted.`);
-});
+function tagClick(item) {
+  userSetting.selectedTag = item;
+}
+function likeClick(item) {
+  item.like = !item.like;
+}
 </script>
 
 <template>
-  <div
-    class="min-w-min overflow-auto bg-explore-bg-large bg-cover bg-fixed bg-center bg-no-repeat"
-  >
-    <header
-      class="flex h-20 justify-between py-2 px-6 text-2xl font-medium lg:px-20 lg:pt-[60px]"
-    >
-      <div class="flex w-10 flex-shrink-0 items-center">
-        <img src="@/assets/image/vue.svg" alt="vue logo" />
+  <div class="exploreBG p-8 lg:px-16">
+    <header class="flex justify-between text-3xl font-medium lg:pt-6">
+      <div class="flex items-center">
+        <img src="@/assets/image/vite.svg" alt="vue logo" class="w-10" />
       </div>
-      <nav class="flex items-center lg:flex-grow">
+      <nav
+        class="flex flex-grow items-center justify-center lg:ml-[10vw] lg:justify-start"
+      >
         <div class="dropdown relative">
           <button
             id="dropdownMenuButton"
@@ -85,116 +87,156 @@ onMounted(async () => {
         </div>
 
         <div class="hidden lg:flex">
-          <div class="ml-[16vw] flex flex-shrink-0 gap-20">
-            <a>探索活動</a>
-            <a class="text-gray">建立活動</a>
-            <a class="text-gray">我的活動</a>
+          <div class="flex flex-shrink-0 gap-20 pl-[10vw] font-bold">
+            <a class="">探索活動</a>
+            <a class="text-black">建立活動</a>
+            <a class="text-black">我的活動</a>
           </div>
         </div>
       </nav>
-      <div class="flex w-10 flex-shrink-0 items-center">
-        <img src="@/assets/image/vue.svg" alt="vue logo" />
+      <div class="flex items-center">
+        <img src="@/assets/image/vue.svg" alt="vue logo" class="w-10" />
       </div>
     </header>
-    <main class="py-2 px-6">
-      <div class="lg:p-4 lg:pr-14 lg:pl-[16vw]">
-        <div class="flex">
-          <!-- 條件排序 -->
-          <div class="flex flex-grow flex-wrap">
-            <template v-for="(item, index) in sortOptions" :key="index">
-              <div
-                class="mx-4 my-2 inline-flex w-20 items-center justify-center"
-              >
-                <label for="">{{ item }}</label>
-                <img src="@/assets/image/sortButton.svg" alt="" class="w-3" />
-              </div>
-            </template>
-          </div>
-          <!-- 排序模式 -->
-          <div class="hidden justify-center gap-4 self-center lg:flex">
-            <img
-              src="@/assets/image/exploreList.svg"
-              alt="list"
-              class="h-8 w-8 rounded-lg border-black p-1"
-              :class="{
-                ' border-2': userSetting.displayMode == 'block',
-              }"
-              @click="userSetting.displayMode = 'block'"
-            />
-            <img
-              src="@/assets/image/exploreBlock.svg"
-              alt="block"
-              class="h-8 w-8 rounded-lg border-black p-1"
-              :class="{
-                'border-2 ': userSetting.displayMode == 'list',
-              }"
-              @click="userSetting.displayMode = 'list'"
-            />
-          </div>
+    <main class="py-4">
+      <!-- sort bar -->
+      <div class="flex py-2 lg:py-8 lg:pl-[16vw]">
+        <!-- 條件排序 -->
+        <div class="flex flex-grow flex-wrap text-xl font-semibold">
+          <template v-for="(item, index) in sortOptions" :key="index">
+            <div
+              class="mx-6 my-2 inline-flex items-center justify-center gap-2"
+            >
+              <label for="">{{ item }}</label>
+              <img src="@/assets/image/sortButton.svg" alt="" class="w-3" />
+            </div>
+          </template>
+        </div>
+        <!-- 排序模式 -->
+        <div class="hidden justify-center gap-4 self-center lg:flex">
+          <img
+            src="@/assets/image/exploreList.svg"
+            alt="list"
+            class="h-8 w-8 rounded-lg border-black p-1"
+            :class="{
+              ' border-2': userSetting.displayMode == 'list',
+            }"
+            @click="userSetting.displayMode = 'list'"
+          />
+          <img
+            src="@/assets/image/exploreBlock.svg"
+            alt="block"
+            class="h-8 w-8 rounded-lg border-black p-1"
+            :class="{
+              'border-2 ': userSetting.displayMode == 'block',
+            }"
+            @click="userSetting.displayMode = 'block'"
+          />
         </div>
       </div>
-      <!-- tag過濾 -->
+
       <div class="lg:flex">
-        <div class="flex flex-wrap content-center lg:w-1/5 lg:flex-col">
+        <!-- tag過濾 -->
+        <div class="flex flex-wrap font-semibold lg:w-1/5 lg:flex-col">
           <template v-for="(item, index) in filterOptions" :key="index">
             <div
-              class="tag mx-4 my-2 inline-flex w-20 lg:w-11/12 lg:max-w-[160px]"
+              class="tag mx-2 my-2 inline-flex w-20 lg:w-11/12 lg:max-w-[160px]"
+              :class="{
+                'bg-primary text-white': userSetting.selectedTag == item,
+              }"
+              @click="tagClick(item)"
             >
               {{ item }}
             </div>
           </template>
         </div>
         <!-- 活動顯示 -->
-        <div class="flex w-full flex-col flex-wrap gap-4 lg:flex-row">
+        <div
+          class="flex w-full flex-wrap gap-4 font-medium"
+          :class="{
+            'lg:flex-row': userSetting.displayMode == 'block',
+            'lg:flex-col': userSetting.displayMode == 'list',
+          }"
+        >
           <template v-for="(item, index) in activityData" :key="index">
-            <div class="mx-2 min-w-[350px] rounded-lg bg-white p-6 shadow-lg">
-              <div class="text-end">
-                <heart-filled
-                  v-if="item.like"
-                  class="cursor-pointer text-red-600"
-                  @click="item.like = !item.like"
-                />
-                <heart-outlined
-                  v-else
-                  class="cursor-pointer"
-                  @click="item.like = !item.like"
-                />
+            <!-- 每個活動 -->
+            <div
+              class="relative m-auto min-w-[350px] rounded-lg bg-white p-6 shadow-lg lg:m-0"
+            >
+              <!-- 愛心 -->
+              <div
+                class="absolute top-2 right-4 cursor-pointer"
+                @click="likeClick(item)"
+              >
+                <heart-filled v-if="item.like" class="text-red-600" />
+                <heart-outlined v-else />
               </div>
-              <div class="flex flex-col gap-4">
-                <div class="flex">
-                  <div class="w-20">標題</div>
-                  <div class="text-gray">{{ item.title }}</div>
-                </div>
-                <div class="flex">
-                  <div class="w-20">對象</div>
-                  <div class="text-gray">{{ item.object }}</div>
-                </div>
-                <div class="flex">
-                  <div class="w-20">地點</div>
-                  <div class="text-gray">{{ item.location }}</div>
-                </div>
-                <div class="flex">
-                  <div class="w-20">活動時間</div>
-                  <div class="text-gray">{{ item.activity_time }}</div>
-                </div>
-                <div class="flex">
-                  <div class="w-20">報名時間</div>
-                  <div class="text-gray">{{ item.register_time }}</div>
-                </div>
-                <hr class="border-1" />
-                <div class="flex justify-end gap-4">
-                  <div class="w-10">${{ item.fee }}</div>
-                  <div class="flex w-10 items-center">
-                    <eye-filled />{{ item.watch }}
+              <div :class="{ 'lg:flex': userSetting.displayMode == 'list' }">
+                <div
+                  class="flex flex-grow flex-col flex-wrap gap-4"
+                  :class="{
+                    'flex-col': userSetting.displayMode == 'block',
+                    'lg:flex-row': userSetting.displayMode == 'list',
+                  }"
+                >
+                  <div
+                    class="flex"
+                    :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
+                  >
+                    <div class="w-20">標題</div>
+                    <div class="text-gray">{{ item.title }}</div>
                   </div>
-                  <div class="flex w-10 items-center">
-                    <user-outlined />{{ item.enrollment }}
+                  <div
+                    class="flex"
+                    :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
+                  >
+                    <div class="w-20">對象</div>
+                    <div class="text-gray">{{ item.object }}</div>
+                  </div>
+                  <div
+                    class="flex"
+                    :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
+                  >
+                    <div class="w-20">地點</div>
+                    <div class="text-gray">{{ item.location }}</div>
+                  </div>
+                  <div
+                    class="flex"
+                    :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
+                  >
+                    <div class="w-20">活動時間</div>
+                    <div class="text-gray">{{ item.activity_time }}</div>
+                  </div>
+                  <div
+                    class="flex"
+                    :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
+                  >
+                    <div class="w-20">報名時間</div>
+                    <div class="text-gray">{{ item.enroll_time }}</div>
+                  </div>
+                  <!-- 分隔線 -->
+                  <hr class="border-1 w-[98%]" />
+                  <!-- 簡略資訊 -->
+                  <div class="mb-2 flex w-[98%] justify-end gap-4">
+                    <div class="w-10">${{ item.fee }}</div>
+                    <div class="flex w-10 items-center">
+                      <eye-filled />{{ item.watch }}
+                    </div>
+                    <div class="flex w-10 items-center">
+                      <user-outlined />{{ item.enrollment }}
+                    </div>
                   </div>
                 </div>
 
-                <div class="flex justify-between">
-                  <button class="btn mr-2 w-1/2 bg-gray-500">詳細資訊</button>
-                  <button class="bg-primary btn ml-2 w-1/2">報名活動</button>
+                <div
+                  class="flex items-center justify-between gap-4"
+                  :class="{
+                    'lg:w-1/6  lg:min-w-[150px] lg:flex-col lg:justify-center':
+                      userSetting.displayMode == 'list',
+                  }"
+                >
+                  <button class="btn w-[150px] bg-gray-500">詳細資訊</button>
+                  <button class="bg-primary btn w-[150px]">報名活動</button>
                 </div>
               </div>
             </div>

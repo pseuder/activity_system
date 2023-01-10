@@ -4,6 +4,7 @@ import vue3GoogleLogin from "vue3-google-login";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+import "./tailwind.css";
 import "./style.css";
 
 const app = createApp(App).use(router).use(store).use(Antd);

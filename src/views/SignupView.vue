@@ -13,14 +13,18 @@ defineEmits(["navigate"]);
         <img src="@/assets/image/vue.svg" alt="vue logo" />
       </div>
       <div class="flex items-center gap-2">
-        <a
+        <button
           class="border-primary text-primary btn h-10"
           @click="$emit('navigate', 'login')"
-          >Login</a
         >
-        <a class="bg-primary btn h-10" @click="$emit('navigate', 'signup')"
-          >Signup</a
+          Login
+        </button>
+        <button
+          class="bg-primary btn h-10"
+          @click="$emit('navigate', 'signup')"
         >
+          Signup
+        </button>
       </div>
     </header>
     <main class="flex flex-grow items-center justify-center">
