@@ -1,5 +1,5 @@
 <script setup>
-import LoginCard from "@/components/LoginPanel.vue";
+import LoginPanel from "@/components/LoginPanel.vue";
 
 defineEmits(["navigate"]);
 </script>
@@ -27,7 +27,7 @@ defineEmits(["navigate"]);
     <main class="flex flex-grow items-center justify-center">
       <div class="w-0 md:w-1/2"></div>
       <div class="md:w-1/2">
-        <LoginCard class="mx-auto my-4 w-11/12 max-w-lg" title="Login">
+        <LoginPanel class="mx-auto my-4 w-11/12 max-w-lg" title="Login">
           <template #helpbar>
             <div class="flex flex-wrap justify-center md:justify-between">
               <!-- 記住資訊 -->
@@ -46,7 +46,7 @@ defineEmits(["navigate"]);
               <a @click="$emit('navigate', 'signup')">Signup</a>
             </div>
           </template>
-        </LoginCard>
+        </LoginPanel>
       </div>
     </main>
   </div>

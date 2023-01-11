@@ -7,6 +7,9 @@ import {
   EyeFilled,
   UserOutlined,
 } from "@ant-design/icons-vue";
+import ButtonModal from "@/components/ButtonModal.vue";
+
+//data
 
 let sortOptions = ["活動時間", "報名時間", "報名價格", "查看人數", "參加人數"];
 let filterOptions = ["全部", "A Group", "B Group", "C Group", "D Group"];
@@ -14,6 +17,7 @@ let activityData = reactive([]);
 
 for (let i = 0; i < 5; i++) {
   activityData.push({
+    id: i,
     title: "活動標題",
     object: "所有人",
     location: "Building 1",
@@ -22,7 +26,7 @@ for (let i = 0; i < 5; i++) {
     like: true,
     fee: 100,
     watch: 50,
-    enrollment: 20,
+    enrollment: "20", // 數字or滿
   });
 }
 
@@ -31,11 +35,26 @@ let userSetting = reactive({
   selectedTag: "全部",
 });
 
+// functions
+
+function sortClick(target) {
+  console.log(target);
+}
+function displayClick() {
+  userSetting.displayMode =
+    userSetting.displayMode === "list" ? "block" : "list";
+}
 function tagClick(item) {
   userSetting.selectedTag = item;
 }
 function likeClick(item) {
   item.like = !item.like;
+}
+function detailClick(id) {
+  console.log(id);
+}
+function enrollClick(id) {
+  console.log(id);
 }
 </script>
 
@@ -121,7 +140,7 @@ function likeClick(item) {
             :class="{
               ' border-2': userSetting.displayMode == 'list',
             }"
-            @click="userSetting.displayMode = 'list'"
+            @click="displayClick"
           />
           <img
             src="@/assets/image/exploreBlock.svg"
@@ -130,7 +149,7 @@ function likeClick(item) {
             :class="{
               'border-2 ': userSetting.displayMode == 'block',
             }"
-            @click="userSetting.displayMode = 'block'"
+            @click="displayClick"
           />
         </div>
       </div>
@@ -235,8 +254,21 @@ function likeClick(item) {
                       userSetting.displayMode == 'list',
                   }"
                 >
-                  <button class="btn w-[150px] bg-gray-500">詳細資訊</button>
-                  <button class="bg-primary btn w-[150px]">報名活動</button>
+                  <ButtonModal :detail-data="item" @like-click="likeClick">
+                    <button
+                      class="btn w-[150px] bg-gray-500"
+                      @click="detailClick(item.id)"
+                    >
+                      詳細資訊
+                    </button>
+                  </ButtonModal>
+
+                  <button
+                    class="bg-primary btn w-[150px]"
+                    @click="enrollClick(item.id)"
+                  >
+                    報名活動
+                  </button>
                 </div>
               </div>
             </div>
