@@ -1,10 +1,6 @@
 <script setup>
-import {
-  HeartOutlined,
-  HeartFilled,
-  EyeFilled,
-  UserOutlined,
-} from "@ant-design/icons-vue";
+import { onMounted } from "vue";
+import { HeartOutlined, HeartFilled, EyeFilled } from "@ant-design/icons-vue";
 
 // props
 defineProps({
@@ -17,6 +13,10 @@ defineProps({
 });
 
 defineEmits(["likeClick"]);
+
+onMounted(() => {
+  console.log("onmounted!");
+});
 </script>
 
 <template>

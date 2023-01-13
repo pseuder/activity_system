@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive } from "vue";
+import { reactive, ref } from "vue";
 import "tw-elements";
 import {
   HeartOutlined,
@@ -7,18 +7,22 @@ import {
   EyeFilled,
   UserOutlined,
 } from "@ant-design/icons-vue";
+
+import ActivityService from "@/services/activity.service.js";
 import ButtonModal from "@/components/ButtonModal.vue";
+import AutofadeMessage from "@/components/AutofadeMessage.vue";
 
 //data
 
 let sortOptions = ["活動時間", "報名時間", "報名價格", "查看人數", "參加人數"];
 let filterOptions = ["全部", "A Group", "B Group", "C Group", "D Group"];
 let activityData = reactive([]);
+let buttonModalData = ref({});
 
 for (let i = 0; i < 5; i++) {
   activityData.push({
     id: i,
-    title: "活動標題",
+    title: "活動標題" + i,
     object: "所有人",
     location: "Building 1",
     activity_time: "2022/11/12",
@@ -50,11 +54,12 @@ function tagClick(item) {
 function likeClick(item) {
   item.like = !item.like;
 }
-function detailClick(id) {
-  console.log(id);
+function detailClick(item) {
+  buttonModalData.value = item;
 }
 function enrollClick(id) {
   console.log(id);
+  ActivityService.enroll(JWT, activity_id);
 }
 </script>
 
@@ -119,9 +124,9 @@ function enrollClick(id) {
     </header>
     <main class="py-4">
       <!-- sort bar -->
-      <div class="flex py-2 lg:py-8 lg:pl-[16vw]">
+      <div class="flex py-2 lg:py-4 lg:pl-[16vw]">
         <!-- 條件排序 -->
-        <div class="flex flex-grow flex-wrap text-xl font-semibold">
+        <div class="flex flex-grow flex-wrap text-xl">
           <template v-for="(item, index) in sortOptions" :key="index">
             <div
               class="mx-6 my-2 inline-flex items-center justify-center gap-2"
@@ -254,10 +259,14 @@ function enrollClick(id) {
                       userSetting.displayMode == 'list',
                   }"
                 >
-                  <ButtonModal :detail-data="item" @like-click="likeClick">
+                  {{ testVal }}
+                  <ButtonModal
+                    :detail-data="buttonModalData"
+                    @like-click="likeClick"
+                  >
                     <button
                       class="btn w-[150px] bg-gray-500"
-                      @click="detailClick(item.id)"
+                      @click="detailClick(item)"
                     >
                       詳細資訊
                     </button>

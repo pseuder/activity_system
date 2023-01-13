@@ -1,25 +1,30 @@
-<template>
-  <div class="flex items-center justify-center bg-black"></div>
-</template>
-
 <script setup lang="ts">
-import {
-  MailOutlined,
-  LockOutlined,
-  LinkedinFilled,
-} from "@ant-design/icons-vue";
-
 import { ref, reactive } from "vue";
+import AutofadeMessage from "@/components/AutofadeMessage.vue";
 
 let testref = ref("test");
-
-let alertData = reactive({
+let messageData = reactive({
   show: true,
-  type: "warning",
-  message: "帳號密碼錯誤!",
+  type: "success",
+  message: "成功!",
 });
 
-function pri() {
-  console.log(alertData.show);
+function showMessage(type) {
+  messageData.show = true;
+  messageData.type = type;
+}
+
+function closeMessage() {
+  messageData.show = false;
 }
 </script>
+
+<template>
+  <div class="flex items-center justify-center bg-black">
+    <button @click="showMessage('success')">success</button>
+    <button @click="showMessage('warning')">warning</button>
+    <button @click="showMessage('error')">error</button>
+    <AutofadeMessage :messageData="messageData" @click="closeMessage">
+    </AutofadeMessage>
+  </div>
+</template>
