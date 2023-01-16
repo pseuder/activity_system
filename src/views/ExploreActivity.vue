@@ -13,7 +13,6 @@ import ButtonModal from "@/components/ButtonModal.vue";
 import AutofadeMessage from "@/components/AutofadeMessage.vue";
 
 //data
-
 let sortOptions = ["活動時間", "報名時間", "報名價格", "查看人數", "參加人數"];
 let filterOptions = ["全部", "A Group", "B Group", "C Group", "D Group"];
 let activityData = reactive([]);
@@ -59,7 +58,7 @@ function detailClick(item) {
 }
 function enrollClick(id) {
   console.log(id);
-  ActivityService.enroll(JWT, activity_id);
+  // ActivityService.enroll(JWT, activity_id);
 }
 </script>
 
