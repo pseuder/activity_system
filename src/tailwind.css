@@ -73,7 +73,7 @@
 }
 
 @layer components {
-  .exploreBG {
+  .mainBG {
     @apply overflow-auto bg-explore-bg-large bg-cover bg-fixed bg-center bg-no-repeat;
   }
   .tag {

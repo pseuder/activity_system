@@ -2,7 +2,7 @@ import { createWebHistory, createRouter } from "vue-router";
 import Splash from "@/views/SplashView.vue";
 import Trial from "@/Trial.vue";
 import ExploreActivity from "@/views/ExploreActivity.vue";
-
+import CreateActivity from "@/views/CreateActivity.vue";
 const routes = [
   {
     path: "/",
@@ -11,6 +11,10 @@ const routes = [
   {
     path: "/explore",
     component: ExploreActivity,
+  },
+  {
+    path: "/create",
+    component: CreateActivity,
   },
   {
     path: "/trial",

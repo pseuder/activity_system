@@ -12,7 +12,7 @@ class AuthService {
         })
         .then((res) => {
           if (res.data.token) {
-            localStorage.setItem("user", JSON.stringify(res.data));
+            localStorage.setItem("userInfo", JSON.stringify(res.data));
             alertData.show = true;
             alertData.message = "登入成功";
           }

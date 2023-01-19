@@ -7,7 +7,7 @@ defineProps({
     default() {
       return {
         show: false,
-        type: "success",
+        state: "success",
         message: "",
       };
     },
@@ -20,11 +20,11 @@ defineEmits(["closeMessage"]);
 <template>
   <div
     v-show="messageData.show"
-    class="autofade-message absolute top-10 flex w-[90%] max-w-lg"
+    class="autofade-message absolute top-10 left-1/2 z-[1] flex w-[90%] max-w-lg -translate-x-1/2"
     :class="{
-      ' text-white': messageData.type === 'success',
-      'bg-warning': messageData.type === 'warning',
-      'bg-error': messageData.type === 'error',
+      ' text-white': messageData.state === 'success',
+      'bg-warning': messageData.state === 'warning',
+      'bg-error': messageData.state === 'error',
     }"
   >
     <div class="flex flex-grow">
@@ -34,7 +34,7 @@ defineEmits(["closeMessage"]);
       </div>
       <div class="w-fit">
         <button
-          v-show="messageData.type === 'success'"
+          v-show="messageData.state === 'success'"
           class="bg-warning text-black"
         >
           加入行事曆
@@ -42,6 +42,8 @@ defineEmits(["closeMessage"]);
       </div>
     </div>
 
-    <button class="ml-4 w-fit text-black" @click="closeMessage">x</button>
+    <button class="ml-4 w-fit text-black" @click="$emit('closeMessage')">
+      x
+    </button>
   </div>
 </template>

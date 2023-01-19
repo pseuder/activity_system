@@ -12,7 +12,7 @@ import ActivityService from "@/services/activity.service.js";
 import ButtonModal from "@/components/ButtonModal.vue";
 import AutofadeMessage from "@/components/AutofadeMessage.vue";
 
-//data
+/* data */
 let sortOptions = ["活動時間", "報名時間", "報名價格", "查看人數", "參加人數"];
 let filterOptions = ["全部", "A Group", "B Group", "C Group", "D Group"];
 let activityData = reactive([]);
@@ -25,7 +25,7 @@ for (let i = 0; i < 5; i++) {
     object: "所有人",
     location: "Building 1",
     activity_time: "2022/11/12",
-    enroll_time: "2022/11/01 ~ 2022/11/10",
+    enroll_time: ["2022/11/01", "2022/11/10"],
     like: true,
     fee: 100,
     watch: 50,
@@ -38,7 +38,13 @@ let userSetting = reactive({
   selectedTag: "全部",
 });
 
-// functions
+let messageData = reactive({
+  show: false,
+  state: "success",
+  message: "成功!",
+});
+
+/* functions */
 
 function sortClick(target) {
   console.log(target);
@@ -56,14 +62,39 @@ function likeClick(item) {
 function detailClick(item) {
   buttonModalData.value = item;
 }
-function enrollClick(id) {
-  console.log(id);
-  // ActivityService.enroll(JWT, activity_id);
+function enrollClick(activity_id) {
+  console.log(activity_id);
+  ActivityService.enroll(activity_id)
+    .then((res) => {
+      console.log(res);
+      messageData.message = "ok!";
+      messageData.state = "success";
+      messageData.show = true;
+    })
+    .catch((err) => {
+      console.log(err);
+      if (err.code === "ERR_BAD_REQUEST") {
+        messageData.message = err.message;
+        messageData.state = "warning";
+      } else if (err.code === "ERR_NETWORK") {
+        messageData.message = "伺服器錯誤";
+        messageData.state = "error";
+      } else {
+        messageData.message = "非預期的錯誤";
+        messageData.state = "error";
+      }
+      messageData.show = true;
+    });
 }
 </script>
 
 <template>
-  <div class="exploreBG p-8 lg:px-16">
+  <div class="mainBG p-8 lg:px-16">
+    <AutofadeMessage
+      :message-data="messageData"
+      @close-message="messageData.show = false"
+    >
+    </AutofadeMessage>
     <header class="flex justify-between text-3xl font-medium lg:pt-6">
       <div class="flex items-center">
         <img src="@/assets/image/vite.svg" alt="vue logo" class="w-10" />
@@ -98,10 +129,10 @@ function enrollClick(id) {
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <li>
-              <a class="text-primary dropdown-item" href="#">探索活動</a>
+              <a class="text-primary dropdown-item" href="/explore">探索活動</a>
             </li>
             <li>
-              <a class="dropdown-item" href="#">建立活動</a>
+              <a class="dropdown-item" href="/create">建立活動</a>
             </li>
             <li>
               <a class="dropdown-item" href="#">我的活動</a>
@@ -111,8 +142,8 @@ function enrollClick(id) {
 
         <div class="hidden lg:flex">
           <div class="flex flex-shrink-0 gap-20 pl-[10vw] font-bold">
-            <a class="">探索活動</a>
-            <a class="text-black">建立活動</a>
+            <a class="" href="/explore">探索活動</a>
+            <a class="text-black" href="/create">建立活動</a>
             <a class="text-black">我的活動</a>
           </div>
         </div>
@@ -140,7 +171,7 @@ function enrollClick(id) {
           <img
             src="@/assets/image/exploreList.svg"
             alt="list"
-            class="h-8 w-8 rounded-lg border-black p-1"
+            class="h-8 w-8 cursor-pointer rounded-lg border-black p-1"
             :class="{
               ' border-2': userSetting.displayMode == 'list',
             }"
@@ -149,7 +180,7 @@ function enrollClick(id) {
           <img
             src="@/assets/image/exploreBlock.svg"
             alt="block"
-            class="h-8 w-8 rounded-lg border-black p-1"
+            class="h-8 w-8 cursor-pointer rounded-lg border-black p-1"
             :class="{
               'border-2 ': userSetting.displayMode == 'block',
             }"
