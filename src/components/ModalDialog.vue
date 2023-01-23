@@ -113,7 +113,7 @@ onMounted(() => {
             <div class="h-[80px] w-full">
               <!-- 分隔線 -->
               <hr class="my-3 w-[98%] border-2" />
-              <button class="bg-primary btn w-full">報名活動</button>
+              <button class="w-full bg-primary">報名活動</button>
             </div>
           </div>
         </div>

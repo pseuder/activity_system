@@ -9,14 +9,14 @@ import {
 } from "@ant-design/icons-vue";
 
 import ActivityService from "@/services/activity.service.js";
-import ButtonModal from "@/components/ButtonModal.vue";
-import AutofadeMessage from "@/components/AutofadeMessage.vue";
+import ModalDialog from "@/components/ModalDialog.vue";
+import AlertMessage from "@/components/AlertMessage.vue";
 
 /* data */
 let sortOptions = ["活動時間", "報名時間", "報名價格", "查看人數", "參加人數"];
 let filterOptions = ["全部", "A Group", "B Group", "C Group", "D Group"];
 let activityData = reactive([]);
-let buttonModalData = ref({});
+let modalDialogData = ref({});
 
 for (let i = 0; i < 5; i++) {
   activityData.push({
@@ -60,7 +60,7 @@ function likeClick(item) {
   item.like = !item.like;
 }
 function detailClick(item) {
-  buttonModalData.value = item;
+  modalDialogData.value = item;
 }
 function enrollClick(activity_id) {
   console.log(activity_id);
@@ -89,12 +89,12 @@ function enrollClick(activity_id) {
 </script>
 
 <template>
-  <div class="mainBG p-8 lg:px-16">
-    <AutofadeMessage
+  <div class="main-bg p-8 lg:px-16">
+    <AlertMessage
       :message-data="messageData"
       @close-message="messageData.show = false"
     >
-    </AutofadeMessage>
+    </AlertMessage>
     <header class="flex justify-between text-3xl font-medium lg:pt-6">
       <div class="flex items-center">
         <img src="@/assets/image/vite.svg" alt="vue logo" class="w-10" />
@@ -105,7 +105,7 @@ function enrollClick(activity_id) {
         <div class="dropdown relative">
           <button
             id="dropdownMenuButton"
-            class="text-primary dropdown-toggle flex items-center lg:hidden"
+            class="dropdown-toggle flex items-center text-primary lg:hidden"
             type="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
@@ -129,7 +129,7 @@ function enrollClick(activity_id) {
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <li>
-              <a class="text-primary dropdown-item" href="/explore">探索活動</a>
+              <a class="dropdown-item text-primary" href="/explore">探索活動</a>
             </li>
             <li>
               <a class="dropdown-item" href="/create">建立活動</a>
@@ -171,16 +171,16 @@ function enrollClick(activity_id) {
           <img
             src="@/assets/image/exploreList.svg"
             alt="list"
-            class="h-8 w-8 cursor-pointer rounded-lg border-black p-1"
+            class="h-8 w-8 cursor-pointer rounded-lg border-solid border-black p-1"
             :class="{
-              ' border-2': userSetting.displayMode == 'list',
+              'border-2': userSetting.displayMode == 'list',
             }"
             @click="displayClick"
           />
           <img
             src="@/assets/image/exploreBlock.svg"
             alt="block"
-            class="h-8 w-8 cursor-pointer rounded-lg border-black p-1"
+            class="h-8 w-8 cursor-pointer rounded-lg border-solid border-black p-1"
             :class="{
               'border-2 ': userSetting.displayMode == 'block',
             }"
@@ -196,7 +196,7 @@ function enrollClick(activity_id) {
             <div
               class="tag mx-2 my-2 inline-flex w-20 lg:w-11/12 lg:max-w-[160px]"
               :class="{
-                'bg-primary text-white': userSetting.selectedTag == item,
+                'text-white bg-primary': userSetting.selectedTag == item,
               }"
               @click="tagClick(item)"
             >
@@ -290,20 +290,20 @@ function enrollClick(activity_id) {
                   }"
                 >
                   {{ testVal }}
-                  <ButtonModal
-                    :detail-data="buttonModalData"
+                  <ModalDialog
+                    :detail-data="modalDialogData"
                     @like-click="likeClick"
                   >
                     <button
-                      class="btn w-[150px] bg-gray-500"
+                      class="w-[150px] bg-gray-500"
                       @click="detailClick(item)"
                     >
                       詳細資訊
                     </button>
-                  </ButtonModal>
+                  </ModalDialog>
 
                   <button
-                    class="bg-primary btn w-[150px]"
+                    class="w-[150px] bg-primary"
                     @click="enrollClick(item.id)"
                   >
                     報名活動

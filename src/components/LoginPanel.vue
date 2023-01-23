@@ -6,7 +6,7 @@ import { googleTokenLogin } from "vue3-google-login";
 import AuthService from "@/services/auth.service.js";
 import router from "@/router";
 import CustomInput from "./CustomInput.vue";
-import Alert from "./AlertMessage.vue";
+import LoginPanelAlertMessage from "./LoginPanelAlertMessage.vue";
 
 // props
 let props = defineProps({
@@ -55,31 +55,28 @@ function clickSSO(type) {
     <!-- 內框-->
     <div class="flex flex-col gap-2 lg:gap-4 xl:gap-6 2xl:gap-10">
       <!-- 標題: 居中, 粗體, h1 -->
-      <h1 class="text-shadow text-center">{{ title }}</h1>
+      <h1 class="text-center text-shadow">{{ title }}</h1>
       <!-- 第三方登入: flex排列 -->
       <div class="flex justify-center gap-5 self-center">
         <!-- 登入按鈕: 圓角, flex淡灰色背景 (hover效果) -->
-        <button class="btn h-10 w-10 bg-[#FAFAFA] p-2">
+        <button class="h-10 w-10 bg-[#FAFAFA] p-2">
           <img src="@/assets/image/Facebook.svg" />
         </button>
-        <button
-          class="btn h-10 w-10 bg-[#FAFAFA] p-2"
-          @click="clickSSO('google')"
-        >
+        <button class="h-10 w-10 bg-[#FAFAFA] p-2" @click="clickSSO('google')">
           <img src="@/assets/image/Google.svg" />
         </button>
-        <button class="btn h-10 w-10 bg-[#FAFAFA] p-2">
+        <button class="h-10 w-10 bg-[#FAFAFA] p-2">
           <img src="@/assets/image/Linkedin.svg" />
         </button>
       </div>
-      <!-- <button @click="alertData.show = !alertData.show" class="btn bg-primary">
+      <!-- <button @click="alertData.show = !alertData.show" class=" bg-primary">
         切換提示訊息
       </button> -->
       <!-- 提示訊息 -->
-      <Alert
+      <LoginPanelAlertMessage
         :alert-data="alertData"
         @close-alert="alertData.show = false"
-      ></Alert>
+      ></LoginPanelAlertMessage>
 
       <!-- 信箱&密碼 -->
       <div>
@@ -107,7 +104,7 @@ function clickSSO(type) {
       <slot name="helpbar"></slot>
       <!-- 登入按鈕 -->
       <button
-        class="btn h-12 font-bold"
+        class="h-12 font-bold"
         :class="{
           'bg-primary': title === 'Login',
           'bg-[#6836DD]': title === 'Signup',

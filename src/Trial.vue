@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
-import AutofadeMessage from "@/components/AutofadeMessage.vue";
+import AlertMessage from "@/components/AlertMessage.vue";
 
 let testref = ref("test");
 let messageData = reactive({
@@ -24,7 +24,7 @@ function closeMessage() {
     <button @click="showMessage('success')">success</button>
     <button @click="showMessage('warning')">warning</button>
     <button @click="showMessage('error')">error</button>
-    <AutofadeMessage :messageData="messageData" @click="closeMessage">
-    </AutofadeMessage>
+    <AlertMessage :messageData="messageData" @click="closeMessage">
+    </AlertMessage>
   </div>
 </template>

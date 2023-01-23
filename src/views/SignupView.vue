@@ -14,15 +14,12 @@ defineEmits(["navigate"]);
       </div>
       <div class="flex items-center gap-2">
         <button
-          class="border-primary text-primary btn h-10"
+          class="h-10 text-primary border-primary"
           @click="$emit('navigate', 'login')"
         >
           Login
         </button>
-        <button
-          class="bg-primary btn h-10"
-          @click="$emit('navigate', 'signup')"
-        >
+        <button class="h-10 bg-primary" @click="$emit('navigate', 'signup')">
           Signup
         </button>
       </div>

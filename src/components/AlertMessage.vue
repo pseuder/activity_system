@@ -1,41 +1,49 @@
 <script setup>
-import { InfoCircleOutlined, CloseOutlined } from "@ant-design/icons-vue";
+import { InfoCircleOutlined } from "@ant-design/icons-vue";
 
 defineProps({
-  alertData: {
+  messageData: {
     type: Object,
-    required: false,
     default() {
       return {
-        show: true,
-        state: "warning",
-        message: "預設!",
+        show: false,
+        state: "success",
+        message: "",
       };
     },
   },
 });
 
-defineEmits(["closeAlert"]);
+defineEmits(["closeMessage"]);
 </script>
 
 <template>
   <div
-    v-show="alertData.show"
-    class="alert flex items-center"
+    v-show="messageData.show"
+    class="autofade-message absolute top-10 left-1/2 z-[1] flex w-[90%] max-w-lg -translate-x-1/2"
     :class="{
-      'bg-warning': alertData.state === 'warning',
-      'bg-error': alertData.state === 'error',
+      ' text-white': messageData.state === 'success',
+      'bg-warning': messageData.state === 'warning',
+      'bg-error': messageData.state === 'error',
     }"
   >
-    <div class="flex items-center justify-center text-xl">
-      <info-circle-outlined />
-    </div>
-    <div class="flex-grow overflow-ellipsis text-center">
-      {{ alertData.message }}
+    <div class="flex flex-grow">
+      <div class="flex flex-grow items-center">
+        <info-circle-outlined class="my-auto mx-2" />
+        <div>{{ messageData.message }}</div>
+      </div>
+      <div class="w-fit">
+        <button
+          v-show="messageData.state === 'success'"
+          class="text-black bg-warning"
+        >
+          加入行事曆
+        </button>
+      </div>
     </div>
 
-    <div class="flex items-center justify-center">
-      <close-outlined @click="$emit('closeAlert')" />
-    </div>
+    <button class="ml-4 w-fit text-black" @click="$emit('closeMessage')">
+      x
+    </button>
   </div>
 </template>
