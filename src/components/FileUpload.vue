@@ -65,7 +65,8 @@ export default defineComponent({
       previewTitle.value =
         file.name || file.url.substring(file.url.lastIndexOf("/") + 1);
     };
-    const handleChange = (argc) => {
+    const handleChange = async (argc) => {
+      argc.file.preview = (await getBase64(argc.file.originFileObj)) as string;
       emit("update:value", argc.fileList);
     };
 

@@ -36,7 +36,12 @@ function submitClick() {
   let submitData = {};
   for (let key in createFormData) {
     submitData[key] = JSON.parse(JSON.stringify(createFormData[key]));
+    if (key === "activity_imgs") {
+      for (let i in submitData["activity_imgs"])
+        submitData["activity_imgs"][i] = submitData["activity_imgs"][i].preview;
+    }
   }
+
   ActivityService.create(submitData)
     .then((res) => {
       console.log(res);
@@ -45,10 +50,10 @@ function submitClick() {
       messageData.message = res.data;
     })
     .catch((err) => {
-      console.log(err.message);
+      console.log(err);
       messageData.show = true;
       messageData.state = "error";
-      messageData.message = err.message;
+      messageData.message = err.response.data;
     });
 }
 
