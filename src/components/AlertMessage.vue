@@ -20,11 +20,11 @@ defineEmits(["closeMessage"]);
 <template>
   <div
     v-show="messageData.show"
-    class="autofade-message absolute top-10 left-1/2 z-[1] flex w-[90%] max-w-lg -translate-x-1/2"
+    class="alert-message flex"
     :class="{
-      ' text-white': messageData.state === 'success',
-      'bg-warning': messageData.state === 'warning',
-      'bg-error': messageData.state === 'error',
+      ' text-white ': messageData.state === 'success',
+      'text-black bg-warning': messageData.state === 'warning',
+      'text-white bg-error': messageData.state === 'error',
     }"
   >
     <div class="flex flex-grow">
@@ -42,8 +42,16 @@ defineEmits(["closeMessage"]);
       </div>
     </div>
 
-    <button class="ml-4 w-fit text-black" @click="$emit('closeMessage')">
+    <div
+      class="ml-4 w-fit cursor-pointer py-2 px-4"
+      :class="{
+        ' text-white ': messageData.state === 'success',
+        'text-black ': messageData.state === 'warning',
+        'text-white bg-error': messageData.state === 'error',
+      }"
+      @click="$emit('closeMessage')"
+    >
       x
-    </button>
+    </div>
   </div>
 </template>

@@ -42,9 +42,9 @@ module.exports = {
             "linear-gradient( 0deg, rgba(255, 255, 255, 0.8),rgba(255, 255, 255, 0.8)),#ffc107;",
         },
         ".bg-error": {
-          background:
-            "linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), #dc3545;",
+          background: "#F56C6C",
         },
+
         ".bg-gray": { "@apply  bg-gray-500": {} },
         ".bg-lightgray": { "@apply  bg-gray-300": {} },
         ".bg-todark": { "@apply filter brightness-90": {} },
@@ -54,6 +54,21 @@ module.exports = {
       });
 
       addComponents({
+        ".alert-primary": {
+          color: "#004085",
+          "background-color": "#cce5ff",
+          "border-color": "#b8daff",
+        },
+        ".alert-warning": {
+          color: "#856404",
+          "background-color": "#fff3cd",
+          "border-color": "#ffeeba",
+        },
+        ".alert-error": {
+          color: "#721c24",
+          "background-color": "#f8d7da",
+          "border-color": "#f5c6cb",
+        },
         ".main-bg": {
           "@apply overflow-auto bg-explore-bg-large bg-cover bg-fixed bg-center bg-no-repeat":
             {},
@@ -68,8 +83,9 @@ module.exports = {
               "0px 4px 8px rgba(0, 0, 0, 0.08), 0px 1px 2px rgba(0, 0, 0, 0.18);",
           },
         },
-        ".autofade-message": {
-          "@apply rounded-md p-2 text-black bg-primary": {},
+        ".alert-message": {
+          "@apply rounded-md p-2 text-black  absolute top-10 w-[90%] left-1/2 z-[1]   max-w-lg -translate-x-1/2":
+            {},
         },
         ".dropdown-menu": {
           "@apply absolute z-50 float-left m-0 mt-1 hidden min-w-max list-none rounded-lg border-none bg-white bg-clip-padding py-2 text-left text-base shadow-lg":

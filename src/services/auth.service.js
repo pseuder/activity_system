@@ -19,7 +19,6 @@ class AuthService {
           resolve(true);
         })
         .catch((err) => {
-          console.log(err);
           if (err.code === "ERR_BAD_REQUEST") {
             alertData.message = err.response.data;
             alertData.state = "warning";

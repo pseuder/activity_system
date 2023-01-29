@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onBeforeMount, ref } from "vue";
+import { reactive, onBeforeMount, ref, onMounted } from "vue";
 import "tw-elements";
 
 import ActivityService from "@/services/activity.service.js";
@@ -15,11 +15,13 @@ let messageData = reactive({
   message: "成功!",
 });
 
+const antUpload = ref(null);
+
 /* functions */
 function initCreateFormData() {
   createFormData = reactive({
     title: "",
-    object: ["所有人"],
+    object: [],
     location: "",
     activity_time: [],
     enroll_time: [],
@@ -32,28 +34,45 @@ function initCreateFormData() {
   });
 }
 
+function resetClick(handleReset) {
+  antUpload.value.resetFileList();
+  handleReset();
+}
+
 function submitClick() {
   let submitData = {};
   for (let key in createFormData) {
-    submitData[key] = JSON.parse(JSON.stringify(createFormData[key]));
-    if (key === "activity_imgs") {
-      for (let i in submitData["activity_imgs"])
-        submitData["activity_imgs"][i] = submitData["activity_imgs"][i].preview;
+    if (createFormData[key] != undefined || createFormData[key] != null) {
+      if (key === "activity_imgs") {
+        submitData["activity_imgs"] = [];
+        let activity_imgs_arr = JSON.parse(JSON.stringify(createFormData[key]));
+        for (let i of activity_imgs_arr) {
+          submitData["activity_imgs"].push(i.preview);
+        }
+      } else {
+        submitData[key] = JSON.parse(JSON.stringify(createFormData[key]));
+      }
     }
   }
 
   ActivityService.create(submitData)
     .then((res) => {
-      console.log(res);
       messageData.show = true;
       messageData.state = "success";
       messageData.message = res.data;
     })
     .catch((err) => {
-      console.log(err);
+      if (err.code === "ERR_BAD_REQUEST") {
+        messageData.message = err.response.data;
+        messageData.state = "warning";
+      } else if (err.code === "ERR_NETWORK") {
+        messageData.message = "伺服器錯誤";
+        messageData.state = "error";
+      } else {
+        messageData.message = "非預期的錯誤";
+        messageData.state = "error";
+      }
       messageData.show = true;
-      messageData.state = "error";
-      messageData.message = err.response.data;
     });
 }
 
@@ -61,6 +80,8 @@ function submitClick() {
 onBeforeMount(() => {
   initCreateFormData();
 });
+
+onMounted(() => {});
 </script>
 
 <template>
@@ -128,37 +149,61 @@ onBeforeMount(() => {
       </div>
     </header>
     <main>
-      <div
+      <VeeForm
         class="flex w-full flex-wrap justify-between gap-4 overflow-y-auto bg-white bg-opacity-50 text-2xl"
+        v-slot="{ errors, handleSubmit, handleReset }"
       >
         <div class="flex w-full gap-4 p-4 lg:w-2/5">
-          <label class="w-28 flex-shrink-0">活動標題</label>
-          <a-input
-            v-model:value="createFormData.title"
-            class="w-full lg:max-w-md"
+          <label class="w-28 flex-shrink-0" for="">活動標題</label>
+          <VeeField
+            id="title"
+            v-model="createFormData.title"
+            name="title"
+            type="text"
+            rules="required"
             placeholder="活動標題"
+            class="ant-input form-control w-full lg:max-w-md"
+            :class="{
+              'is-invalid': errors['title'],
+            }"
           />
         </div>
         <div class="flex w-full gap-4 p-4 lg:w-2/5">
           <label class="w-28 flex-shrink-0">活動地點</label>
-          <a-input
-            v-model:value="createFormData.location"
+          <VeeField
+            id="location"
+            v-model="createFormData.location"
+            name="location"
             type="text"
-            class="w-full lg:max-w-md"
+            rules="required"
             placeholder="活動地點"
+            class="ant-input form-control w-full lg:max-w-md"
+            :class="{
+              'is-invalid': errors['location'],
+            }"
           />
         </div>
         <div class="flex w-full gap-4 p-4 lg:w-2/5">
           <label class="w-28 flex-shrink-0">對象(多選)</label>
-          <a-select
-            v-model:value="createFormData.object"
-            mode="multiple"
-            class="w-full lg:max-w-md"
-            placeholder="選擇對象"
+          <VeeField
+            v-slot="{ field }"
+            v-model="createFormData.object"
+            name="object"
+            rules="required"
           >
-            <a-select-option value="china">China</a-select-option>
-            <a-select-option value="usa">U.S.A</a-select-option>
-          </a-select>
+            <a-select
+              v-bind="field"
+              class="w-full lg:max-w-md"
+              :class="{
+                ' border border-red-600 ': errors['object'],
+              }"
+              mode="multiple"
+            >
+              <a-select-option value="">none</a-select-option>
+              <a-select-option value="china">China</a-select-option>
+              <a-select-option value="usa">U.S.A</a-select-option>
+            </a-select>
+          </VeeField>
         </div>
 
         <div class="flex w-full gap-4 p-4 lg:w-[24%]">
@@ -181,71 +226,124 @@ onBeforeMount(() => {
         </div>
         <div class="flex w-full gap-4 p-4 lg:w-2/5">
           <label class="w-28 flex-shrink-0">負責人</label>
-          <a-input
-            v-model:value="createFormData.manager"
+          <VeeField
+            id="manager"
+            v-model="createFormData.manager"
+            name="manager"
             type="text"
-            class="w-full lg:max-w-md"
+            rules="required"
             placeholder="負責人"
+            class="ant-input form-control w-full lg:max-w-md"
+            :class="{
+              'is-invalid': errors['manager'],
+            }"
           />
         </div>
         <div class="flex w-full gap-4 p-4 lg:w-2/5">
           <label class="w-28 flex-shrink-0">聯絡方式</label>
-          <a-input
-            v-model:value="createFormData.manager_contact"
+          <VeeField
+            id="manager_contact"
+            v-model="createFormData.manager_contact"
+            name="manager_contact"
             type="text"
-            class="w-full lg:max-w-md"
-            placeholder="負責人聯絡方式"
+            rules="required"
+            placeholder="聯絡方式"
+            class="ant-input form-control w-full lg:max-w-md"
+            :class="{
+              'is-invalid': errors['manager_contact'],
+            }"
           />
         </div>
-        <div class="flex w-full gap-4 p-4">
+        <div class="flex w-full gap-4 p-4 lg:w-2/5">
           <label class="w-28 flex-shrink-0">活動時間</label>
-          <a-range-picker
-            v-model:value="createFormData.activity_time"
-            class="w-full lg:max-w-md"
-            value-format="YYYY-MM-DD"
-            :placeholder="['開始時間', '結束時間']"
-          />
+          <VeeField
+            v-slot="{ field }"
+            v-model="createFormData.activity_time"
+            name="activity_time"
+            rules="required"
+          >
+            <a-range-picker
+              value-format="YYYY-MM-DD"
+              :placeholder="['開始時間', '結束時間']"
+              v-bind="field"
+              class="w-full lg:max-w-md"
+              :class="{
+                ' border border-red-600 ': errors['activity_time'],
+              }"
+            />
+          </VeeField>
         </div>
 
-        <div class="flex h-16 w-full gap-4 p-4">
+        <div class="flex h-16 w-full gap-4 p-4 lg:w-2/5">
           <label class="w-28 flex-shrink-0">報名時間</label>
-          <a-range-picker
-            v-model:value="createFormData.enroll_time"
-            class="w-full lg:max-w-md"
-            value-format="YYYY-MM-DD"
-            :placeholder="['開始時間', '結束時間']"
-          />
+          <VeeField
+            v-slot="{ field }"
+            v-model="createFormData.enroll_time"
+            name="enroll_time"
+            rules="required"
+          >
+            <a-range-picker
+              value-format="YYYY-MM-DD"
+              :placeholder="['開始時間', '結束時間']"
+              v-bind="field"
+              class="w-full lg:max-w-md"
+              :class="{
+                ' border border-red-600 ': errors['enroll_time'],
+              }"
+            />
+          </VeeField>
         </div>
         <div class="flex w-full gap-4 p-4">
-          <label class="w-28 flex-shrink-0">上傳照片<br />(限8張)</label>
-          <FileUpload v-model:value="createFormData.activity_imgs" />
+          <label class="w-28 flex-shrink-0">活動照片<br />(限8張)</label>
+          <FileUpload
+            v-model:value="createFormData.activity_imgs"
+            ref="antUpload"
+          />
         </div>
         <div class="flex w-full gap-4 p-4">
           <label class="w-28 flex-shrink-0">活動介紹</label>
-          <a-textarea
-            v-model:value="createFormData.description"
-            placeholder="活動介紹"
-            :auto-size="{ minRows: 3, maxRows: 5 }"
+          <VeeField
+            id="description"
+            v-slot="{ field }"
+            v-model="createFormData.description"
+            name="description"
+            rules="required"
             class="w-full lg:max-w-md"
-          />
+            type="textarea"
+          >
+            <textarea
+              v-bind="field"
+              name="description"
+              class="ant-input form-control"
+              :class="{
+                'is-invalid': errors['description'],
+              }"
+              rows="5"
+            />
+          </VeeField>
         </div>
-      </div>
+        <div class="flex w-full justify-end gap-4">
+          <button
+            class="w-24 rounded-md text-base font-normal text-gray bg-lightgray"
+          >
+            取消
+          </button>
+          <button
+            type="reset"
+            class="alert-warning w-24 rounded-md text-base font-normal"
+            @click.prevent="resetClick(handleReset)"
+          >
+            清空
+          </button>
+          <button
+            class="w-24 rounded-md text-base font-normal text-white bg-primary"
+            @click="handleSubmit($event, submitClick)"
+          >
+            建立
+          </button>
+        </div>
+      </VeeForm>
     </main>
-    <footer class="flex justify-end gap-4">
-      <button class="w-28 font-normal text-gray bg-lightgray">取消</button>
-      <button
-        class="w-28 font-normal text-black bg-warning"
-        @click="initCreateFormData"
-      >
-        清空
-      </button>
-      <button
-        class="w-28 font-normal text-white bg-primary"
-        @click="submitClick"
-      >
-        建立
-      </button>
-    </footer>
   </div>
 </template>
 

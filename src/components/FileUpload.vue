@@ -70,6 +70,10 @@ export default defineComponent({
       emit("update:value", argc.fileList);
     };
 
+    const resetFileList = () => {
+      fileList.value.length = 0;
+    };
+
     return {
       previewVisible,
       previewImage,
@@ -77,6 +81,7 @@ export default defineComponent({
       handleCancel,
       handlePreview,
       handleChange,
+      resetFileList,
       previewTitle,
       Store,
       urlJoin,

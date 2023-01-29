@@ -24,7 +24,7 @@ defineEmits(["closeAlert"]);
     class="alert flex items-center"
     :class="{
       'bg-warning': alertData.state === 'warning',
-      'bg-error': alertData.state === 'error',
+      'text-white bg-error': alertData.state === 'error',
     }"
   >
     <div class="flex items-center justify-center text-xl">
