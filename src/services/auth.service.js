@@ -5,16 +5,19 @@ import Store from "../store";
 class AuthService {
   localAuth(title, formData, alertData) {
     return new Promise(function (resolve) {
-      const apiPath = title == "Login" ? "login" : "signup";
       axios
-        .post(urlJoin(Store.state.domainAddress, "api/auth/", apiPath), {
-          formData,
-        })
+        .post(
+          urlJoin(Store.state.domainAddress, "api/auth/", title.toLowerCase()),
+          {
+            formData,
+          }
+        )
         .then((res) => {
-          if (res.data.token) {
-            localStorage.setItem("userInfo", JSON.stringify(res.data));
-            alertData.show = true;
-            alertData.message = "登入成功";
+          if (res.data) {
+            localStorage.setItem("authorization", JSON.stringify(res.data));
+            // 成功後即跳轉, 不需提示
+            // alertData.show = true;
+            // alertData.message = "登入成功";
           }
           resolve(true);
         })
@@ -42,7 +45,7 @@ class AuthService {
       })
       .then((res) => {
         if (res.data.token) {
-          localStorage.setItem("user", JSON.stringify(res.data));
+          localStorage.setItem("authorization", JSON.stringify(res.data));
           return true;
         }
       })

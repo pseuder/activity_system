@@ -54,6 +54,16 @@ module.exports = {
       });
 
       addComponents({
+        ".alert": {
+          "@apply rounded-md py-2 px-4 hover:bg-tobright": {
+            "box-shadow":
+              "0px 4px 8px rgba(0, 0, 0, 0.08), 0px 1px 2px rgba(0, 0, 0, 0.18);",
+          },
+        },
+        ".alert-message": {
+          "@apply rounded-md p-2 text-black  absolute top-10 w-[90%] left-1/2 z-[1]   max-w-lg -translate-x-1/2":
+            {},
+        },
         ".alert-primary": {
           color: "#004085",
           "background-color": "#cce5ff",
@@ -75,16 +85,6 @@ module.exports = {
         },
         ".tag": {
           "@apply cursor-pointer  justify-center rounded-xl bg-gray-300 px-2 py-1 text-gray-500 hover:bg-todark":
-            {},
-        },
-        ".alert": {
-          "@apply rounded-md py-2 px-4 text-black  hover:bg-tobright": {
-            "box-shadow":
-              "0px 4px 8px rgba(0, 0, 0, 0.08), 0px 1px 2px rgba(0, 0, 0, 0.18);",
-          },
-        },
-        ".alert-message": {
-          "@apply rounded-md p-2 text-black  absolute top-10 w-[90%] left-1/2 z-[1]   max-w-lg -translate-x-1/2":
             {},
         },
         ".dropdown-menu": {

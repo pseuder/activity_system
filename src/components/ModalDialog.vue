@@ -14,9 +14,7 @@ defineProps({
 
 defineEmits(["likeClick"]);
 
-onMounted(() => {
-  console.log("onmounted!");
-});
+onMounted(() => {});
 </script>
 
 <template>
@@ -69,7 +67,7 @@ onMounted(() => {
               <div class="flex w-full lg:w-2/5">
                 <div class="w-20">名額</div>
                 <div class="text-gray">
-                  {{ detailData.enrollment }}
+                  {{ detailData.enrollment_num }}/{{ detailData.quota }}
                 </div>
               </div>
               <div class="flex w-full lg:w-2/5">
@@ -90,19 +88,16 @@ onMounted(() => {
               </div>
               <div class="flex w-full lg:w-2/5">
                 <div class="w-20">負責人</div>
-                <div class="text-gray">{{ detailData.object }}</div>
+                <div class="text-gray">{{ detailData.manager }}</div>
               </div>
               <div class="flex w-full lg:w-2/5">
                 <div class="w-20">聯絡方式</div>
-                <div class="text-gray">{{ detailData.object }}</div>
+                <div class="text-gray">{{ detailData.manager_contact }}</div>
               </div>
               <div class="flex w-full">
                 <div class="w-20 flex-shrink-0">介紹</div>
                 <div class="text-gray">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Tenetur animi in, sed porro soluta error accusantium iure?
-                  Quos accusamus, non, quas doloremque dolore magni iusto,
-                  repellat ab error praesentium ex?
+                  {{ detailData.description }}
                 </div>
               </div>
               <div class="flex w-full justify-center">

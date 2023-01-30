@@ -1,36 +1,63 @@
 import axios from "axios";
 import urlJoin from "url-join";
 import Store from "../store";
+
+function getJWTtoken() {
+  return localStorage.getItem("authorization")
+    ? JSON.parse(localStorage.getItem("authorization")).token
+    : null;
+}
 class ActivityService {
+  explore() {
+    return axios.get(
+      urlJoin(Store.state.domainAddress, "/api/activity/explore"),
+      {
+        headers: {
+          Authorization: getJWTtoken(),
+        },
+      }
+    );
+  }
+
   enroll(activity_id) {
-    let token = "",
-      user_id = "";
-    if (localStorage.getItem("user")) {
-      token = JSON.parse(localStorage.getItem("userInfo")).token;
-      user_id = JSON.parse(localStorage.getItem("userInfo")).user;
-    }
+    let user_id = "";
+    if (localStorage.getItem("authorization"))
+      user_id = JSON.parse(localStorage.getItem("authorization")).user._id;
+
     return axios.post(
-      urlJoin(Store.state.domainAddress, "/enroll/", activity_id.toString()),
+      urlJoin(
+        Store.state.domainAddress,
+        "/api/activity/enroll/",
+        activity_id.toString()
+      ),
       { user_id },
       {
         headers: {
-          Authorization: token,
+          Authorization: getJWTtoken(),
         },
       }
     );
   }
 
   create(formData) {
-    let token = "";
-    if (localStorage.getItem("user")) {
-      token = JSON.parse(localStorage.getItem("userInfo")).token;
-    }
     return axios.post(
       urlJoin(Store.state.domainAddress, "/api/activity/create"),
       { formData },
       {
         headers: {
-          Authorization: token,
+          Authorization: getJWTtoken(),
+        },
+      }
+    );
+  }
+
+  watch(activity_id) {
+    return axios.post(
+      urlJoin(Store.state.domainAddress, "/api/activity/watch/", activity_id),
+      {},
+      {
+        headers: {
+          Authorization: getJWTtoken(),
         },
       }
     );

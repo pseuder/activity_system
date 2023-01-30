@@ -1,6 +1,8 @@
 <script setup>
 import { reactive, onBeforeMount, ref, onMounted } from "vue";
 import "tw-elements";
+import { useRouter } from "vue-router";
+const router = useRouter();
 
 import ActivityService from "@/services/activity.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
@@ -21,7 +23,7 @@ const antUpload = ref(null);
 function initCreateFormData() {
   createFormData = reactive({
     title: "",
-    object: [],
+    object: ["all"],
     location: "",
     activity_time: [],
     enroll_time: [],
@@ -74,6 +76,17 @@ function submitClick() {
       }
       messageData.show = true;
     });
+}
+
+function autoFill() {
+  createFormData.title = "title";
+  createFormData.object = ["all"];
+  createFormData.location = "location";
+  createFormData.activity_time = ["2023/01/29", "2023/01/30"];
+  createFormData.enroll_time = ["2023/01/29", "2023/01/30"];
+  createFormData.manager = "manager";
+  createFormData.manager_contact = "manager_contact";
+  createFormData.description = "description";
 }
 
 // hook
@@ -150,8 +163,8 @@ onMounted(() => {});
     </header>
     <main>
       <VeeForm
-        class="flex w-full flex-wrap justify-between gap-4 overflow-y-auto bg-white bg-opacity-50 text-2xl"
         v-slot="{ errors, handleSubmit, handleReset }"
+        class="flex w-full flex-wrap justify-between gap-4 overflow-y-auto bg-white bg-opacity-50 text-2xl"
       >
         <div class="flex w-full gap-4 p-4 lg:w-2/5">
           <label class="w-28 flex-shrink-0" for="">活動標題</label>
@@ -199,7 +212,7 @@ onMounted(() => {});
               }"
               mode="multiple"
             >
-              <a-select-option value="">none</a-select-option>
+              <a-select-option value="all">所有人</a-select-option>
               <a-select-option value="china">China</a-select-option>
               <a-select-option value="usa">U.S.A</a-select-option>
             </a-select>
@@ -296,8 +309,8 @@ onMounted(() => {});
         <div class="flex w-full gap-4 p-4">
           <label class="w-28 flex-shrink-0">活動照片<br />(限8張)</label>
           <FileUpload
-            v-model:value="createFormData.activity_imgs"
             ref="antUpload"
+            v-model:value="createFormData.activity_imgs"
           />
         </div>
         <div class="flex w-full gap-4 p-4">
@@ -324,19 +337,26 @@ onMounted(() => {});
         </div>
         <div class="flex w-full justify-end gap-4">
           <button
-            class="w-24 rounded-md text-base font-normal text-gray bg-lightgray"
+            class="w-24 rounded-md bg-red-300 text-base font-semibold text-gray"
+            @click.prevent="autoFill"
+          >
+            autoFill
+          </button>
+          <button
+            class="w-24 rounded-md text-base font-semibold text-gray bg-lightgray"
+            @click.prevent="router.push('explore')"
           >
             取消
           </button>
           <button
             type="reset"
-            class="alert-warning w-24 rounded-md text-base font-normal"
+            class="alert-warning w-24 rounded-md text-base font-semibold"
             @click.prevent="resetClick(handleReset)"
           >
             清空
           </button>
           <button
-            class="w-24 rounded-md text-base font-normal text-white bg-primary"
+            class="w-24 rounded-md text-base font-semibold text-white bg-primary"
             @click="handleSubmit($event, submitClick)"
           >
             建立
@@ -347,8 +367,4 @@ onMounted(() => {});
   </div>
 </template>
 
-<style scoped>
-.ant-btn-primary {
-  background: #1890ff;
-}
-</style>
+<style scoped></style>

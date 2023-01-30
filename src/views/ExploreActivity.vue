@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, onBeforeMount } from "vue";
 import "tw-elements";
 import {
   HeartOutlined,
@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons-vue";
 
 import ActivityService from "@/services/activity.service.js";
+import UserService from "@/services/user.service.js";
 import ModalDialog from "@/components/ModalDialog.vue";
 import AlertMessage from "@/components/AlertMessage.vue";
 
@@ -16,22 +17,9 @@ import AlertMessage from "@/components/AlertMessage.vue";
 let sortOptions = ["活動時間", "報名時間", "報名價格", "查看人數", "參加人數"];
 let filterOptions = ["全部", "A Group", "B Group", "C Group", "D Group"];
 let activityData = reactive([]);
-let modalDialogData = ref({});
+let userData = reactive(null);
 
-for (let i = 0; i < 5; i++) {
-  activityData.push({
-    id: i,
-    title: "活動標題" + i,
-    object: "所有人",
-    location: "Building 1",
-    activity_time: "2022/11/12",
-    enroll_time: ["2022/11/01", "2022/11/10"],
-    like: true,
-    fee: 100,
-    watch: 50,
-    enrollment: "20", // 數字or滿
-  });
-}
+let modalDialogData = ref({});
 
 let userSetting = reactive({
   displayMode: "list",
@@ -56,36 +44,106 @@ function displayClick() {
 function tagClick(item) {
   userSetting.selectedTag = item;
 }
-function likeClick(item) {
-  item.like = !item.like;
+function likeClick(activity) {
+  UserService.likeActivity(activity._id);
+  activity.like = !activity.like;
 }
-function detailClick(item) {
-  modalDialogData.value = item;
+function detailClick(activity) {
+  ActivityService.watch(activity._id);
+  activity.watch += 1;
+  modalDialogData.value = activity;
 }
-function enrollClick(activity_id) {
-  console.log(activity_id);
-  ActivityService.enroll(activity_id)
+function enrollClick(activity) {
+  ActivityService.enroll(activity._id)
     .then((res) => {
-      console.log(res);
-      messageData.message = "ok!";
+      messageData.message = res.data;
       messageData.state = "success";
       messageData.show = true;
+      activity.enrollment_num += 1;
     })
     .catch((err) => {
-      console.log(err);
       if (err.code === "ERR_BAD_REQUEST") {
-        messageData.message = err.message;
+        // 伺服器回饋的錯誤(預期錯誤)
+        messageData.message = err.response.data;
         messageData.state = "warning";
       } else if (err.code === "ERR_NETWORK") {
-        messageData.message = "伺服器錯誤";
+        // 連不上伺服器(網路錯誤)
+        messageData.message = "無法連接至伺服器";
         messageData.state = "error";
       } else {
+        // 任何非預期錯誤
         messageData.message = "非預期的錯誤";
         messageData.state = "error";
       }
       messageData.show = true;
     });
 }
+
+// hook
+onBeforeMount(() => {
+  try {
+    UserService.getUserInfo()
+      .then((res) => {
+        userData = res.data[0];
+
+        ActivityService.explore()
+          .then((res) => {
+            res.data.map((item) => {
+              item.object = item.object.join("  ");
+
+              //utc時間轉換
+              item.activity_time[0] = new Date(
+                item.activity_time[0]
+              ).toLocaleDateString();
+              item.activity_time[1] = new Date(
+                item.activity_time[1]
+              ).toLocaleDateString();
+              item.activity_time = item.activity_time.join("~");
+
+              item.enroll_time[0] = new Date(
+                item.enroll_time[0]
+              ).toLocaleDateString();
+              item.enroll_time[1] = new Date(
+                item.enroll_time[1]
+              ).toLocaleDateString();
+              item.enroll_time = item.enroll_time.join("~");
+
+              item.enrollment_num = item.enrollment.length;
+
+              // like尚未處理
+              item["like"] = false;
+              if (userData.likedActivity.includes(item._id))
+                item["like"] = true;
+
+              activityData.push(item);
+            });
+          })
+          .catch((err) => {
+            console.log("ActivityService err");
+            throw new Error(err);
+          });
+      })
+      .catch((err) => {
+        console.log("UserService err");
+        throw new Error(err);
+      });
+  } catch (err) {
+    console.log(err);
+    if (err.code === "ERR_BAD_REQUEST") {
+      if (err.response.status == 401) {
+        messageData.message = "請登入後再試!";
+        messageData.state = "unauthorized";
+      } else messageData.message = err.message;
+    } else if (err.code === "ERR_NETWORK") {
+      messageData.message = "伺服器錯誤";
+      messageData.state = "error";
+    } else {
+      messageData.message = "非預期的錯誤";
+      messageData.state = "error";
+    }
+    messageData.show = true;
+  }
+});
 </script>
 
 <template>
@@ -277,7 +335,7 @@ function enrollClick(activity_id) {
                       <eye-filled />{{ item.watch }}
                     </div>
                     <div class="flex w-10 items-center">
-                      <user-outlined />{{ item.enrollment }}
+                      <user-outlined />{{ item.enrollment_num }}
                     </div>
                   </div>
                 </div>
@@ -304,7 +362,7 @@ function enrollClick(activity_id) {
 
                   <button
                     class="w-[150px] bg-primary"
-                    @click="enrollClick(item.id)"
+                    @click="enrollClick(item)"
                   >
                     報名活動
                   </button>

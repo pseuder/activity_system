@@ -1,6 +1,9 @@
 <script setup>
 import { InfoCircleOutlined } from "@ant-design/icons-vue";
 
+import { useRouter } from "vue-router";
+const router = useRouter();
+
 defineProps({
   messageData: {
     type: Object,
@@ -20,10 +23,11 @@ defineEmits(["closeMessage"]);
 <template>
   <div
     v-show="messageData.show"
-    class="alert-message flex"
+    class="alert alert-message flex font-semibold"
     :class="{
-      ' text-white ': messageData.state === 'success',
-      'text-black bg-warning': messageData.state === 'warning',
+      ' text-white bg-primary ': messageData.state === 'success',
+      'text-black bg-warning':
+        messageData.state === 'warning' || messageData.state === 'unauthorized',
       'text-white bg-error': messageData.state === 'error',
     }"
   >
@@ -38,6 +42,13 @@ defineEmits(["closeMessage"]);
           class="text-black bg-warning"
         >
           加入行事曆
+        </button>
+        <button
+          v-show="messageData.state === 'unauthorized'"
+          class="text-white bg-primary"
+          @click="router.push('/')"
+        >
+          登入
         </button>
       </div>
     </div>
