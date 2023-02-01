@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 
 import ActivityService from "@/services/activity.service.js";
+import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
 import FileUpload from "@/components/FileUpload.vue";
 
@@ -17,24 +18,11 @@ let messageData = reactive({
   message: "成功!",
 });
 
+let groupData = ref([]);
+
 const antUpload = ref(null);
 
 /* functions */
-function initCreateFormData() {
-  createFormData = reactive({
-    title: "",
-    object: ["all"],
-    location: "",
-    activity_time: [],
-    enroll_time: [],
-    fee: 0,
-    manager: "",
-    manager_contact: "",
-    quota: 0,
-    activity_imgs: [],
-    description: "",
-  });
-}
 
 function resetClick(handleReset) {
   antUpload.value.resetFileList();
@@ -64,23 +52,14 @@ function submitClick() {
       messageData.message = res.data;
     })
     .catch((err) => {
-      if (err.code === "ERR_BAD_REQUEST") {
-        messageData.message = err.response.data;
-        messageData.state = "warning";
-      } else if (err.code === "ERR_NETWORK") {
-        messageData.message = "伺服器錯誤";
-        messageData.state = "error";
-      } else {
-        messageData.message = "非預期的錯誤";
-        messageData.state = "error";
-      }
-      messageData.show = true;
+      handleHTTPResponse(err);
     });
 }
 
 function autoFill() {
   createFormData.title = "title";
-  createFormData.object = ["all"];
+  createFormData.object = ["所有人"];
+  createFormData.quota = 1;
   createFormData.location = "location";
   createFormData.activity_time = ["2023/01/29", "2023/01/30"];
   createFormData.enroll_time = ["2023/01/29", "2023/01/30"];
@@ -89,9 +68,50 @@ function autoFill() {
   createFormData.description = "description";
 }
 
+function handleHTTPResponse(res) {
+  if (res.code === "ERR_NETWORK") {
+    // 無法連接至伺服器
+    console.error(res);
+    messageData.message = "無法連接至伺服器";
+    messageData.state = "error";
+  } else {
+    let { message, state, error } = res.response.data;
+    console.error(error);
+    // 伺服器預期的錯誤
+    if (res.response.status == 401) {
+      messageData.message = "請登入後再試!";
+      messageData.state = "unauthorized";
+    } else {
+      messageData.message = message;
+      messageData.state = state;
+    }
+  }
+  messageData.show = true;
+}
+
 // hook
 onBeforeMount(() => {
-  initCreateFormData();
+  GroupService.getAllGroups()
+    .then((res) => {
+      groupData.value = res.data;
+    })
+    .catch((err) => {
+      handleHTTPResponse(err);
+    });
+
+  createFormData = reactive({
+    title: "",
+    object: [],
+    location: "",
+    activity_time: [],
+    enroll_time: [],
+    fee: 0,
+    manager: "",
+    manager_contact: "",
+    quota: 0,
+    activity_imgs: [],
+    description: "",
+  });
 });
 
 onMounted(() => {});
@@ -212,9 +232,12 @@ onMounted(() => {});
               }"
               mode="multiple"
             >
-              <a-select-option value="all">所有人</a-select-option>
-              <a-select-option value="china">China</a-select-option>
-              <a-select-option value="usa">U.S.A</a-select-option>
+              <a-select-option value="所有人">所有人</a-select-option>
+              <template v-for="(item, index) in groupData" :key="item._id">
+                <a-select-option :value="item.name">{{
+                  item.name
+                }}</a-select-option>
+              </template>
             </a-select>
           </VeeField>
         </div>

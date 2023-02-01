@@ -5,7 +5,7 @@ import Store from "../store";
 function getAuthorization() {
   return localStorage.getItem("authorization")
     ? JSON.parse(localStorage.getItem("authorization"))
-    : { user: {} };
+    : { user: { _id: "0" } };
 }
 
 class UserService {
