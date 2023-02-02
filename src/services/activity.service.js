@@ -40,9 +40,13 @@ class ActivityService {
   }
 
   create(formData) {
+    let user_id = "";
+    if (localStorage.getItem("authorization"))
+      user_id = JSON.parse(localStorage.getItem("authorization")).user._id;
+
     return axios.post(
       urlJoin(Store.state.domainAddress, "/api/activity/create"),
-      { formData },
+      { formData, user_id },
       {
         headers: {
           Authorization: getJWTtoken(),

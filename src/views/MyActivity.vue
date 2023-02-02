@@ -11,7 +11,6 @@ import {
 import Store from "@/store";
 import ActivityService from "@/services/activity.service.js";
 import UserService from "@/services/user.service.js";
-import GroupService from "@/services/group.service.js";
 import ModalDialog from "@/components/ModalDialog.vue";
 import AlertMessage from "@/components/AlertMessage.vue";
 
@@ -23,7 +22,14 @@ let sortOptions = reactive([
   { name: "查看人數", status: 2, attribute: "watch" },
   { name: "參加人數", status: 2, attribute: "enrollment_display" },
 ]);
-let groupData = [];
+
+let filterOption = reactive([
+  { name: "已報名", attribute: "registered" },
+  { name: "已截止", attribute: "expired" },
+  { name: "已收藏", attribute: "liked" },
+  { name: "已建立", attribute: "created" },
+  { name: "全部", attribute: "all" },
+]);
 let activityData = reactive([]);
 let activityData_display = reactive([]);
 let userData = reactive({});
@@ -31,7 +37,7 @@ let modalDialogData = ref({});
 
 let userSetting = reactive({
   displayMode: "list",
-  selectedTag: "全部",
+  selectedTag: "已報名",
 });
 
 let messageData = reactive({
@@ -72,19 +78,21 @@ function displayClick() {
 function tagClick(item) {
   userSetting.selectedTag = item.name;
 
-  if (item.name === "全部") {
+  if (item.attribute === "all") {
     activityData_display = JSON.parse(JSON.stringify(activityData));
   } else {
     activityData_display = JSON.parse(
       JSON.stringify(
-        activityData.filter((activity) => activity.object.includes(item.name))
+        activityData.filter((activity) => {
+          return activity[item.attribute];
+        })
       )
     );
   }
 }
 function likeClick(activity) {
   UserService.likeActivity(activity._id);
-  activity.like = !activity.like;
+  activity.liked = !activity.liked;
 }
 function detailClick(activity) {
   ActivityService.watch(activity._id);
@@ -92,7 +100,7 @@ function detailClick(activity) {
   modalDialogData.value = activity;
 }
 function enrollClick(activity) {
-  return ActivityService.enroll(activity._id)
+  ActivityService.enroll(activity._id)
     .then((res) => {
       messageData.message = res.data;
       messageData.state = "success";
@@ -107,60 +115,68 @@ function enrollClick(activity) {
 }
 
 function fetchData() {
-  // Get Group data
-  return GroupService.getAllGroups()
+  // Get User data
+  return UserService.getUserInfo()
     .then((res) => {
-      groupData = res.data;
-      groupData.unshift({
-        _id: "0",
-        authority: [],
-        createTime: "",
-        member: [],
-        name: "全部",
-        updateTime: "",
+      userData = res.data;
+      let user_enrolledActivity = [],
+        user_likedActivity = [];
+      userData.enrolledActivity.forEach((user_enrolled) => {
+        user_enrolledActivity.push(user_enrolled._id);
       });
-      // Get User data
-      return UserService.getUserInfo().then((res) => {
-        userData = res.data;
-        // Get Activity data
-        return ActivityService.explore().then((res) => {
-          res.data.map((item) => {
-            let enrolled = false,
-              liked = false;
-            userData.enrolledActivity.forEach((element) => {
-              if (element._id === item._id) enrolled = true;
-            });
-            userData.likedActivity.forEach((element) => {
-              if (element._id === item._id) liked = true;
-            });
 
-            item.object_display = item.object.join("  ");
+      userData.likedActivity.forEach((user_liked) => {
+        user_likedActivity.push(user_liked._id);
+      });
+
+      // Get Activity data
+      return ActivityService.explore().then((res) => {
+        res.data.filter((activity) => {
+          let registered = false,
+            expired = false,
+            liked = false,
+            created = false;
+
+          if (user_enrolledActivity.includes(activity._id)) {
+            if (new Date(activity.activity_time[1]) >= new Date())
+              registered = true;
+            else expired = true;
+          }
+
+          liked = user_likedActivity.includes(activity._id);
+
+          created = activity.creator._id === userData._id;
+
+          if (registered || expired || liked || created) {
+            activity.object_display = activity.object.join("  ");
 
             //utc時間轉換
-            item.activity_time[0] = new Date(item.activity_time[0]);
-            item.activity_time[1] = new Date(item.activity_time[1]);
+            activity.activity_time[0] = new Date(activity.activity_time[0]);
+            activity.activity_time[1] = new Date(activity.activity_time[1]);
 
-            item.activity_time_display = [
-              item.activity_time[0].toLocaleDateString(),
-              item.activity_time[1].toLocaleDateString(),
+            activity.activity_time_display = [
+              activity.activity_time[0].toLocaleDateString(),
+              activity.activity_time[1].toLocaleDateString(),
             ].join("~");
 
-            item.enroll_time[0] = new Date(item.enroll_time[0]);
-            item.enroll_time[1] = new Date(item.enroll_time[1]);
+            activity.enroll_time[0] = new Date(activity.enroll_time[0]);
+            activity.enroll_time[1] = new Date(activity.enroll_time[1]);
 
-            item.enroll_time_display = [
-              item.enroll_time[0].toLocaleDateString(),
-              item.enroll_time[1].toLocaleDateString(),
+            activity.enroll_time_display = [
+              activity.enroll_time[0].toLocaleDateString(),
+              activity.enroll_time[1].toLocaleDateString(),
             ].join("~");
 
-            item.enrollment_display = item.enrollment.length;
+            activity.enrollment_display = activity.enrollment.length;
 
-            if (liked) item["like"] = true;
-            else item["like"] = false;
+            activity["registered"] = registered;
+            activity["expired"] = expired;
+            activity["liked"] = liked;
+            activity["created"] = created;
 
-            activityData.push(item);
-            activityData_display.push(item);
-          });
+            activityData.push(activity);
+            activityData_display.push(activity);
+          }
         });
       });
     })
@@ -207,7 +223,7 @@ onBeforeMount(() => {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              探索活動
+              我的活動
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -226,24 +242,22 @@ onBeforeMount(() => {
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               <li>
-                <a class="dropdown-item text-primary" href="/explore"
-                  >探索活動</a
-                >
+                <a class="dropdown-item" href="/explore">探索活動</a>
               </li>
               <li>
                 <a class="dropdown-item" href="/create">建立活動</a>
               </li>
               <li>
-                <a class="dropdown-item" href="/myactivity">我的活動</a>
+                <a class="dropdown-item text-primary" href="#">我的活動</a>
               </li>
             </ul>
           </div>
 
           <div class="hidden lg:flex">
             <div class="flex flex-shrink-0 gap-20 pl-[10vw] font-bold">
-              <a class="" href="/explore">探索活動</a>
+              <a class="text-black" href="/explore">探索活動</a>
               <a class="text-black" href="/create">建立活動</a>
-              <a class="text-black" href="/myactivity">我的活動</a>
+              <a class="">我的活動</a>
             </div>
           </div>
         </nav>
@@ -325,7 +339,7 @@ onBeforeMount(() => {
         <div class="lg:flex">
           <!-- tag過濾 -->
           <div class="flex flex-wrap font-semibold lg:w-1/5 lg:flex-col">
-            <template v-for="(item, index) in groupData" :key="index">
+            <template v-for="(item, index) in filterOption" :key="index">
               <div
                 class="tag mx-2 my-2 inline-flex w-20 lg:w-11/12 lg:max-w-[160px]"
                 :class="{
@@ -358,7 +372,7 @@ onBeforeMount(() => {
                   class="absolute top-2 right-4 cursor-pointer"
                   @click="likeClick(item)"
                 >
-                  <heart-filled v-if="item.like" class="text-red-600" />
+                  <heart-filled v-if="item.liked" class="text-red-600" />
                   <heart-outlined v-else />
                 </div>
                 <div :class="{ 'lg:flex': userSetting.displayMode == 'list' }">

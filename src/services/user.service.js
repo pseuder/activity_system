@@ -26,7 +26,11 @@ class UserService {
 
   likeActivity(activity_id) {
     return axios.post(
-      urlJoin(Store.state.domainAddress, "/api/user/like/", activity_id),
+      urlJoin(
+        Store.state.domainAddress,
+        "/api/user/likeActivity/",
+        activity_id
+      ),
       { user_id: getAuthorization().user._id },
       {
         headers: {

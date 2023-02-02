@@ -3,6 +3,7 @@ import Splash from "@/views/SplashView.vue";
 import Trial from "@/Trial.vue";
 import ExploreActivity from "@/views/ExploreActivity.vue";
 import CreateActivity from "@/views/CreateActivity.vue";
+import MyActivity from "@/views/MyActivity.vue";
 const routes = [
   {
     path: "/",
@@ -15,6 +16,10 @@ const routes = [
   {
     path: "/create",
     component: CreateActivity,
+  },
+  {
+    path: "/myactivity",
+    component: MyActivity,
   },
   {
     path: "/trial",

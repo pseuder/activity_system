@@ -4,6 +4,7 @@ import "tw-elements";
 import { useRouter } from "vue-router";
 const router = useRouter();
 
+import Store from "@/store";
 import ActivityService from "@/services/activity.service.js";
 import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
@@ -52,7 +53,9 @@ function submitClick() {
       messageData.message = res.data;
     })
     .catch((err) => {
-      handleHTTPResponse(err);
+      if (err.name === "AxiosError")
+        Store.commit("handleHTTPResponse", { err, messageData });
+      else console.error(err);
     });
 }
 
@@ -68,27 +71,6 @@ function autoFill() {
   createFormData.description = "description";
 }
 
-function handleHTTPResponse(res) {
-  if (res.code === "ERR_NETWORK") {
-    // 無法連接至伺服器
-    console.error(res);
-    messageData.message = "無法連接至伺服器";
-    messageData.state = "error";
-  } else {
-    let { message, state, error } = res.response.data;
-    console.error(error);
-    // 伺服器預期的錯誤
-    if (res.response.status == 401) {
-      messageData.message = "請登入後再試!";
-      messageData.state = "unauthorized";
-    } else {
-      messageData.message = message;
-      messageData.state = state;
-    }
-  }
-  messageData.show = true;
-}
-
 // hook
 onBeforeMount(() => {
   GroupService.getAllGroups()
@@ -96,7 +78,9 @@ onBeforeMount(() => {
       groupData.value = res.data;
     })
     .catch((err) => {
-      handleHTTPResponse(err);
+      if (err.name === "AxiosError")
+        Store.commit("handleHTTPResponse", { err, messageData });
+      else console.error(err);
     });
 
   createFormData = reactive({
@@ -164,7 +148,7 @@ onMounted(() => {});
               <a class="dropdown-item text-primary" href="/create">建立活動</a>
             </li>
             <li>
-              <a class="dropdown-item" href="#">我的活動</a>
+              <a class="dropdown-item" href="/myactivity">我的活動</a>
             </li>
           </ul>
         </div>
@@ -173,7 +157,7 @@ onMounted(() => {});
           <div class="flex flex-shrink-0 gap-20 font-bold">
             <a class="text-black" href="/explore">探索活動</a>
             <a class="" href="/create">建立活動</a>
-            <a class="text-black">我的活動</a>
+            <a class="text-black" href="/myactivity">我的活動</a>
           </div>
         </div>
       </nav>
