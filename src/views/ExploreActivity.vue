@@ -176,6 +176,7 @@ onBeforeMount(() => {
       loading.value = false;
     })
     .catch((err) => {
+      console.log(err);
       if (err.name === "AxiosError")
         Store.commit("handleHTTPResponse", { err, messageData });
       else console.error(err);

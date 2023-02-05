@@ -2,11 +2,7 @@ import axios from "axios";
 import urlJoin from "url-join";
 import Store from "../store";
 
-function getAuthorization() {
-  return localStorage.getItem("authorization")
-    ? JSON.parse(localStorage.getItem("authorization"))
-    : { user: { _id: "0" } };
-}
+import { getAuthorization } from "./auth.service";
 
 class UserService {
   getUserInfo() {

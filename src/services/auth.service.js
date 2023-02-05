@@ -2,6 +2,16 @@ import axios from "axios";
 import urlJoin from "url-join";
 import Store from "../store";
 
+export function getAuthorization() {
+  if (localStorage.getItem("authorization")) {
+    return JSON.parse(localStorage.getItem("authorization"));
+  } else if (sessionStorage.getItem("authorization")) {
+    return JSON.parse(sessionStorage.getItem("authorization"));
+  } else {
+    return { user: { _id: "0" } };
+  }
+}
+
 class AuthService {
   localAuth(title, formData, alertData) {
     return new Promise(function (resolve) {
@@ -15,9 +25,6 @@ class AuthService {
         .then((res) => {
           if (res.data) {
             localStorage.setItem("authorization", JSON.stringify(res.data));
-            // 成功後即跳轉, 不需提示
-            // alertData.show = true;
-            // alertData.message = "登入成功";
           }
           resolve(true);
         })
@@ -53,6 +60,14 @@ class AuthService {
         console.log(err);
         return false;
       });
+  }
+
+  sessionAuth() {
+    return axios.get(urlJoin(Store.state.domainAddress, "/api/auth_session"), {
+      headers: {
+        Authorization: getAuthorization().token,
+      },
+    });
   }
 }
 

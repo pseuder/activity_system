@@ -15,12 +15,23 @@ import ModalDialog from "@/components/ModalDialog.vue";
 import AlertMessage from "@/components/AlertMessage.vue";
 
 /* data */
+
+const sortStatus = {
+  UP: 0,
+  DOWN: 1,
+  None: 2,
+};
+
 let sortOptions = reactive([
-  { name: "活動時間", status: 2, attribute: "activity_time" },
-  { name: "報名時間", status: 2, attribute: "enroll_time" },
-  { name: "報名價格", status: 2, attribute: "fee" },
-  { name: "查看人數", status: 2, attribute: "watch" },
-  { name: "參加人數", status: 2, attribute: "enrollment_display" },
+  { name: "活動時間", status: sortStatus.None, attribute: "activity_time" },
+  { name: "報名時間", status: sortStatus.None, attribute: "enroll_time" },
+  { name: "報名價格", status: sortStatus.None, attribute: "fee" },
+  { name: "查看人數", status: sortStatus.None, attribute: "watch" },
+  {
+    name: "參加人數",
+    status: sortStatus.None,
+    attribute: "enrollment_display",
+  },
 ]);
 
 let filterOption = reactive([
@@ -30,6 +41,7 @@ let filterOption = reactive([
   { name: "已建立", attribute: "created" },
   { name: "全部", attribute: "all" },
 ]);
+
 let activityData = reactive([]);
 let activityData_display = reactive([]);
 let userData = reactive({});
@@ -51,30 +63,30 @@ let loading = ref(true);
 /* functions */
 
 function sortClick(option) {
+  // 將其他排序選項重置
   sortOptions.map((opt) => {
-    if (opt.name != option.name) opt.status = 2;
+    if (opt.name != option.name) opt.status = sortStatus.None;
   });
 
-  if (option.name === "活動時間" || option.name === "報名時間") {
+  // status於0, 1, 2循環, 用於控制箭頭顯示和判斷遞增遞減
+  if (option.status == sortStatus.DOWN) {
+    activityData_display = JSON.parse(JSON.stringify(activityData));
+  } else if (option.name === "活動時間" || option.name === "報名時間") {
     activityData_display.sort(function (pre, next) {
       return pre[option.attribute][0] > next[option.attribute][0]
         ? (option.status - 1) * 1
         : (option.status - 1) * -1;
     });
-    option.status = (option.status + 1) % 3;
   } else {
     activityData_display.sort(function (pre, next) {
       return pre[option.attribute] > next[option.attribute]
         ? (option.status - 1) * 1
         : (option.status - 1) * -1;
     });
-    option.status = (option.status + 1) % 3;
   }
+  option.status = (option.status + 1) % 3;
 }
-function displayClick() {
-  userSetting.displayMode =
-    userSetting.displayMode === "list" ? "block" : "list";
-}
+
 function tagClick(item) {
   userSetting.selectedTag = item.name;
 
@@ -95,11 +107,10 @@ function likeClick(activity) {
   activity.liked = !activity.liked;
 }
 function detailClick(activity) {
-  ActivityService.watch(activity._id);
-  activity.watch += 1;
   modalDialogData.value = activity;
 }
 function enrollClick(activity) {
+  // 未完成: 報名後馬上加入當前畫面
   ActivityService.enroll(activity._id)
     .then((res) => {
       messageData.message = res.data;
@@ -112,6 +123,31 @@ function enrollClick(activity) {
         Store.commit("handleHTTPResponse", { err, messageData });
       else console.error(err);
     });
+}
+
+function cancelClick(activity) {
+  // 未完成: 取消後馬上將從當前畫面移除
+
+  // let asd = activityData_display.filter((act) => {
+  //   return activity._id != act._id;
+  // });
+
+  // activityData_display = JSON.parse(JSON.stringify([]));
+
+  activityData_display.splice(0, 1);
+
+  // ActivityService.cancel(activity._id)
+  //   .then((res) => {
+  //     messageData.message = res.data;
+  //     messageData.state = "success";
+  //     messageData.show = true;
+  //     activity.enrollment_display -= 1;
+  //   })
+  //   .catch((err) => {
+  //     if (err.name === "AxiosError")
+  //       Store.commit("handleHTTPResponse", { err, messageData });
+  //     else console.error(err);
+  //   });
 }
 
 function fetchData() {
@@ -169,13 +205,16 @@ function fetchData() {
 
             activity.enrollment_display = activity.enrollment.length;
 
+            // 如果自己是創立者, 從已報名, 已截止中排除, 便於分類
+            if (created) registered = expired = false;
+
             activity["registered"] = registered;
             activity["expired"] = expired;
             activity["liked"] = liked;
             activity["created"] = created;
 
             activityData.push(activity);
-            activityData_display.push(activity);
+            activityData_display.push(JSON.parse(JSON.stringify(activity)));
           }
         });
       });
@@ -189,6 +228,14 @@ function fetchData() {
 onBeforeMount(() => {
   fetchData()
     .then(() => {
+      // 將處理好的資料過濾成已報名的條件
+      // activityData_display = JSON.parse(
+      //   JSON.stringify(
+      //     activityData.filter((activity) => {
+      //       return activity.registered;
+      //     })
+      //   )
+      // );
       loading.value = false;
     })
     .catch((err) => {
@@ -289,7 +336,7 @@ onBeforeMount(() => {
                     viewBox="0 0 12 9"
                     xmlns="http://www.w3.org/2000/svg"
                     :class="{
-                      ' fill-blue-500': item.status === 0,
+                      ' fill-blue-500': item.status === sortStatus.UP,
                     }"
                   >
                     <path
@@ -302,7 +349,7 @@ onBeforeMount(() => {
                     viewBox="0 0 12 9"
                     xmlns="http://www.w3.org/2000/svg"
                     :class="{
-                      ' fill-blue-500': item.status === 1,
+                      ' fill-blue-500': item.status === sortStatus.DOWN,
                     }"
                   >
                     <path
@@ -322,7 +369,7 @@ onBeforeMount(() => {
               :class="{
                 'border-2': userSetting.displayMode == 'list',
               }"
-              @click="displayClick"
+              @click="userSetting.displayMode = 'list'"
             />
             <img
               src="@/assets/image/exploreBlock.svg"
@@ -331,7 +378,7 @@ onBeforeMount(() => {
               :class="{
                 'border-2 ': userSetting.displayMode == 'block',
               }"
-              @click="displayClick"
+              @click="userSetting.displayMode = 'block'"
             />
           </div>
         </div>
@@ -359,10 +406,7 @@ onBeforeMount(() => {
               'lg:flex-col': userSetting.displayMode == 'list',
             }"
           >
-            <template
-              v-for="(item, index) in activityData_display"
-              :key="item._id"
-            >
+            <template v-for="item in activityData_display" :key="item">
               <!-- 每個活動 -->
               <div
                 class="relative m-auto min-w-[350px] rounded-lg bg-white p-6 shadow-lg lg:m-0"
@@ -443,7 +487,6 @@ onBeforeMount(() => {
                         userSetting.displayMode == 'list',
                     }"
                   >
-                    {{ testVal }}
                     <ModalDialog
                       :detail-data="modalDialogData"
                       @like-click="likeClick"
@@ -457,7 +500,28 @@ onBeforeMount(() => {
                     </ModalDialog>
 
                     <button
+                      v-if="item.created"
                       class="w-[150px] bg-primary"
+                      @click="enrollClick(item)"
+                    >
+                      修改活動
+                    </button>
+                    <button
+                      v-else-if="item.registered"
+                      class="w-[150px] bg-blue-500"
+                      @click.prevent="cancelClick(item)"
+                    >
+                      取消報名
+                    </button>
+                    <button
+                      v-else-if="item.expired"
+                      class="w-[150px] cursor-not-allowed bg-blue-200"
+                    >
+                      取消報名
+                    </button>
+                    <button
+                      v-else-if="item.liked"
+                      class="w-[150px] bg-blue-500"
                       @click="enrollClick(item)"
                     >
                       報名活動

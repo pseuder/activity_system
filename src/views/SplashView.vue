@@ -1,4 +1,9 @@
 <script setup>
+// import { qq, AuthService } from "@/services/auth.service.js";
+
+import AuthService from "@/services/auth.service.js";
+import router from "@/router";
+
 import LoginView from "@/views/LoginView.vue";
 import SignupView from "@/views/SignupView.vue";
 import { ref, reactive, onMounted } from "vue";
@@ -11,9 +16,17 @@ const pageMap = reactive({
   signup: SignupView,
 });
 
+function checkAuthorization() {
+  AuthService.sessionAuth()
+    .then(() => {
+      router.push("/explore");
+    })
+    .catch(() => {});
+}
+
 // hooks
 onMounted(() => {
-  console.log(`the component is now mounted.`);
+  checkAuthorization();
 });
 
 // functions

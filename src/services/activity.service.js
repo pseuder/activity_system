@@ -1,28 +1,22 @@
 import axios from "axios";
 import urlJoin from "url-join";
 import Store from "../store";
+import { getAuthorization } from "./auth.service";
 
-function getJWTtoken() {
-  return localStorage.getItem("authorization")
-    ? JSON.parse(localStorage.getItem("authorization")).token
-    : null;
-}
 class ActivityService {
   explore() {
     return axios.get(
       urlJoin(Store.state.domainAddress, "/api/activity/explore"),
       {
         headers: {
-          Authorization: getJWTtoken(),
+          Authorization: getAuthorization().token,
         },
       }
     );
   }
 
   enroll(activity_id) {
-    let user_id = "";
-    if (localStorage.getItem("authorization"))
-      user_id = JSON.parse(localStorage.getItem("authorization")).user._id;
+    let user_id = getAuthorization().user._id;
 
     return axios.post(
       urlJoin(
@@ -33,23 +27,39 @@ class ActivityService {
       { user_id },
       {
         headers: {
-          Authorization: getJWTtoken(),
+          Authorization: getAuthorization().token,
+        },
+      }
+    );
+  }
+
+  cancel(activity_id) {
+    let user_id = getAuthorization().user._id;
+
+    return axios.post(
+      urlJoin(
+        Store.state.domainAddress,
+        "/api/activity/cancel/",
+        activity_id.toString()
+      ),
+      { user_id },
+      {
+        headers: {
+          Authorization: getAuthorization().token,
         },
       }
     );
   }
 
   create(formData) {
-    let user_id = "";
-    if (localStorage.getItem("authorization"))
-      user_id = JSON.parse(localStorage.getItem("authorization")).user._id;
+    let user_id = getAuthorization().user._id;
 
     return axios.post(
       urlJoin(Store.state.domainAddress, "/api/activity/create"),
       { formData, user_id },
       {
         headers: {
-          Authorization: getJWTtoken(),
+          Authorization: getAuthorization().token,
         },
       }
     );
@@ -61,7 +71,7 @@ class ActivityService {
       {},
       {
         headers: {
-          Authorization: getJWTtoken(),
+          Authorization: getAuthorization().token,
         },
       }
     );
