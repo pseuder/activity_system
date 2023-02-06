@@ -430,7 +430,6 @@ onBeforeMount(() => {
                         userSetting.displayMode == 'list',
                     }"
                   >
-                    {{ testVal }}
                     <ModalDialog
                       :detail-data="modalDialogData"
                       @like-click="likeClick"

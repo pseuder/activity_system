@@ -70,7 +70,7 @@ function sortClick(option) {
 
   // status於0, 1, 2循環, 用於控制箭頭顯示和判斷遞增遞減
   if (option.status == sortStatus.DOWN) {
-    activityData_display = JSON.parse(JSON.stringify(activityData));
+    activityData_display = reactive(JSON.parse(JSON.stringify(activityData)));
   } else if (option.name === "活動時間" || option.name === "報名時間") {
     activityData_display.sort(function (pre, next) {
       return pre[option.attribute][0] > next[option.attribute][0]
@@ -91,13 +91,15 @@ function tagClick(item) {
   userSetting.selectedTag = item.name;
 
   if (item.attribute === "all") {
-    activityData_display = JSON.parse(JSON.stringify(activityData));
+    activityData_display = reactive(JSON.parse(JSON.stringify(activityData)));
   } else {
-    activityData_display = JSON.parse(
-      JSON.stringify(
-        activityData.filter((activity) => {
-          return activity[item.attribute];
-        })
+    activityData_display = reactive(
+      JSON.parse(
+        JSON.stringify(
+          activityData.filter((activity) => {
+            return activity[item.attribute];
+          })
+        )
       )
     );
   }
@@ -128,26 +130,22 @@ function enrollClick(activity) {
 function cancelClick(activity) {
   // 未完成: 取消後馬上將從當前畫面移除
 
-  // let asd = activityData_display.filter((act) => {
-  //   return activity._id != act._id;
-  // });
-
-  // activityData_display = JSON.parse(JSON.stringify([]));
-
-  activityData_display.splice(0, 1);
-
-  // ActivityService.cancel(activity._id)
-  //   .then((res) => {
-  //     messageData.message = res.data;
-  //     messageData.state = "success";
-  //     messageData.show = true;
-  //     activity.enrollment_display -= 1;
-  //   })
-  //   .catch((err) => {
-  //     if (err.name === "AxiosError")
-  //       Store.commit("handleHTTPResponse", { err, messageData });
-  //     else console.error(err);
-  //   });
+  let act_index = 0,
+    actD_index = 0;
+  for (let i in activityData) {
+    if (activityData[i]._id == activity._id) {
+      act_index = i;
+      break;
+    }
+  }
+  for (let i in activityData_display) {
+    if (activityData_display[i]._id == activity._id) {
+      actD_index = i;
+      break;
+    }
+  }
+  activityData.splice(act_index, 1);
+  activityData_display.splice(actD_index, 1);
 }
 
 function fetchData() {
@@ -214,7 +212,6 @@ function fetchData() {
             activity["created"] = created;
 
             activityData.push(activity);
-            activityData_display.push(JSON.parse(JSON.stringify(activity)));
           }
         });
       });
@@ -229,13 +226,11 @@ onBeforeMount(() => {
   fetchData()
     .then(() => {
       // 將處理好的資料過濾成已報名的條件
-      // activityData_display = JSON.parse(
-      //   JSON.stringify(
-      //     activityData.filter((activity) => {
-      //       return activity.registered;
-      //     })
-      //   )
-      // );
+      activityData.map((activity) => {
+        if (activity.registered)
+          activityData_display.push(JSON.parse(JSON.stringify(activity)));
+      });
+
       loading.value = false;
     })
     .catch((err) => {
