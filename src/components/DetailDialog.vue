@@ -1,5 +1,4 @@
 <script setup>
-import { onMounted } from "vue";
 import { HeartOutlined, HeartFilled, EyeFilled } from "@ant-design/icons-vue";
 
 // props
@@ -13,19 +12,11 @@ defineProps({
 });
 
 defineEmits(["likeClick"]);
-
-onMounted(() => {});
 </script>
 
 <template>
-  <!-- Button -->
-  <div data-bs-toggle="modal" data-bs-target="#myModal">
-    <slot></slot>
-  </div>
-
-  <!-- Modal -->
   <div
-    id="myModal"
+    id="detailDialog"
     class="modal fade fixed top-0 left-0 hidden h-full w-full overflow-hidden"
     tabindex="-1"
   >
@@ -39,7 +30,7 @@ onMounted(() => {});
           <div class="flex h-full flex-col p-6">
             <div class="flex flex-wrap justify-between gap-6 overflow-y-auto">
               <div class="flex w-full justify-between">
-                <div class="flex items-center text-xl">
+                <div class="flex items-center gap-2 text-xl">
                   <eye-filled />{{ detailData.watch }}
                 </div>
                 <div
@@ -56,7 +47,7 @@ onMounted(() => {});
               </div>
               <div class="flex w-full lg:w-2/5">
                 <div class="w-20">對象</div>
-                <div class="text-gray">{{ detailData.object }}</div>
+                <div class="text-gray">{{ detailData.object_display }}</div>
               </div>
               <div class="flex w-full lg:w-2/5">
                 <div class="w-20">地點</div>
@@ -67,7 +58,7 @@ onMounted(() => {});
               <div class="flex w-full lg:w-2/5">
                 <div class="w-20">名額</div>
                 <div class="text-gray">
-                  {{ detailData.enrollment_num }}/{{ detailData.quota }}
+                  {{ detailData.enrollment_display }}/{{ detailData.quota }}
                 </div>
               </div>
               <div class="flex w-full lg:w-2/5">
@@ -77,13 +68,13 @@ onMounted(() => {});
               <div class="flex w-full lg:w-2/5">
                 <div class="w-20">活動時間</div>
                 <div class="text-gray">
-                  {{ detailData.activity_time }}
+                  {{ detailData.activity_time_display }}
                 </div>
               </div>
               <div class="flex w-full">
                 <div class="w-20">報名時間</div>
                 <div class="text-gray">
-                  {{ detailData.enroll_time }}
+                  {{ detailData.enroll_time_display }}
                 </div>
               </div>
               <div class="flex w-full lg:w-2/5">

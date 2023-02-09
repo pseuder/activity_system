@@ -171,7 +171,7 @@ onMounted(() => {});
         class="flex w-full flex-wrap justify-between gap-4 overflow-y-auto bg-white bg-opacity-50 text-2xl"
       >
         <div class="flex w-full gap-4 p-4 lg:w-2/5">
-          <label class="w-28 flex-shrink-0" for="">活動標題</label>
+          <label class="w-28 flex-shrink-0" for="title">活動標題</label>
           <VeeField
             id="title"
             v-model="createFormData.title"
@@ -217,7 +217,7 @@ onMounted(() => {});
               mode="multiple"
             >
               <a-select-option value="所有人">所有人</a-select-option>
-              <template v-for="(item, index) in groupData" :key="item._id">
+              <template v-for="item in groupData" :key="item._id">
                 <a-select-option :value="item.name">{{
                   item.name
                 }}</a-select-option>
@@ -373,5 +373,3 @@ onMounted(() => {});
     </main>
   </div>
 </template>
-
-<style scoped></style>

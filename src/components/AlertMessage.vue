@@ -23,7 +23,7 @@ defineEmits(["closeMessage"]);
 <template>
   <div
     v-show="messageData.show"
-    class="alert alert-message flex font-semibold"
+    class="alert alert-message z-[2000] flex font-semibold"
     :class="{
       ' text-white bg-primary ': messageData.state === 'success',
       'text-black bg-warning':

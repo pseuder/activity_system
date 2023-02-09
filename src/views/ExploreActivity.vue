@@ -1,19 +1,15 @@
 <script setup>
 import { reactive, ref, onBeforeMount } from "vue";
 import "tw-elements";
-import {
-  HeartOutlined,
-  HeartFilled,
-  EyeFilled,
-  UserOutlined,
-} from "@ant-design/icons-vue";
 
 import Store from "@/store";
 import ActivityService from "@/services/activity.service.js";
 import UserService from "@/services/user.service.js";
 import GroupService from "@/services/group.service.js";
-import ModalDialog from "@/components/ModalDialog.vue";
 import AlertMessage from "@/components/AlertMessage.vue";
+import ActivityCard from "@/components/ActivityCard.vue";
+import DetailDialog from "@/components/DetailDialog.vue";
+import EditDialog from "@/components/EditDialog.vue";
 
 /* data */
 let sortOptions = reactive([
@@ -27,7 +23,21 @@ let groupData = [];
 let activityData = reactive([]);
 let activityData_display = reactive([]);
 let userData = reactive({});
-let modalDialogData = ref({});
+let detialDialogData = ref({});
+let editDialogData = reactive({
+  _id: "",
+  title: "",
+  object: [],
+  location: "",
+  activity_time: [],
+  enroll_time: [],
+  fee: 0,
+  manager: "",
+  manager_contact: "",
+  quota: 0,
+  activity_imgs: [],
+  description: "",
+});
 
 let userSetting = reactive({
   displayMode: "list",
@@ -87,9 +97,11 @@ function likeClick(activity) {
   activity.like = !activity.like;
 }
 function detailClick(activity) {
+  // 未完成: 愛心連動
+  // 未完成: 事件 提示訊息
   ActivityService.watch(activity._id);
   activity.watch += 1;
-  modalDialogData.value = activity;
+  detialDialogData.value = activity;
 }
 function enrollClick(activity) {
   return ActivityService.enroll(activity._id)
@@ -104,6 +116,12 @@ function enrollClick(activity) {
         Store.commit("handleHTTPResponse", { err, messageData });
       else console.error(err);
     });
+}
+
+function editClick(activity) {
+  for (let key in editDialogData) {
+    editDialogData[key] = activity[key];
+  }
 }
 
 function fetchData() {
@@ -122,44 +140,60 @@ function fetchData() {
       // Get User data
       return UserService.getUserInfo().then((res) => {
         userData = res.data;
+        let user_enrolledActivity = [],
+          user_likedActivity = [];
+        userData.enrolledActivity.forEach((user_enrolled) => {
+          user_enrolledActivity.push(user_enrolled._id);
+        });
+
+        userData.likedActivity.forEach((user_liked) => {
+          user_likedActivity.push(user_liked._id);
+        });
+
         // Get Activity data
         return ActivityService.explore().then((res) => {
-          res.data.map((item) => {
-            let enrolled = false,
-              liked = false;
-            userData.enrolledActivity.forEach((element) => {
-              if (element._id === item._id) enrolled = true;
-            });
-            userData.likedActivity.forEach((element) => {
-              if (element._id === item._id) liked = true;
-            });
+          res.data.map((activity) => {
+            let registered = false,
+              expired = false,
+              liked = false,
+              created = false;
 
-            item.object_display = item.object.join("  ");
+            registered = user_enrolledActivity.includes(activity._id);
+            expired = new Date(activity.activity_time[1]) < new Date();
+            liked = user_likedActivity.includes(activity._id);
+            created = activity.creator._id === userData._id;
 
-            //utc時間轉換
-            item.activity_time[0] = new Date(item.activity_time[0]);
-            item.activity_time[1] = new Date(item.activity_time[1]);
+            // 除了過期的都保留
+            if (!expired) {
+              activity.object_display = activity.object.join(" ");
 
-            item.activity_time_display = [
-              item.activity_time[0].toLocaleDateString(),
-              item.activity_time[1].toLocaleDateString(),
-            ].join("~");
+              //utc時間轉換
+              activity.activity_time[0] = new Date(activity.activity_time[0]);
+              activity.activity_time[1] = new Date(activity.activity_time[1]);
 
-            item.enroll_time[0] = new Date(item.enroll_time[0]);
-            item.enroll_time[1] = new Date(item.enroll_time[1]);
+              activity.activity_time_display = [
+                activity.activity_time[0].toLocaleDateString(),
+                activity.activity_time[1].toLocaleDateString(),
+              ].join("~");
 
-            item.enroll_time_display = [
-              item.enroll_time[0].toLocaleDateString(),
-              item.enroll_time[1].toLocaleDateString(),
-            ].join("~");
+              activity.enroll_time[0] = new Date(activity.enroll_time[0]);
+              activity.enroll_time[1] = new Date(activity.enroll_time[1]);
 
-            item.enrollment_display = item.enrollment.length;
+              activity.enroll_time_display = [
+                activity.enroll_time[0].toLocaleDateString(),
+                activity.enroll_time[1].toLocaleDateString(),
+              ].join("~");
 
-            if (liked) item["like"] = true;
-            else item["like"] = false;
+              activity.enrollment_display = activity.enrollment.length;
 
-            activityData.push(item);
-            activityData_display.push(item);
+              activity["registered"] = registered;
+              activity["expired"] = expired;
+              activity["liked"] = liked;
+              activity["created"] = created;
+
+              activityData.push(JSON.parse(JSON.stringify(activity)));
+              activityData_display.push(JSON.parse(JSON.stringify(activity)));
+            }
           });
         });
       });
@@ -169,6 +203,19 @@ function fetchData() {
     });
 }
 
+function showAlert(data) {
+  if (data.state === "success") {
+    messageData.message = data.message;
+    messageData.state = "success";
+    messageData.show = true;
+  } else {
+    let err = data.err;
+    if (err.name === "AxiosError")
+      Store.commit("handleHTTPResponse", { err, messageData });
+    else console.error(err);
+  }
+}
+
 // hook
 onBeforeMount(() => {
   fetchData()
@@ -176,7 +223,6 @@ onBeforeMount(() => {
       loading.value = false;
     })
     .catch((err) => {
-      console.log(err);
       if (err.name === "AxiosError")
         Store.commit("handleHTTPResponse", { err, messageData });
       else console.error(err);
@@ -189,9 +235,16 @@ onBeforeMount(() => {
     <AlertMessage
       :message-data="messageData"
       @close-message="messageData.show = false"
-    >
-    </AlertMessage>
+    />
     <a-spin v-show="loading" size="large" class="absolute left-1/2 top-1/2" />
+
+    <DetailDialog :detail-data="detialDialogData" @like-click="likeClick" />
+    <EditDialog
+      :edit-data="editDialogData"
+      :group-data="groupData"
+      @show-alert="showAlert"
+    />
+
     <div v-show="!loading">
       <header class="flex justify-between text-3xl font-medium lg:pt-6">
         <div class="flex items-center">
@@ -346,111 +399,17 @@ onBeforeMount(() => {
               'lg:flex-col': userSetting.displayMode == 'list',
             }"
           >
-            <template
-              v-for="(item, index) in activityData_display"
-              :key="item._id"
-            >
+            <template v-for="item in activityData_display" :key="item._id">
               <!-- 每個活動 -->
-              <div
-                class="relative m-auto min-w-[350px] rounded-lg bg-white p-6 shadow-lg lg:m-0"
-              >
-                <!-- 愛心 -->
-                <div
-                  class="absolute top-2 right-4 cursor-pointer"
-                  @click="likeClick(item)"
-                >
-                  <heart-filled v-if="item.like" class="text-red-600" />
-                  <heart-outlined v-else />
-                </div>
-                <div :class="{ 'lg:flex': userSetting.displayMode == 'list' }">
-                  <div
-                    class="flex flex-grow flex-col flex-wrap gap-4"
-                    :class="{
-                      'flex-col': userSetting.displayMode == 'block',
-                      'lg:flex-row': userSetting.displayMode == 'list',
-                    }"
-                  >
-                    <div
-                      class="flex"
-                      :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
-                    >
-                      <div class="w-20">標題</div>
-                      <div class="text-gray">{{ item.title }}</div>
-                    </div>
-                    <div
-                      class="flex"
-                      :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
-                    >
-                      <div class="w-20">對象</div>
-                      <div class="text-gray">{{ item.object_display }}</div>
-                    </div>
-                    <div
-                      class="flex"
-                      :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
-                    >
-                      <div class="w-20">地點</div>
-                      <div class="text-gray">{{ item.location }}</div>
-                    </div>
-                    <div
-                      class="flex"
-                      :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
-                    >
-                      <div class="w-20">活動時間</div>
-                      <div class="text-gray">
-                        {{ item.activity_time_display }}
-                      </div>
-                    </div>
-                    <div
-                      class="flex"
-                      :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
-                    >
-                      <div class="w-20">報名時間</div>
-                      <div class="text-gray">
-                        {{ item.enroll_time_display }}
-                      </div>
-                    </div>
-                    <!-- 分隔線 -->
-                    <hr class="border-1 w-[98%]" />
-                    <!-- 簡略資訊 -->
-                    <div class="mb-2 flex w-[98%] justify-end gap-4">
-                      <div class="w-10">${{ item.fee }}</div>
-                      <div class="flex w-10 items-center">
-                        <eye-filled />{{ item.watch }}
-                      </div>
-                      <div class="flex w-10 items-center">
-                        <user-outlined />{{ item.enrollment_display }}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    class="flex items-center justify-between gap-4"
-                    :class="{
-                      'lg:w-1/6  lg:min-w-[150px] lg:flex-col lg:justify-center':
-                        userSetting.displayMode == 'list',
-                    }"
-                  >
-                    <ModalDialog
-                      :detail-data="modalDialogData"
-                      @like-click="likeClick"
-                    >
-                      <button
-                        class="w-[150px] bg-gray-500"
-                        @click="detailClick(item)"
-                      >
-                        詳細資訊
-                      </button>
-                    </ModalDialog>
-
-                    <button
-                      class="w-[150px] bg-primary"
-                      @click="enrollClick(item)"
-                    >
-                      報名活動
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <ActivityCard
+                :form-data="item"
+                :group-data="groupData"
+                :user-setting="userSetting"
+                @like-click="likeClick"
+                @detail-click="detailClick"
+                @enroll-click="enrollClick"
+                @edit-click="editClick"
+              />
             </template>
           </div>
         </div>

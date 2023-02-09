@@ -76,6 +76,19 @@ class ActivityService {
       }
     );
   }
+
+  edit(formData) {
+    console.log(formData._id);
+    return axios.patch(
+      urlJoin(Store.state.domainAddress, "/api/activity/edit/", formData._id),
+      { formData },
+      {
+        headers: {
+          Authorization: getAuthorization().token,
+        },
+      }
+    );
+  }
 }
 
 export default new ActivityService();

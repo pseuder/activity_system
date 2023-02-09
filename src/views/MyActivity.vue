@@ -1,18 +1,12 @@
 <script setup>
 import { reactive, ref, onBeforeMount } from "vue";
 import "tw-elements";
-import {
-  HeartOutlined,
-  HeartFilled,
-  EyeFilled,
-  UserOutlined,
-} from "@ant-design/icons-vue";
 
 import Store from "@/store";
 import ActivityService from "@/services/activity.service.js";
 import UserService from "@/services/user.service.js";
-import ModalDialog from "@/components/ModalDialog.vue";
 import AlertMessage from "@/components/AlertMessage.vue";
+import ActivityCard from "@/components/ActivityCard.vue";
 
 /* data */
 
@@ -45,7 +39,7 @@ let filterOption = reactive([
 let activityData = reactive([]);
 let activityData_display = reactive([]);
 let userData = reactive({});
-let modalDialogData = ref({});
+let detialDialogData = ref({});
 
 let userSetting = reactive({
   displayMode: "list",
@@ -109,7 +103,7 @@ function likeClick(activity) {
   activity.liked = !activity.liked;
 }
 function detailClick(activity) {
-  modalDialogData.value = activity;
+  detialDialogData.value = activity;
 }
 function enrollClick(activity) {
   // 未完成: 報名後馬上加入當前畫面
@@ -128,24 +122,35 @@ function enrollClick(activity) {
 }
 
 function cancelClick(activity) {
-  // 未完成: 取消後馬上將從當前畫面移除
+  ActivityService.cancel(activity._id)
+    .then((res) => {
+      messageData.message = res.data;
+      messageData.state = "success";
+      messageData.show = true;
+      activity.enrollment_display -= 1;
 
-  let act_index = 0,
-    actD_index = 0;
-  for (let i in activityData) {
-    if (activityData[i]._id == activity._id) {
-      act_index = i;
-      break;
-    }
-  }
-  for (let i in activityData_display) {
-    if (activityData_display[i]._id == activity._id) {
-      actD_index = i;
-      break;
-    }
-  }
-  activityData.splice(act_index, 1);
-  activityData_display.splice(actD_index, 1);
+      let act_index = 0,
+        actD_index = 0;
+      for (let i in activityData) {
+        if (activityData[i]._id == activity._id) {
+          act_index = i;
+          break;
+        }
+      }
+      for (let i in activityData_display) {
+        if (activityData_display[i]._id == activity._id) {
+          actD_index = i;
+          break;
+        }
+      }
+      activityData.splice(act_index, 1);
+      activityData_display.splice(actD_index, 1);
+    })
+    .catch((err) => {
+      if (err.name === "AxiosError")
+        Store.commit("handleHTTPResponse", { err, messageData });
+      else console.error(err);
+    });
 }
 
 function fetchData() {
@@ -165,22 +170,18 @@ function fetchData() {
 
       // Get Activity data
       return ActivityService.explore().then((res) => {
-        res.data.filter((activity) => {
+        res.data.map((activity) => {
           let registered = false,
             expired = false,
             liked = false,
             created = false;
 
-          if (user_enrolledActivity.includes(activity._id)) {
-            if (new Date(activity.activity_time[1]) >= new Date())
-              registered = true;
-            else expired = true;
-          }
-
+          registered = user_enrolledActivity.includes(activity._id);
+          expired = new Date(activity.activity_time[1]) < new Date();
           liked = user_likedActivity.includes(activity._id);
-
           created = activity.creator._id === userData._id;
 
+          // 只留下跟使用者有關的資料
           if (registered || expired || liked || created) {
             activity.object_display = activity.object.join("  ");
 
@@ -205,6 +206,8 @@ function fetchData() {
 
             // 如果自己是創立者, 從已報名, 已截止中排除, 便於分類
             if (created) registered = expired = false;
+            // 如果過期了, 從已報名中排除, 便於分類
+            if (expired) registered = false;
 
             activity["registered"] = registered;
             activity["expired"] = expired;
@@ -403,127 +406,14 @@ onBeforeMount(() => {
           >
             <template v-for="item in activityData_display" :key="item">
               <!-- 每個活動 -->
-              <div
-                class="relative m-auto min-w-[350px] rounded-lg bg-white p-6 shadow-lg lg:m-0"
-              >
-                <!-- 愛心 -->
-                <div
-                  class="absolute top-2 right-4 cursor-pointer"
-                  @click="likeClick(item)"
-                >
-                  <heart-filled v-if="item.liked" class="text-red-600" />
-                  <heart-outlined v-else />
-                </div>
-                <div :class="{ 'lg:flex': userSetting.displayMode == 'list' }">
-                  <div
-                    class="flex flex-grow flex-col flex-wrap gap-4"
-                    :class="{
-                      'flex-col': userSetting.displayMode == 'block',
-                      'lg:flex-row': userSetting.displayMode == 'list',
-                    }"
-                  >
-                    <div
-                      class="flex"
-                      :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
-                    >
-                      <div class="w-20">標題</div>
-                      <div class="text-gray">{{ item.title }}</div>
-                    </div>
-                    <div
-                      class="flex"
-                      :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
-                    >
-                      <div class="w-20">對象</div>
-                      <div class="text-gray">{{ item.object_display }}</div>
-                    </div>
-                    <div
-                      class="flex"
-                      :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
-                    >
-                      <div class="w-20">地點</div>
-                      <div class="text-gray">{{ item.location }}</div>
-                    </div>
-                    <div
-                      class="flex"
-                      :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
-                    >
-                      <div class="w-20">活動時間</div>
-                      <div class="text-gray">
-                        {{ item.activity_time_display }}
-                      </div>
-                    </div>
-                    <div
-                      class="flex"
-                      :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
-                    >
-                      <div class="w-20">報名時間</div>
-                      <div class="text-gray">
-                        {{ item.enroll_time_display }}
-                      </div>
-                    </div>
-                    <!-- 分隔線 -->
-                    <hr class="border-1 w-[98%]" />
-                    <!-- 簡略資訊 -->
-                    <div class="mb-2 flex w-[98%] justify-end gap-4">
-                      <div class="w-10">${{ item.fee }}</div>
-                      <div class="flex w-10 items-center">
-                        <eye-filled />{{ item.watch }}
-                      </div>
-                      <div class="flex w-10 items-center">
-                        <user-outlined />{{ item.enrollment_display }}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    class="flex items-center justify-between gap-4"
-                    :class="{
-                      'lg:w-1/6  lg:min-w-[150px] lg:flex-col lg:justify-center':
-                        userSetting.displayMode == 'list',
-                    }"
-                  >
-                    <ModalDialog
-                      :detail-data="modalDialogData"
-                      @like-click="likeClick"
-                    >
-                      <button
-                        class="w-[150px] bg-gray-500"
-                        @click="detailClick(item)"
-                      >
-                        詳細資訊
-                      </button>
-                    </ModalDialog>
-
-                    <button
-                      v-if="item.created"
-                      class="w-[150px] bg-primary"
-                      @click="enrollClick(item)"
-                    >
-                      修改活動
-                    </button>
-                    <button
-                      v-else-if="item.registered"
-                      class="w-[150px] bg-blue-500"
-                      @click.prevent="cancelClick(item)"
-                    >
-                      取消報名
-                    </button>
-                    <button
-                      v-else-if="item.expired"
-                      class="w-[150px] cursor-not-allowed bg-blue-200"
-                    >
-                      取消報名
-                    </button>
-                    <button
-                      v-else-if="item.liked"
-                      class="w-[150px] bg-blue-500"
-                      @click="enrollClick(item)"
-                    >
-                      報名活動
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <ActivityCard
+                :form-data="item"
+                :user-setting="userSetting"
+                @like-click="likeClick"
+                @detail-click="detailClick"
+                @enroll-click="enrollClick"
+                @cancel-click="cancelClick"
+              />
             </template>
           </div>
         </div>
