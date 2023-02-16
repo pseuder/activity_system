@@ -1,4 +1,4 @@
-function handleHTTPResponse(state, payload) {
+function handleHTTPResponse(payload) {
   console.error(payload);
   let { err, messageData } = payload;
   if (err.code === "ERR_NETWORK") {
@@ -19,3 +19,5 @@ function handleHTTPResponse(state, payload) {
   }
   messageData.show = true;
 }
+
+export { handleHTTPResponse };

@@ -2,7 +2,6 @@
 import { reactive, ref, onBeforeMount } from "vue";
 import "tw-elements";
 
-import Store from "@/store";
 import ActivityService from "@/services/activity.service.js";
 import UserService from "@/services/user.service.js";
 import GroupService from "@/services/group.service.js";
@@ -10,6 +9,7 @@ import AlertMessage from "@/components/AlertMessage.vue";
 import ActivityCard from "@/components/ActivityCard.vue";
 import DetailDialog from "@/components/DetailDialog.vue";
 import EditDialog from "@/components/EditDialog.vue";
+import { handleHTTPResponse } from "@/utils/commonFunction.js";
 
 /* data */
 let sortOptions = reactive([
@@ -111,8 +111,7 @@ function enrollClick(activity) {
       activity.registered = true;
     })
     .catch((err) => {
-      if (err.name === "AxiosError")
-        Store.commit("handleHTTPResponse", { err, messageData });
+      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
       else console.error(err);
     });
 }
@@ -143,8 +142,7 @@ function cancelClick(activity) {
       activityData_display.splice(actD_index, 1);
     })
     .catch((err) => {
-      if (err.name === "AxiosError")
-        Store.commit("handleHTTPResponse", { err, messageData });
+      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
       else console.error(err);
     });
 }
@@ -239,8 +237,7 @@ function showAlert(data) {
     messageData.show = true;
   } else {
     let err = data.err;
-    if (err.name === "AxiosError")
-      Store.commit("handleHTTPResponse", { err, messageData });
+    if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
     else console.error(err);
   }
 }
@@ -252,8 +249,7 @@ onBeforeMount(() => {
       loading.value = false;
     })
     .catch((err) => {
-      if (err.name === "AxiosError")
-        Store.commit("handleHTTPResponse", { err, messageData });
+      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
       else console.error(err);
     });
 });

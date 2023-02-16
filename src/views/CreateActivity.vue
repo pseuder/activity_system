@@ -4,11 +4,11 @@ import "tw-elements";
 import { useRouter } from "vue-router";
 const router = useRouter();
 
-import Store from "@/store";
 import ActivityService from "@/services/activity.service.js";
 import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
 import FileUpload from "@/components/FileUpload.vue";
+import { handleHTTPResponse } from "@/utils/commonFunction.js";
 
 /* data */
 let createFormData;
@@ -118,8 +118,7 @@ async function submitClick() {
       messageData.message = res.data;
     })
     .catch((err) => {
-      if (err.name === "AxiosError")
-        Store.commit("handleHTTPResponse", { err, messageData });
+      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
       else console.error(err);
     });
 }
@@ -143,8 +142,7 @@ onBeforeMount(() => {
       groupData.value = res.data;
     })
     .catch((err) => {
-      if (err.name === "AxiosError")
-        Store.commit("handleHTTPResponse", { err, messageData });
+      if (err.name === "AxiosError") handleHTTPResponse({ err, messageData });
       else console.error(err);
     });
 

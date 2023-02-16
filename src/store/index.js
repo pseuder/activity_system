@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 
-const store = createStore({
+export default createStore({
   state() {
     return {
       domainAddress:
@@ -11,5 +11,3 @@ const store = createStore({
   },
   mutations: {},
 });
-
-export default store;

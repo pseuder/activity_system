@@ -7,6 +7,9 @@ import router from "./router";
 import store from "./store";
 import "./style.css";
 import Antd from "ant-design-vue";
+import axios from "axios";
+import urlJoin from "url-join";
+import Store from "./store";
 
 import { Field, Form, ErrorMessage, defineRule, configure } from "vee-validate";
 import { required, email, min } from "@vee-validate/rules";
@@ -23,7 +26,13 @@ configure({
 });
 setLocale("zh_TW");
 
-const app = createApp(App).use(router).use(store).use(Antd);
+const app = createApp(App);
+
+app.config.globalProperties["$axios"] = axios;
+app.config.globalProperties["$urlJoin"] = urlJoin;
+app.config.globalProperties["$Store"] = Store;
+
+app.use(router).use(store).use(Antd);
 
 app.component("VeeForm", Form);
 app.component("VeeField", Field);
