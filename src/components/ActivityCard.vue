@@ -131,7 +131,7 @@ defineEmits([
           data-bs-target="#editDialog"
         >
           <button
-            class="w-[150px] bg-yellow-600"
+            class="w-[150px] bg-edit"
             @click="$emit('editClick', formData)"
           >
             修改活動
@@ -139,19 +139,14 @@ defineEmits([
         </div>
         <button
           v-else-if="formData.registered"
-          class="w-[150px] bg-blue-500"
+          class="w-[150px] bg-cancel"
           @click.prevent="$emit('cancelClick', formData)"
         >
           取消報名
         </button>
+        <!-- 過期的不顯示下面的按鈕 -->
         <button
-          v-else-if="formData.expired"
-          class="w-[150px] cursor-not-allowed bg-blue-200"
-        >
-          取消報名
-        </button>
-        <button
-          v-else
+          v-else-if="!formData.expired"
           class="w-[150px] bg-blue-500"
           @click="$emit('enrollClick', formData)"
         >

@@ -2,7 +2,7 @@
 import { HeartOutlined, HeartFilled, EyeFilled } from "@ant-design/icons-vue";
 
 // props
-defineProps({
+const props = defineProps({
   detailData: {
     type: Object,
     default() {
@@ -11,7 +11,14 @@ defineProps({
   },
 });
 
-defineEmits(["likeClick"]);
+const emit = defineEmits(["likeClick", "enrollClick", "cancelClick"]);
+
+function enrollClick() {
+  emit("enrollClick", props.detailData);
+}
+function cancelClick() {
+  emit("cancelClick", props.detailData);
+}
 </script>
 
 <template>
@@ -37,7 +44,7 @@ defineEmits(["likeClick"]);
                   class="cursor-pointer text-3xl"
                   @click="$emit('likeClick', detailData)"
                 >
-                  <heart-filled v-if="detailData.like" class="text-red-600" />
+                  <heart-filled v-if="detailData.liked" class="text-red-600" />
                   <heart-outlined v-else class="" />
                 </div>
               </div>
@@ -99,7 +106,20 @@ defineEmits(["likeClick"]);
             <div class="h-[80px] w-full">
               <!-- 分隔線 -->
               <hr class="my-3 w-[98%] border-2" />
-              <button class="w-full bg-primary">報名活動</button>
+              <button
+                v-if="detailData.registered"
+                class="w-full bg-cancel"
+                @click.prevent="cancelClick"
+              >
+                取消報名
+              </button>
+              <button
+                v-else
+                class="w-full bg-primary"
+                @click.prevent="enrollClick"
+              >
+                報名活動
+              </button>
             </div>
           </div>
         </div>

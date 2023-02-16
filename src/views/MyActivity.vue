@@ -5,8 +5,11 @@ import "tw-elements";
 import Store from "@/store";
 import ActivityService from "@/services/activity.service.js";
 import UserService from "@/services/user.service.js";
+import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
 import ActivityCard from "@/components/ActivityCard.vue";
+import DetailDialog from "@/components/DetailDialog.vue";
+import EditDialog from "@/components/EditDialog.vue";
 
 /* data */
 
@@ -35,7 +38,7 @@ let filterOption = reactive([
   { name: "已建立", attribute: "created" },
   { name: "全部", attribute: "all" },
 ]);
-
+let groupData = [];
 let activityData = reactive([]);
 let activityData_display = reactive([]);
 let userData = reactive({});
@@ -50,6 +53,21 @@ let messageData = reactive({
   show: false,
   state: "success",
   message: "成功!",
+});
+
+let editDialogData = reactive({
+  _id: "",
+  title: "",
+  object: [],
+  location: "",
+  activity_time: [],
+  enroll_time: [],
+  fee: 0,
+  manager: "",
+  manager_contact: "",
+  quota: 0,
+  activity_imgs: [],
+  description: "",
 });
 
 let loading = ref(true);
@@ -103,6 +121,8 @@ function likeClick(activity) {
   activity.liked = !activity.liked;
 }
 function detailClick(activity) {
+  ActivityService.watch(activity._id);
+  activity.watch += 1;
   detialDialogData.value = activity;
 }
 function enrollClick(activity) {
@@ -153,69 +173,97 @@ function cancelClick(activity) {
     });
 }
 
+function editClick(activity) {
+  for (let key in editDialogData) editDialogData[key] = activity[key];
+}
+
+function showAlert(data) {
+  if (data.state === "success") {
+    messageData.message = data.message;
+    messageData.state = "success";
+    messageData.show = true;
+  } else {
+    let err = data.err;
+    if (err.name === "AxiosError")
+      Store.commit("handleHTTPResponse", { err, messageData });
+    else console.error(err);
+  }
+}
+
 function fetchData() {
-  // Get User data
-  return UserService.getUserInfo()
+  return GroupService.getAllGroups()
     .then((res) => {
-      userData = res.data;
-      let user_enrolledActivity = [],
-        user_likedActivity = [];
-      userData.enrolledActivity.forEach((user_enrolled) => {
-        user_enrolledActivity.push(user_enrolled._id);
+      groupData = res.data;
+      groupData.unshift({
+        _id: "0",
+        authority: [],
+        createTime: "",
+        member: [],
+        name: "全部",
+        updateTime: "",
       });
+      // Get User data
+      return UserService.getUserInfo().then((res) => {
+        userData = res.data;
+        let user_enrolledActivity = [],
+          user_likedActivity = [];
+        userData.enrolledActivity.forEach((user_enrolled) => {
+          user_enrolledActivity.push(user_enrolled._id);
+        });
 
-      userData.likedActivity.forEach((user_liked) => {
-        user_likedActivity.push(user_liked._id);
-      });
+        userData.likedActivity.forEach((user_liked) => {
+          user_likedActivity.push(user_liked._id);
+        });
 
-      // Get Activity data
-      return ActivityService.explore().then((res) => {
-        res.data.map((activity) => {
-          let registered = false,
-            expired = false,
-            liked = false,
-            created = false;
+        // Get Activity data
+        return ActivityService.explore().then((res) => {
+          res.data.map((activity) => {
+            let registered = false,
+              expired = false,
+              liked = false,
+              created = false;
 
-          registered = user_enrolledActivity.includes(activity._id);
-          expired = new Date(activity.activity_time[1]) < new Date();
-          liked = user_likedActivity.includes(activity._id);
-          created = activity.creator._id === userData._id;
+            registered = user_enrolledActivity.includes(activity._id);
+            expired = new Date(activity.activity_time[1]) < new Date();
+            liked = user_likedActivity.includes(activity._id);
+            created = activity.creator._id === userData._id;
 
-          // 只留下跟使用者有關的資料
-          if (registered || expired || liked || created) {
-            activity.object_display = activity.object.join("  ");
+            // 只留下跟使用者有關的資料
+            if (registered || expired || liked || created) {
+              activity.object_display = activity.object.join("  ");
 
-            //utc時間轉換
-            activity.activity_time[0] = new Date(activity.activity_time[0]);
-            activity.activity_time[1] = new Date(activity.activity_time[1]);
+              //utc時間轉換
+              activity.activity_time[0] = new Date(activity.activity_time[0]);
+              activity.activity_time[1] = new Date(activity.activity_time[1]);
 
-            activity.activity_time_display = [
-              activity.activity_time[0].toLocaleDateString(),
-              activity.activity_time[1].toLocaleDateString(),
-            ].join("~");
+              activity.activity_time_display = [
+                activity.activity_time[0].toLocaleDateString(),
+                activity.activity_time[1].toLocaleDateString(),
+              ].join("~");
 
-            activity.enroll_time[0] = new Date(activity.enroll_time[0]);
-            activity.enroll_time[1] = new Date(activity.enroll_time[1]);
+              activity.enroll_time[0] = new Date(activity.enroll_time[0]);
+              activity.enroll_time[1] = new Date(activity.enroll_time[1]);
 
-            activity.enroll_time_display = [
-              activity.enroll_time[0].toLocaleDateString(),
-              activity.enroll_time[1].toLocaleDateString(),
-            ].join("~");
+              activity.enroll_time_display = [
+                activity.enroll_time[0].toLocaleDateString(),
+                activity.enroll_time[1].toLocaleDateString(),
+              ].join("~");
 
-            activity.enrollment_display = activity.enrollment.length;
+              activity.enrollment_display = activity.enrollment.length;
 
-            // 如果自己是創立者, 從已報名, 已截止中排除, 便於分類
-            if (created) registered = expired = false;
-            // 如果過期了, 從已報名中排除, 便於分類
-            if (expired) registered = false;
+              // 如果自己是創立者, 從已報名, 已截止中排除, 便於分類
+              if (created) registered = expired = false;
+              // 如果過期了, 從已報名中排除, 便於分類
+              if (expired) registered = false;
 
-            activity["registered"] = registered;
-            activity["expired"] = expired;
-            activity["liked"] = liked;
-            activity["created"] = created;
+              activity["registered"] = registered;
+              activity["expired"] = expired;
+              activity["liked"] = liked;
+              activity["created"] = created;
 
-            activityData.push(activity);
-          }
+              activityData.push(activity);
+            }
+          });
         });
       });
     })
@@ -252,6 +300,17 @@ onBeforeMount(() => {
     >
     </AlertMessage>
     <a-spin v-show="loading" size="large" class="absolute left-1/2 top-1/2" />
+    <DetailDialog
+      :detail-data="detialDialogData"
+      @like-click="likeClick"
+      @enroll-click="enrollClick"
+      @cancel-click="cancelClick"
+    />
+    <EditDialog
+      :edit-data="editDialogData"
+      :group-data="groupData"
+      @show-alert="showAlert"
+    />
     <div v-show="!loading">
       <header class="flex justify-between text-3xl font-medium lg:pt-6">
         <div class="flex items-center">
@@ -408,11 +467,13 @@ onBeforeMount(() => {
               <!-- 每個活動 -->
               <ActivityCard
                 :form-data="item"
+                :group-data="groupData"
                 :user-setting="userSetting"
                 @like-click="likeClick"
                 @detail-click="detailClick"
                 @enroll-click="enrollClick"
                 @cancel-click="cancelClick"
+                @edit-click="editClick"
               />
             </template>
           </div>

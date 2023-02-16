@@ -37,7 +37,10 @@ module.exports = {
         ".text-gray": { "@apply text-gray-500": {} },
         /* background */
         ".bg-primary": { "background-color": "#0d6efd" },
-        ".bg-warning": {
+        ".bg-warning": { "background-color": "#ffc107" },
+        ".bg-edit": { "@apply bg-yellow-500": {} },
+        ".bg-cancel": { "background-color": "#F56C6C" },
+        ".bg-lightyellow": {
           background:
             "linear-gradient( 0deg, rgba(255, 255, 255, 0.8),rgba(255, 255, 255, 0.8)),#ffc107;",
         },

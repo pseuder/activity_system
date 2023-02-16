@@ -23,7 +23,7 @@ defineEmits(["closeAlert"]);
     v-show="alertData.show"
     class="alert flex items-center"
     :class="{
-      'bg-warning': alertData.state === 'warning',
+      'bg-lightyellow': alertData.state === 'warning',
       'text-white bg-error': alertData.state === 'error',
     }"
   >

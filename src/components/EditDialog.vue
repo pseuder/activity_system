@@ -1,9 +1,7 @@
 <script setup>
-import { onBeforeMount, reactive, watch } from "vue";
+import { reactive, watch } from "vue";
 import ActivityService from "@/services/activity.service.js";
 import FileUpload from "@/components/FileUpload.vue";
-import AlertMessage from "@/components/AlertMessage.vue";
-import Store from "@/store";
 
 // props
 let props = defineProps({
@@ -37,12 +35,6 @@ let editData_copy = reactive({
   quota: 0,
   activity_imgs: [],
   description: "",
-});
-
-let messageData = reactive({
-  show: false,
-  state: "success",
-  message: "成功!",
 });
 
 watch(props.editData, async (newData) => {

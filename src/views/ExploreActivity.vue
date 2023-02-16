@@ -94,11 +94,9 @@ function tagClick(item) {
 }
 function likeClick(activity) {
   UserService.likeActivity(activity._id);
-  activity.like = !activity.like;
+  activity.liked = !activity.liked;
 }
 function detailClick(activity) {
-  // 未完成: 愛心連動
-  // 未完成: 事件 提示訊息
   ActivityService.watch(activity._id);
   activity.watch += 1;
   detialDialogData.value = activity;
@@ -110,6 +108,39 @@ function enrollClick(activity) {
       messageData.state = "success";
       messageData.show = true;
       activity.enrollment_display += 1;
+      activity.registered = true;
+    })
+    .catch((err) => {
+      if (err.name === "AxiosError")
+        Store.commit("handleHTTPResponse", { err, messageData });
+      else console.error(err);
+    });
+}
+
+function cancelClick(activity) {
+  ActivityService.cancel(activity._id)
+    .then((res) => {
+      messageData.message = res.data;
+      messageData.state = "success";
+      messageData.show = true;
+      activity.enrollment_display -= 1;
+
+      let act_index = 0,
+        actD_index = 0;
+      for (let i in activityData) {
+        if (activityData[i]._id == activity._id) {
+          act_index = i;
+          break;
+        }
+      }
+      for (let i in activityData_display) {
+        if (activityData_display[i]._id == activity._id) {
+          actD_index = i;
+          break;
+        }
+      }
+      activityData.splice(act_index, 1);
+      activityData_display.splice(actD_index, 1);
     })
     .catch((err) => {
       if (err.name === "AxiosError")
@@ -119,9 +150,7 @@ function enrollClick(activity) {
 }
 
 function editClick(activity) {
-  for (let key in editDialogData) {
-    editDialogData[key] = activity[key];
-  }
+  for (let key in editDialogData) editDialogData[key] = activity[key];
 }
 
 function fetchData() {
@@ -237,8 +266,12 @@ onBeforeMount(() => {
       @close-message="messageData.show = false"
     />
     <a-spin v-show="loading" size="large" class="absolute left-1/2 top-1/2" />
-
-    <DetailDialog :detail-data="detialDialogData" @like-click="likeClick" />
+    <DetailDialog
+      :detail-data="detialDialogData"
+      @like-click="likeClick"
+      @enroll-click="enrollClick"
+      @cancel-click="cancelClick"
+    />
     <EditDialog
       :edit-data="editDialogData"
       :group-data="groupData"
@@ -408,6 +441,7 @@ onBeforeMount(() => {
                 @like-click="likeClick"
                 @detail-click="detailClick"
                 @enroll-click="enrollClick"
+                @cancel-click="cancelClick"
                 @edit-click="editClick"
               />
             </template>
@@ -417,24 +451,3 @@ onBeforeMount(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f9f9f9;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  padding: 12px 16px;
-  z-index: 1;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-</style>

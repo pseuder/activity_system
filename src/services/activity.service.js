@@ -52,6 +52,8 @@ class ActivityService {
   }
 
   create(formData) {
+    debugger;
+    console.log(formData);
     let user_id = getAuthorization().user._id;
 
     return axios.post(
@@ -60,6 +62,7 @@ class ActivityService {
       {
         headers: {
           Authorization: getAuthorization().token,
+          "Content-Type": "application/octet-stream",
         },
       }
     );

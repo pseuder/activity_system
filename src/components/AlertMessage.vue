@@ -26,7 +26,7 @@ defineEmits(["closeMessage"]);
     class="alert alert-message z-[2000] flex font-semibold"
     :class="{
       ' text-white bg-primary ': messageData.state === 'success',
-      'text-black bg-warning':
+      'text-black bg-lightyellow':
         messageData.state === 'warning' || messageData.state === 'unauthorized',
       'text-white bg-error': messageData.state === 'error',
     }"
@@ -39,7 +39,7 @@ defineEmits(["closeMessage"]);
       <div class="w-fit">
         <button
           v-show="messageData.state === 'success'"
-          class="text-black bg-warning"
+          class="text-black bg-lightyellow"
         >
           加入行事曆
         </button>
