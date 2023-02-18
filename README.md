@@ -10,12 +10,16 @@ vee-validate
 
 # 上傳照片壓縮
 
-支援 png, jpg, bmp, pdf 格式
-15mb -> 200kb
-10mb -> 100kb
+- 支援 png, jpg, bmp, pdf 格式
+- 15mb -> 200kb
+- 10mb -> 100kb
 
-z-index
+# z-index
 
-alertMessage 2000
+- alertMessage 2000
+- dialog 1055
 
-dialog 1055
+# AI Commit
+
+根據修改內容自動產生 commmit message
+https://github.com/Nutlope/aicommits

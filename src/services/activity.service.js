@@ -52,8 +52,6 @@ class ActivityService {
   }
 
   create(formData) {
-    debugger;
-    console.log(formData);
     let user_id = getAuthorization().user._id;
 
     return axios.post(

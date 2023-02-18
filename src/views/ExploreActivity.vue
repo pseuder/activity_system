@@ -9,7 +9,7 @@ import AlertMessage from "@/components/AlertMessage.vue";
 import ActivityCard from "@/components/ActivityCard.vue";
 import DetailDialog from "@/components/DetailDialog.vue";
 import EditDialog from "@/components/EditDialog.vue";
-import { handleHTTPResponse } from "@/utils/commonFunction.js";
+import { handleHTTPResponse } from "@/utils/common.js";
 
 /* data */
 let sortOptions = reactive([

@@ -11,25 +11,26 @@ import ActivityCard from "@/components/ActivityCard.vue";
 import DetailDialog from "@/components/DetailDialog.vue";
 import EditDialog from "@/components/EditDialog.vue";
 
+import {
+  sortStatus,
+  sortOptions,
+  messageData,
+  activityData as editDialogData,
+  userSetting,
+  sorting,
+  filtering,
+  liking,
+  detailing,
+  enrolling,
+  canceling,
+  fillEditData,
+  showAlert,
+  handleHTTPResponse,
+  fetchGroupData,
+  fetchAndMarkActivityData,
+} from "@/utils/common.js";
+
 /* data */
-
-const sortStatus = {
-  UP: 0,
-  DOWN: 1,
-  None: 2,
-};
-
-let sortOptions = reactive([
-  { name: "活動時間", status: sortStatus.None, attribute: "activity_time" },
-  { name: "報名時間", status: sortStatus.None, attribute: "enroll_time" },
-  { name: "報名價格", status: sortStatus.None, attribute: "fee" },
-  { name: "查看人數", status: sortStatus.None, attribute: "watch" },
-  {
-    name: "參加人數",
-    status: sortStatus.None,
-    attribute: "enrollment_display",
-  },
-]);
 
 let filterOption = reactive([
   { name: "已報名", attribute: "registered" },
@@ -41,253 +42,60 @@ let filterOption = reactive([
 let groupData = [];
 let activityData = reactive([]);
 let activityData_display = reactive([]);
-let userData = reactive({});
 let detialDialogData = ref({});
-
-let userSetting = reactive({
-  displayMode: "list",
-  selectedTag: "已報名",
-});
-
-let messageData = reactive({
-  show: false,
-  state: "success",
-  message: "成功!",
-});
-
-let editDialogData = reactive({
-  _id: "",
-  title: "",
-  object: [],
-  location: "",
-  activity_time: [],
-  enroll_time: [],
-  fee: 0,
-  manager: "",
-  manager_contact: "",
-  quota: 0,
-  activity_imgs: [],
-  description: "",
-});
-
 let loading = ref(true);
 
+userSetting.displayMode = "list";
+userSetting.selectedTag = "已報名";
+
 /* functions */
-
 function sortClick(option) {
-  // 將其他排序選項重置
-  sortOptions.map((opt) => {
-    if (opt.name != option.name) opt.status = sortStatus.None;
+  sorting({
+    option,
+    activityData,
+    activityData_display,
   });
-
-  // status於0, 1, 2循環, 用於控制箭頭顯示和判斷遞增遞減
-  if (option.status == sortStatus.DOWN) {
-    activityData_display = reactive(JSON.parse(JSON.stringify(activityData)));
-  } else if (option.name === "活動時間" || option.name === "報名時間") {
-    activityData_display.sort(function (pre, next) {
-      return pre[option.attribute][0] > next[option.attribute][0]
-        ? (option.status - 1) * 1
-        : (option.status - 1) * -1;
-    });
-  } else {
-    activityData_display.sort(function (pre, next) {
-      return pre[option.attribute] > next[option.attribute]
-        ? (option.status - 1) * 1
-        : (option.status - 1) * -1;
-    });
-  }
-  option.status = (option.status + 1) % 3;
 }
-
-function tagClick(item) {
-  userSetting.selectedTag = item.name;
-
-  if (item.attribute === "all") {
-    activityData_display = reactive(JSON.parse(JSON.stringify(activityData)));
-  } else {
-    activityData_display = reactive(
-      JSON.parse(
-        JSON.stringify(
-          activityData.filter((activity) => {
-            return activity[item.attribute];
-          })
-        )
-      )
-    );
-  }
-}
-function likeClick(activity) {
-  UserService.likeActivity(activity._id);
-  activity.liked = !activity.liked;
+function filterClick(option) {
+  activityData_display = filtering({
+    option,
+    activityData,
+  });
 }
 function detailClick(activity) {
-  ActivityService.watch(activity._id);
-  activity.watch += 1;
-  detialDialogData.value = activity;
+  detailing({ activity, detialDialogData });
 }
 function enrollClick(activity) {
-  // 未完成: 報名後馬上加入當前畫面
-  ActivityService.enroll(activity._id)
-    .then((res) => {
-      messageData.message = res.data;
-      messageData.state = "success";
-      messageData.show = true;
-      activity.enrollment_display += 1;
-    })
-    .catch((err) => {
-      if (err.name === "AxiosError")
-        Store.commit("handleHTTPResponse", { err, messageData });
-      else console.error(err);
-    });
+  enrolling({ activity });
 }
-
 function cancelClick(activity) {
-  ActivityService.cancel(activity._id)
-    .then((res) => {
-      messageData.message = res.data;
-      messageData.state = "success";
-      messageData.show = true;
-      activity.enrollment_display -= 1;
-
-      let act_index = 0,
-        actD_index = 0;
-      for (let i in activityData) {
-        if (activityData[i]._id == activity._id) {
-          act_index = i;
-          break;
-        }
-      }
-      for (let i in activityData_display) {
-        if (activityData_display[i]._id == activity._id) {
-          actD_index = i;
-          break;
-        }
-      }
-      activityData.splice(act_index, 1);
-      activityData_display.splice(actD_index, 1);
-    })
-    .catch((err) => {
-      if (err.name === "AxiosError")
-        Store.commit("handleHTTPResponse", { err, messageData });
-      else console.error(err);
-    });
+  canceling({ activity, activityData_display });
 }
-
 function editClick(activity) {
-  for (let key in editDialogData) editDialogData[key] = activity[key];
-}
-
-function showAlert(data) {
-  if (data.state === "success") {
-    messageData.message = data.message;
-    messageData.state = "success";
-    messageData.show = true;
-  } else {
-    let err = data.err;
-    if (err.name === "AxiosError")
-      Store.commit("handleHTTPResponse", { err, messageData });
-    else console.error(err);
-  }
+  fillEditData({ editDialogData, activity });
 }
 
 function fetchData() {
-  return GroupService.getAllGroups()
-    .then((res) => {
-      groupData = res.data;
-      groupData.unshift({
-        _id: "0",
-        authority: [],
-        createTime: "",
-        member: [],
-        name: "全部",
-        updateTime: "",
-      });
-      // Get User data
-      return UserService.getUserInfo().then((res) => {
-        userData = res.data;
-        let user_enrolledActivity = [],
-          user_likedActivity = [];
-        userData.enrolledActivity.forEach((user_enrolled) => {
-          user_enrolledActivity.push(user_enrolled._id);
-        });
-
-        userData.likedActivity.forEach((user_liked) => {
-          user_likedActivity.push(user_liked._id);
-        });
-
-        // Get Activity data
-        return ActivityService.explore().then((res) => {
-          res.data.map((activity) => {
-            let registered = false,
-              expired = false,
-              liked = false,
-              created = false;
-
-            registered = user_enrolledActivity.includes(activity._id);
-            expired = new Date(activity.activity_time[1]) < new Date();
-            liked = user_likedActivity.includes(activity._id);
-            created = activity.creator._id === userData._id;
-
-            // 只留下跟使用者有關的資料
-            if (registered || expired || liked || created) {
-              activity.object_display = activity.object.join("  ");
-
-              //utc時間轉換
-              activity.activity_time[0] = new Date(activity.activity_time[0]);
-              activity.activity_time[1] = new Date(activity.activity_time[1]);
-
-              activity.activity_time_display = [
-                activity.activity_time[0].toLocaleDateString(),
-                activity.activity_time[1].toLocaleDateString(),
-              ].join("~");
-
-              activity.enroll_time[0] = new Date(activity.enroll_time[0]);
-              activity.enroll_time[1] = new Date(activity.enroll_time[1]);
-
-              activity.enroll_time_display = [
-                activity.enroll_time[0].toLocaleDateString(),
-                activity.enroll_time[1].toLocaleDateString(),
-              ].join("~");
-
-              activity.enrollment_display = activity.enrollment.length;
-
-              // 如果自己是創立者, 從已報名, 已截止中排除, 便於分類
-              if (created) registered = expired = false;
-              // 如果過期了, 從已報名中排除, 便於分類
-              if (expired) registered = false;
-
-              activity["registered"] = registered;
-              activity["expired"] = expired;
-              activity["liked"] = liked;
-              activity["created"] = created;
-
-              activityData.push(activity);
-            }
-          });
-        });
-      });
-    })
-    .catch((error) => {
-      throw error;
+  // 獲取群組資料
+  return fetchGroupData().then((res) => {
+    groupData = res;
+    return fetchAndMarkActivityData().then((res) => {
+      activityData = res;
+      return;
     });
+  });
 }
 
 // hook
 onBeforeMount(() => {
   fetchData()
     .then(() => {
-      // 將處理好的資料過濾成已報名的條件
-      activityData.map((activity) => {
-        if (activity.registered)
-          activityData_display.push(JSON.parse(JSON.stringify(activity)));
-      });
-
+      // 將原始資料過濾成"已報名"的資料
+      filterClick({ name: "已報名", attribute: "registered" });
       loading.value = false;
     })
     .catch((err) => {
-      if (err.name === "AxiosError")
-        Store.commit("handleHTTPResponse", { err, messageData });
-      else console.error(err);
+      handleHTTPResponse(err, messageData);
     });
 });
 </script>
@@ -302,7 +110,7 @@ onBeforeMount(() => {
     <a-spin v-show="loading" size="large" class="absolute left-1/2 top-1/2" />
     <DetailDialog
       :detail-data="detialDialogData"
-      @like-click="likeClick"
+      @like-click="liking"
       @enroll-click="enrollClick"
       @cancel-click="cancelClick"
     />
@@ -374,17 +182,17 @@ onBeforeMount(() => {
         <div class="flex py-2 lg:py-4 lg:pl-[16vw]">
           <!-- 條件排序 -->
           <div class="flex flex-grow flex-wrap text-xl">
-            <template v-for="(item, index) in sortOptions" :key="index">
+            <template v-for="(option, index) in sortOptions" :key="index">
               <div
                 class="mx-6 my-2 inline-flex items-center justify-center gap-2"
-                @click="sortClick(item)"
+                @click="sortClick(option)"
               >
                 <span
                   class="cursor-pointer select-none font-semibold"
                   :class="{
-                    '  text-blue-500': item.status != 2,
+                    '  text-blue-500': option.status != 2,
                   }"
-                  >{{ item.name }}</span
+                  >{{ option.name }}</span
                 >
                 <div class="flex cursor-pointer flex-col gap-1">
                   <svg
@@ -393,7 +201,7 @@ onBeforeMount(() => {
                     viewBox="0 0 12 9"
                     xmlns="http://www.w3.org/2000/svg"
                     :class="{
-                      ' fill-blue-500': item.status === sortStatus.UP,
+                      ' fill-blue-500': option.status === sortStatus.UP,
                     }"
                   >
                     <path
@@ -406,7 +214,7 @@ onBeforeMount(() => {
                     viewBox="0 0 12 9"
                     xmlns="http://www.w3.org/2000/svg"
                     :class="{
-                      ' fill-blue-500': item.status === sortStatus.DOWN,
+                      ' fill-blue-500': option.status === sortStatus.DOWN,
                     }"
                   >
                     <path
@@ -443,15 +251,16 @@ onBeforeMount(() => {
         <div class="lg:flex">
           <!-- tag過濾 -->
           <div class="flex flex-wrap font-semibold lg:w-1/5 lg:flex-col">
-            <template v-for="(item, index) in filterOption" :key="index">
+            <template v-for="(option, index) in filterOption" :key="index">
               <div
                 class="tag mx-2 my-2 inline-flex w-20 lg:w-11/12 lg:max-w-[160px]"
                 :class="{
-                  'text-white bg-primary': userSetting.selectedTag == item.name,
+                  'text-white bg-primary':
+                    userSetting.selectedTag == option.name,
                 }"
-                @click="tagClick(item)"
+                @click="filterClick(option)"
               >
-                {{ item.name }}
+                {{ option.name }}
               </div>
             </template>
           </div>
@@ -469,7 +278,7 @@ onBeforeMount(() => {
                 :form-data="item"
                 :group-data="groupData"
                 :user-setting="userSetting"
-                @like-click="likeClick"
+                @like-click="liking"
                 @detail-click="detailClick"
                 @enroll-click="enrollClick"
                 @cancel-click="cancelClick"

@@ -8,7 +8,7 @@ import ActivityService from "@/services/activity.service.js";
 import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
 import FileUpload from "@/components/FileUpload.vue";
-import { handleHTTPResponse } from "@/utils/commonFunction.js";
+import { handleHTTPResponse } from "@/utils/common.js";
 
 /* data */
 let createFormData;
