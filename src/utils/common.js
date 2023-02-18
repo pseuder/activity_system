@@ -1,4 +1,4 @@
-import { reactive, ref, onBeforeMount } from "vue";
+import { reactive } from "vue";
 import ActivityService from "@/services/activity.service.js";
 import UserService from "@/services/user.service.js";
 import GroupService from "@/services/group.service.js";
@@ -96,7 +96,7 @@ export function sorting(argc) {
   option.status = (option.status + 1) % 3;
 }
 
-export function filtering(argc) {
+export function myActivityFiltering(argc) {
   let { option, activityData } = argc;
   userSetting.selectedTag = option.name;
 
@@ -109,6 +109,25 @@ export function filtering(argc) {
           activityData.filter((activity) => {
             return activity[option.attribute];
           })
+        )
+      )
+    );
+  }
+}
+
+export function exploreActivityFiltering(argc) {
+  let { option, activityData } = argc;
+  userSetting.selectedTag = option.name;
+
+  if (option.name === "全部") {
+    return reactive(JSON.parse(JSON.stringify(activityData)));
+  } else {
+    return reactive(
+      JSON.parse(
+        JSON.stringify(
+          activityData.filter((activity) =>
+            activity.object.includes(option.name)
+          )
         )
       )
     );
@@ -146,31 +165,16 @@ export function enrolling(argc) {
 }
 
 export function canceling(argc) {
-  let { activity, activityData_display } = argc;
+  let { activity } = argc;
 
   ActivityService.cancel(activity._id)
     .then((res) => {
       messageData.message = res.data;
       messageData.state = "success";
       messageData.show = true;
-      activity.enrollment_display -= 1;
 
-      let act_index = 0,
-        actD_index = 0;
-      for (let i in activityData) {
-        if (activityData[i]._id == activity._id) {
-          act_index = i;
-          break;
-        }
-      }
-      for (let i in activityData_display) {
-        if (activityData_display[i]._id == activity._id) {
-          actD_index = i;
-          break;
-        }
-      }
-      activityData.splice(act_index, 1);
-      activityData_display.splice(actD_index, 1);
+      activity.enrollment_display -= 1;
+      activity.registered = false;
     })
     .catch((err) => {
       if (err.name === "AxiosError") handleHTTPResponse(err, messageData);

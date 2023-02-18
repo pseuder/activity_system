@@ -2,10 +2,6 @@
 import { reactive, ref, onBeforeMount } from "vue";
 import "tw-elements";
 
-import Store from "@/store";
-import ActivityService from "@/services/activity.service.js";
-import UserService from "@/services/user.service.js";
-import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
 import ActivityCard from "@/components/ActivityCard.vue";
 import DetailDialog from "@/components/DetailDialog.vue";
@@ -18,7 +14,7 @@ import {
   activityData as editDialogData,
   userSetting,
   sorting,
-  filtering,
+  myActivityFiltering,
   liking,
   detailing,
   enrolling,
@@ -57,7 +53,7 @@ function sortClick(option) {
   });
 }
 function filterClick(option) {
-  activityData_display = filtering({
+  activityData_display = myActivityFiltering({
     option,
     activityData,
   });
@@ -79,6 +75,7 @@ function fetchData() {
   // 獲取群組資料
   return fetchGroupData().then((res) => {
     groupData = res;
+    // 獲取標記後活動資料
     return fetchAndMarkActivityData().then((res) => {
       activityData = res;
       return;
@@ -190,7 +187,7 @@ onBeforeMount(() => {
                 <span
                   class="cursor-pointer select-none font-semibold"
                   :class="{
-                    '  text-blue-500': option.status != 2,
+                    '  text-blue-500': option.status != sortStatus.None,
                   }"
                   >{{ option.name }}</span
                 >

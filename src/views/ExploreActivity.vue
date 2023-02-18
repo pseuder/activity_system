@@ -2,255 +2,92 @@
 import { reactive, ref, onBeforeMount } from "vue";
 import "tw-elements";
 
-import ActivityService from "@/services/activity.service.js";
-import UserService from "@/services/user.service.js";
-import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
 import ActivityCard from "@/components/ActivityCard.vue";
 import DetailDialog from "@/components/DetailDialog.vue";
 import EditDialog from "@/components/EditDialog.vue";
-import { handleHTTPResponse } from "@/utils/common.js";
+import {
+  sortStatus,
+  sortOptions,
+  messageData,
+  activityData as editDialogData,
+  userSetting,
+  sorting,
+  exploreActivityFiltering,
+  liking,
+  detailing,
+  enrolling,
+  canceling,
+  fillEditData,
+  showAlert,
+  handleHTTPResponse,
+  fetchGroupData,
+  fetchAndMarkActivityData,
+} from "@/utils/common.js";
 
 /* data */
-let sortOptions = reactive([
-  { name: "活動時間", status: 2, attribute: "activity_time" },
-  { name: "報名時間", status: 2, attribute: "enroll_time" },
-  { name: "報名價格", status: 2, attribute: "fee" },
-  { name: "查看人數", status: 2, attribute: "watch" },
-  { name: "參加人數", status: 2, attribute: "enrollment_display" },
-]);
+
 let groupData = [];
 let activityData = reactive([]);
 let activityData_display = reactive([]);
-let userData = reactive({});
 let detialDialogData = ref({});
-let editDialogData = reactive({
-  _id: "",
-  title: "",
-  object: [],
-  location: "",
-  activity_time: [],
-  enroll_time: [],
-  fee: 0,
-  manager: "",
-  manager_contact: "",
-  quota: 0,
-  activity_imgs: [],
-  description: "",
-});
-
-let userSetting = reactive({
-  displayMode: "list",
-  selectedTag: "全部",
-});
-
-let messageData = reactive({
-  show: false,
-  state: "success",
-  message: "成功!",
-});
-
 let loading = ref(true);
+
+userSetting.displayMode = "list";
+userSetting.selectedTag = "全部";
 
 /* functions */
 
 function sortClick(option) {
-  sortOptions.map((opt) => {
-    if (opt.name != option.name) opt.status = 2;
+  sorting({
+    option,
+    activityData,
+    activityData_display,
   });
-
-  if (option.name === "活動時間" || option.name === "報名時間") {
-    activityData_display.sort(function (pre, next) {
-      return pre[option.attribute][0] > next[option.attribute][0]
-        ? (option.status - 1) * 1
-        : (option.status - 1) * -1;
-    });
-    option.status = (option.status + 1) % 3;
-  } else {
-    activityData_display.sort(function (pre, next) {
-      return pre[option.attribute] > next[option.attribute]
-        ? (option.status - 1) * 1
-        : (option.status - 1) * -1;
-    });
-    option.status = (option.status + 1) % 3;
-  }
 }
-function displayClick() {
-  userSetting.displayMode =
-    userSetting.displayMode === "list" ? "block" : "list";
-}
-function tagClick(item) {
-  userSetting.selectedTag = item.name;
-
-  if (item.name === "全部") {
-    activityData_display = JSON.parse(JSON.stringify(activityData));
-  } else {
-    activityData_display = JSON.parse(
-      JSON.stringify(
-        activityData.filter((activity) => activity.object.includes(item.name))
-      )
-    );
-  }
-}
-function likeClick(activity) {
-  UserService.likeActivity(activity._id);
-  activity.liked = !activity.liked;
+function filterClick(option) {
+  activityData_display = exploreActivityFiltering({
+    option,
+    activityData,
+  });
 }
 function detailClick(activity) {
-  ActivityService.watch(activity._id);
-  activity.watch += 1;
-  detialDialogData.value = activity;
+  detailing({ activity, detialDialogData });
 }
 function enrollClick(activity) {
-  return ActivityService.enroll(activity._id)
-    .then((res) => {
-      messageData.message = res.data;
-      messageData.state = "success";
-      messageData.show = true;
-      activity.enrollment_display += 1;
-      activity.registered = true;
-    })
-    .catch((err) => {
-      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
-      else console.error(err);
-    });
+  enrolling({ activity });
 }
 
 function cancelClick(activity) {
-  ActivityService.cancel(activity._id)
-    .then((res) => {
-      messageData.message = res.data;
-      messageData.state = "success";
-      messageData.show = true;
-      activity.enrollment_display -= 1;
-
-      let act_index = 0,
-        actD_index = 0;
-      for (let i in activityData) {
-        if (activityData[i]._id == activity._id) {
-          act_index = i;
-          break;
-        }
-      }
-      for (let i in activityData_display) {
-        if (activityData_display[i]._id == activity._id) {
-          actD_index = i;
-          break;
-        }
-      }
-      activityData.splice(act_index, 1);
-      activityData_display.splice(actD_index, 1);
-    })
-    .catch((err) => {
-      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
-      else console.error(err);
-    });
+  canceling({ activity, activityData_display });
 }
 
 function editClick(activity) {
-  for (let key in editDialogData) editDialogData[key] = activity[key];
+  fillEditData({ editDialogData, activity });
 }
 
 function fetchData() {
-  // Get Group data
-  return GroupService.getAllGroups()
-    .then((res) => {
-      groupData = res.data;
-      groupData.unshift({
-        _id: "0",
-        authority: [],
-        createTime: "",
-        member: [],
-        name: "全部",
-        updateTime: "",
-      });
-      // Get User data
-      return UserService.getUserInfo().then((res) => {
-        userData = res.data;
-        let user_enrolledActivity = [],
-          user_likedActivity = [];
-        userData.enrolledActivity.forEach((user_enrolled) => {
-          user_enrolledActivity.push(user_enrolled._id);
-        });
-
-        userData.likedActivity.forEach((user_liked) => {
-          user_likedActivity.push(user_liked._id);
-        });
-
-        // Get Activity data
-        return ActivityService.explore().then((res) => {
-          res.data.map((activity) => {
-            let registered = false,
-              expired = false,
-              liked = false,
-              created = false;
-
-            registered = user_enrolledActivity.includes(activity._id);
-            expired = new Date(activity.activity_time[1]) < new Date();
-            liked = user_likedActivity.includes(activity._id);
-            created = activity.creator._id === userData._id;
-
-            // 除了過期的都保留
-            if (!expired) {
-              activity.object_display = activity.object.join(" ");
-
-              //utc時間轉換
-              activity.activity_time[0] = new Date(activity.activity_time[0]);
-              activity.activity_time[1] = new Date(activity.activity_time[1]);
-
-              activity.activity_time_display = [
-                activity.activity_time[0].toLocaleDateString(),
-                activity.activity_time[1].toLocaleDateString(),
-              ].join("~");
-
-              activity.enroll_time[0] = new Date(activity.enroll_time[0]);
-              activity.enroll_time[1] = new Date(activity.enroll_time[1]);
-
-              activity.enroll_time_display = [
-                activity.enroll_time[0].toLocaleDateString(),
-                activity.enroll_time[1].toLocaleDateString(),
-              ].join("~");
-
-              activity.enrollment_display = activity.enrollment.length;
-
-              activity["registered"] = registered;
-              activity["expired"] = expired;
-              activity["liked"] = liked;
-              activity["created"] = created;
-
-              activityData.push(JSON.parse(JSON.stringify(activity)));
-              activityData_display.push(JSON.parse(JSON.stringify(activity)));
-            }
-          });
-        });
-      });
-    })
-    .catch((error) => {
-      throw error;
+  // 獲取群組資料
+  return fetchGroupData().then((res) => {
+    groupData = res;
+    // 獲取標記後活動資料
+    return fetchAndMarkActivityData().then((res) => {
+      activityData = res;
+      return;
     });
-}
-
-function showAlert(data) {
-  if (data.state === "success") {
-    messageData.message = data.message;
-    messageData.state = "success";
-    messageData.show = true;
-  } else {
-    let err = data.err;
-    if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
-    else console.error(err);
-  }
+  });
 }
 
 // hook
 onBeforeMount(() => {
   fetchData()
     .then(() => {
+      // 將原始資料過濾成"已報名"的資料
+      filterClick({ name: "全部", attribute: "all" });
       loading.value = false;
     })
     .catch((err) => {
-      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
-      else console.error(err);
+      handleHTTPResponse(err, messageData);
     });
 });
 </script>
@@ -264,7 +101,7 @@ onBeforeMount(() => {
     <a-spin v-show="loading" size="large" class="absolute left-1/2 top-1/2" />
     <DetailDialog
       :detail-data="detialDialogData"
-      @like-click="likeClick"
+      @like-click="liking"
       @enroll-click="enrollClick"
       @cancel-click="cancelClick"
     />
@@ -347,7 +184,7 @@ onBeforeMount(() => {
                 <span
                   class="cursor-pointer select-none font-semibold"
                   :class="{
-                    '  text-blue-500': item.status != 2,
+                    '  text-blue-500': item.status != sortStatus.None,
                   }"
                   >{{ item.name }}</span
                 >
@@ -358,7 +195,7 @@ onBeforeMount(() => {
                     viewBox="0 0 12 9"
                     xmlns="http://www.w3.org/2000/svg"
                     :class="{
-                      ' fill-blue-500': item.status === 0,
+                      ' fill-blue-500': item.status === sortStatus.UP,
                     }"
                   >
                     <path
@@ -371,7 +208,7 @@ onBeforeMount(() => {
                     viewBox="0 0 12 9"
                     xmlns="http://www.w3.org/2000/svg"
                     :class="{
-                      ' fill-blue-500': item.status === 1,
+                      ' fill-blue-500': item.status === sortStatus.DOWN,
                     }"
                   >
                     <path
@@ -391,7 +228,7 @@ onBeforeMount(() => {
               :class="{
                 'border-2': userSetting.displayMode == 'list',
               }"
-              @click="displayClick"
+              @click="userSetting.displayMode = 'list'"
             />
             <img
               src="@/assets/image/exploreBlock.svg"
@@ -400,7 +237,7 @@ onBeforeMount(() => {
               :class="{
                 'border-2 ': userSetting.displayMode == 'block',
               }"
-              @click="displayClick"
+              @click="userSetting.displayMode = 'block'"
             />
           </div>
         </div>
@@ -414,7 +251,7 @@ onBeforeMount(() => {
                 :class="{
                   'text-white bg-primary': userSetting.selectedTag == item.name,
                 }"
-                @click="tagClick(item)"
+                @click="filterClick(item)"
               >
                 {{ item.name }}
               </div>
@@ -434,7 +271,7 @@ onBeforeMount(() => {
                 :form-data="item"
                 :group-data="groupData"
                 :user-setting="userSetting"
-                @like-click="likeClick"
+                @like-click="liking"
                 @detail-click="detailClick"
                 @enroll-click="enrollClick"
                 @cancel-click="cancelClick"
