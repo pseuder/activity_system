@@ -52,15 +52,13 @@ class ActivityService {
   }
 
   create(formData) {
-    let user_id = getAuthorization().user._id;
-
     return axios.post(
       urlJoin(Store.state.domainAddress, "/api/activity/create"),
-      { formData, user_id },
+      formData,
       {
         headers: {
           Authorization: getAuthorization().token,
-          "Content-Type": "application/octet-stream",
+          "Content-Type": "multipart/form-data",
         },
       }
     );
@@ -90,6 +88,33 @@ class ActivityService {
       }
     );
   }
+
+  // async saveImages(files) {
+  //   const formData = new FormData();
+  //   formData.append("title", "qweR");
+  //   const QUALITY = 60;
+  //   for (let file of files) {
+  //     await fileToBase64ByQuality(file, QUALITY)
+  //       .then((base64) => {
+  //         let myBlob = convertBase64UrlToBlob(base64, file.type);
+  //         formData.append("files", myBlob);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   }
+
+  //   axios.post(
+  //     urlJoin(Store.state.domainAddress, "/server/upload/"),
+  //     formData,
+  //     {
+  //       headers: {
+  //         // "Content-Type": "application/octet-stream",
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     }
+  //   );
+  // }
 }
 
 export default new ActivityService();
