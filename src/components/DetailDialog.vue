@@ -99,7 +99,9 @@ function cancelClick() {
                 </div>
               </div>
               <div class="flex w-full justify-center">
-                <img src="@\assets\image\acticityImg.png" alt="" class="src" />
+                <img
+                  :src="'data:image/png;base64,' + detailData.activity_imgs[0]"
+                />
               </div>
             </div>
 
