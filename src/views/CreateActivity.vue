@@ -42,7 +42,7 @@ async function submitClick() {
       if (key === "activity_imgs") {
         for (let activity_img of createFormData[key]) {
           let file = activity_img.originFileObj;
-          await fileToBase64ByQuality(file, 60).then((base64) => {
+          await fileToBase64ByQuality(file, 80).then((base64) => {
             let myBlob = convertBase64UrlToBlob(base64, file.type);
             formData.append("files", myBlob);
           });
