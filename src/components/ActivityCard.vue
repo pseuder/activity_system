@@ -1,5 +1,4 @@
 <script setup>
-import "tw-elements";
 import {
   HeartOutlined,
   HeartFilled,
