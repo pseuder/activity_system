@@ -98,10 +98,28 @@ function cancelClick() {
                   {{ detailData.description }}
                 </div>
               </div>
-              <div class="flex w-full justify-center">
-                <img
-                  :src="'data:image/png;base64,' + detailData.activity_imgs[0]"
-                />
+              <div class="flex w-full justify-center gap-2">
+                <!-- <a-carousel autoplay class="w-full">
+                  <template
+                    v-for="img in detailData.activity_imgs"
+                    :key="img._id"
+                  >
+                    <div>
+                      <img
+                        :src="'data:image/png;base64,' + img"
+                        class="m-auto"
+                      />
+                    </div>
+                  </template>
+                </a-carousel> -->
+                <template
+                  v-for="img in detailData.activity_imgs"
+                  :key="img._id"
+                >
+                  <div>
+                    <img :src="'data:image/png;base64,' + img" class="m-auto" />
+                  </div>
+                </template>
               </div>
             </div>
 
@@ -129,3 +147,16 @@ function cancelClick() {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* For demo */
+.ant-carousel :deep(.slick-slide) {
+  text-align: center;
+  background: #364d79;
+  overflow: hidden;
+}
+
+.ant-carousel :deep(.slick-slide h3) {
+  color: #fff;
+}
+</style>
