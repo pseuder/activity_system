@@ -43,6 +43,16 @@ watch(props.editData, async (newData) => {
   }
 });
 
+function deleteClick() {
+  ActivityService.delete(editData_copy)
+    .then((res) => {
+      emit("showAlert", { message: res.data, state: "success", show: true });
+    })
+    .catch((err) => {
+      emit("showAlert", { err: err, state: "error", show: true });
+    });
+}
+
 function resetClick() {
   for (let key in editData_copy) {
     editData_copy[key] = props.editData[key];
@@ -263,6 +273,12 @@ function submitClick() {
               <!-- 分隔線 -->
               <hr class="my-3 w-[98%] border-2" />
               <div class="flex gap-6">
+                <button
+                  class="w-full bg-yellow-600"
+                  @click.prevent="deleteClick"
+                >
+                  刪除活動
+                </button>
                 <button
                   class="w-full bg-yellow-600"
                   @click.prevent="resetClick"

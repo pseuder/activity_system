@@ -77,10 +77,21 @@ class ActivityService {
   }
 
   edit(formData) {
-    console.log(formData._id);
     return axios.patch(
       urlJoin(Store.state.domainAddress, "/api/activity/edit/", formData._id),
       { formData },
+      {
+        headers: {
+          Authorization: getAuthorization().token,
+        },
+      }
+    );
+  }
+
+  delete(formData) {
+    return axios.post(
+      urlJoin(Store.state.domainAddress, "/api/activity/delete/", formData._id),
+      {},
       {
         headers: {
           Authorization: getAuthorization().token,
