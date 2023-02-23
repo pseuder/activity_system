@@ -112,14 +112,27 @@ function cancelClick() {
                     </div>
                   </template>
                 </a-carousel> -->
-                <template
+                <a-carousel dot-position="right" autoplay class="w-full">
+                  <template
+                    v-for="img in detailData.activity_imgs"
+                    :key="img._id"
+                  >
+                    <div>
+                      <img
+                        :src="'data:image/png;base64,' + img"
+                        class="m-auto"
+                      />
+                    </div>
+                  </template>
+                </a-carousel>
+                <!-- <template
                   v-for="img in detailData.activity_imgs"
                   :key="img._id"
                 >
                   <div>
                     <img :src="'data:image/png;base64,' + img" class="m-auto" />
                   </div>
-                </template>
+                </template> -->
               </div>
             </div>
 
