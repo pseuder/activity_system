@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, watch } from "vue";
+import { reactive, watch, ref } from "vue";
 import ActivityService from "@/services/activity.service.js";
 import FileUpload from "@/components/FileUpload.vue";
 
@@ -19,7 +19,7 @@ let props = defineProps({
   },
 });
 
-const emit = defineEmits(["showAlert"]);
+const emit = defineEmits(["showAlert", "removeActivityDisplay"]);
 
 // data
 let editData_copy = reactive({
@@ -37,6 +37,8 @@ let editData_copy = reactive({
   description: "",
 });
 
+let editDialog = ref(null);
+
 watch(props.editData, async (newData) => {
   for (let key in editData_copy) {
     editData_copy[key] = newData[key];
@@ -46,6 +48,8 @@ watch(props.editData, async (newData) => {
 function deleteClick() {
   ActivityService.delete(editData_copy)
     .then((res) => {
+      editDialog.value.click();
+      emit("removeActivityDisplay", editData_copy);
       emit("showAlert", { message: res.data, state: "success", show: true });
     })
     .catch((err) => {
@@ -73,6 +77,7 @@ function submitClick() {
 <template>
   <div
     id="editDialog"
+    ref="editDialog"
     class="modal fade fixed top-0 left-0 hidden h-full w-full overflow-hidden"
     tabindex="-1"
   >
@@ -273,10 +278,7 @@ function submitClick() {
               <!-- 分隔線 -->
               <hr class="my-3 w-[98%] border-2" />
               <div class="flex gap-6">
-                <button
-                  class="w-full bg-yellow-600"
-                  @click.prevent="deleteClick"
-                >
+                <button class="w-full bg-error" @click.prevent="deleteClick">
                   刪除活動
                 </button>
                 <button

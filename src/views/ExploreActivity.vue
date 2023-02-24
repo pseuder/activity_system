@@ -78,6 +78,13 @@ function fetchData() {
   });
 }
 
+function removeActivityDisplay(activity) {
+  activityData_display.splice(activityData_display.indexOf(activity), 1);
+  activityData.splice(activityData_display.indexOf(activity), 1);
+  console.log(activityData);
+  console.log(activityData_display);
+}
+
 // hook
 onBeforeMount(() => {
   fetchData()
@@ -109,6 +116,7 @@ onBeforeMount(() => {
       :edit-data="editDialogData"
       :group-data="groupData"
       @show-alert="showAlert"
+      @remove-activity-display="removeActivityDisplay"
     />
 
     <div v-show="!loading">
