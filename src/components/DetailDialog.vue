@@ -1,6 +1,6 @@
 <script setup>
 import { HeartOutlined, HeartFilled, EyeFilled } from "@ant-design/icons-vue";
-
+import ImageCarousel from "@/components/ImageCarousel.vue";
 // props
 const props = defineProps({
   detailData: {
@@ -99,40 +99,7 @@ function cancelClick() {
                 </div>
               </div>
               <div class="flex w-full justify-center gap-2">
-                <!-- <a-carousel autoplay class="w-full">
-                  <template
-                    v-for="img in detailData.activity_imgs"
-                    :key="img._id"
-                  >
-                    <div>
-                      <img
-                        :src="'data:image/png;base64,' + img"
-                        class="m-auto"
-                      />
-                    </div>
-                  </template>
-                </a-carousel> -->
-                <a-carousel dot-position="right" autoplay class="w-full">
-                  <template
-                    v-for="img in detailData.activity_imgs"
-                    :key="img._id"
-                  >
-                    <div>
-                      <img
-                        :src="'data:image/png;base64,' + img"
-                        class="m-auto"
-                      />
-                    </div>
-                  </template>
-                </a-carousel>
-                <!-- <template
-                  v-for="img in detailData.activity_imgs"
-                  :key="img._id"
-                >
-                  <div>
-                    <img :src="'data:image/png;base64,' + img" class="m-auto" />
-                  </div>
-                </template> -->
+                <ImageCarousel :images="detailData.activity_imgs" />
               </div>
             </div>
 
