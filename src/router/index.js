@@ -4,7 +4,7 @@ import Trial from "@/Trial.vue";
 import ExploreActivity from "@/views/ExploreActivity.vue";
 import CreateActivity from "@/views/CreateActivity.vue";
 import MyActivity from "@/views/MyActivity.vue";
-import Setting from "@/views/setting.vue";
+import Setting from "@/views/Setting.vue";
 const routes = [
   {
     path: "/",
