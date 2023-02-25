@@ -7,10 +7,11 @@ const state = reactive({
 });
 
 onMounted(() => {
+  // 控制照片的輪播
   setInterval(() => {
-    if (state.running)
-      state.currentIndex =
-        props.images.length && (state.currentIndex + 1) % props.images.length;
+    // 避免props還沒準備好時導致計算結果為null
+    if (state.running && props.images.length > 1)
+      state.currentIndex = (state.currentIndex + 1) % props.images.length;
   }, 1000);
 });
 
@@ -38,6 +39,7 @@ let props = defineProps({
 
 <template>
   <div @mouseover="mouseenter" @mouseleave="mouseleave">
-    <a-image :src="currentImage"></a-image>
+    <!-- 待完成: 人為控制輪播 -->
+    <a-image :src="currentImage" :preview="false"></a-image>
   </div>
 </template>
