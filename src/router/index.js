@@ -4,6 +4,7 @@ import Trial from "@/Trial.vue";
 import ExploreActivity from "@/views/ExploreActivity.vue";
 import CreateActivity from "@/views/CreateActivity.vue";
 import MyActivity from "@/views/MyActivity.vue";
+import Setting from "@/views/setting.vue";
 const routes = [
   {
     path: "/",
@@ -20,6 +21,10 @@ const routes = [
   {
     path: "/myactivity",
     component: MyActivity,
+  },
+  {
+    path: "/setting",
+    component: Setting,
   },
   {
     path: "/trial",
