@@ -12,16 +12,11 @@ import {
   handleHTTPResponse,
   fileToBase64ByQuality,
   convertBase64UrlToBlob,
+  messageData,
 } from "@/utils/common.js";
 
 /* data */
 let createFormData;
-
-let messageData = reactive({
-  show: false,
-  state: "success",
-  message: "成功!",
-});
 
 let groupData = ref([]);
 
