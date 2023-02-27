@@ -7,12 +7,14 @@ import {
   CloseOutlined,
 } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import Store from "../store";
 import urlJoin from "url-join";
 import UserService from "@/services/user.service.js";
 
-defineProps({
+const emit = defineEmits(["changeUserData"]);
+
+const props = defineProps({
   userImg: {
     type: String,
     default: "",
@@ -64,25 +66,27 @@ function cancelClick() {
   editable.value = false;
 }
 function checkClick() {
-  editable.value = false;
-
   UserService.updateProfile("avatar", imageUrl.value)
     .then((a) => {
-      console.log(a);
+      emit("changeUserData", "avatar", imageUrl.value);
+      editable.value = false;
     })
     .catch((b) => {
       console.log(b);
     });
 }
+
+watch(
+  () => props.userImg,
+  (newValue) => (imageUrl.value = newValue)
+);
 </script>
 <template>
   <div class="flex max-w-2xl px-4 py-2">
     <div v-show="!editable">
-      <!-- 使用者已上傳照片 -->
-
       <!-- 使用者原照片 -->
       <div class="h-[150px] w-[150px] bg-white">
-        <img :src="userImg" alt="no img here" />
+        <img :src="userImg" alt="no img here" class="rounded-full" />
       </div>
     </div>
     <a-upload
