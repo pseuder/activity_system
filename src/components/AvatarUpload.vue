@@ -1,24 +1,60 @@
 <template>
-  <a-upload
-    v-model:file-list="fileList"
-    name="avatar"
-    list-type="picture-card"
-    class="avatar-uploader"
-    :show-upload-list="false"
-    :action="urlJoin(Store.state.domainAddress, '/api/auth/upload/')"
-    :before-upload="beforeUpload"
-    @change="handleChange"
-  >
-    <img v-if="imageUrl" :src="imageUrl" alt="avatar" class="rounded-full" />
-    <div v-else>
-      <loading-outlined v-if="loading"></loading-outlined>
-      <plus-outlined v-else></plus-outlined>
-      <div class="ant-upload-text">Upload</div>
+  <div class="flex max-w-2xl px-4 py-2">
+    <a-upload
+      v-model:file-list="fileList"
+      name="avatar"
+      list-type="picture-card"
+      class="avatar-uploader w-fit"
+      :show-upload-list="false"
+      :action="urlJoin(Store.state.domainAddress, '/api/auth/upload/')"
+      :before-upload="beforeUpload"
+      @change="handleChange"
+    >
+      <img v-if="imageUrl" :src="imageUrl" alt="avatar" class="rounded-full" />
+      <div v-else>
+        <loading-outlined v-if="loading"></loading-outlined>
+        <plus-outlined v-else></plus-outlined>
+        <div class="ant-upload-text">Upload</div>
+      </div>
+    </a-upload>
+    <!-- edit button group -->
+    <div class="self-center">
+      <span
+        v-show="!editable"
+        class="flex h-8 w-8 items-center justify-center"
+        @click="editClick"
+      >
+        <edit-outlined />
+      </span>
+
+      <div class="flex align-bottom">
+        <span
+          v-show="editable"
+          class="flex h-8 w-8 cursor-pointer items-center justify-center"
+          @click="cancelClick"
+        >
+          <close-outlined />
+        </span>
+        <span
+          v-show="editable"
+          class="flex h-8 w-8 cursor-pointer items-center justify-center"
+          @click="checkClick"
+        >
+          <check-outlined />
+        </span>
+      </div>
     </div>
-  </a-upload>
+  </div>
 </template>
+
 <script>
-import { PlusOutlined, LoadingOutlined } from "@ant-design/icons-vue";
+import {
+  PlusOutlined,
+  LoadingOutlined,
+  EditOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { defineComponent, ref } from "vue";
 import Store from "../store";
@@ -32,12 +68,15 @@ export default defineComponent({
   components: {
     LoadingOutlined,
     PlusOutlined,
+    EditOutlined,
+    CheckOutlined,
+    CloseOutlined,
   },
-  props: ["value"],
   setup(props, { emit }) {
     const fileList = ref([]);
     const loading = ref(false);
     const imageUrl = ref("");
+    let editable = ref(false);
     const handleChange = (info) => {
       if (info.file.status === "uploading") {
         loading.value = true;
@@ -47,7 +86,6 @@ export default defineComponent({
         // Get this url from response in real world.
         getBase64(info.file.originFileObj, (base64Url) => {
           imageUrl.value = base64Url;
-          emit("update:value", base64Url);
           loading.value = false;
         });
       }
@@ -68,6 +106,15 @@ export default defineComponent({
       }
       return isJpgOrPng && isLt2M;
     };
+    function editClick() {
+      editable.value = true;
+    }
+    function cancelClick() {
+      editable.value = false;
+    }
+    function checkClick() {
+      editable.value = false;
+    }
     return {
       fileList,
       loading,
@@ -76,22 +123,17 @@ export default defineComponent({
       beforeUpload,
       Store,
       urlJoin,
+      editable,
+      editClick,
+      cancelClick,
+      checkClick,
     };
   },
 });
 </script>
-<style>
+<style scope>
 .avatar-uploader > .ant-upload {
-  width: 200px;
-  height: 200px;
-}
-.ant-upload-select-picture-card i {
-  font-size: 32px;
-  color: #999;
-}
-
-.ant-upload-select-picture-card .ant-upload-text {
-  margin-top: 8px;
-  color: #666;
+  width: 150px;
+  height: 150px;
 }
 </style>
