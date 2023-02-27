@@ -176,7 +176,9 @@ onBeforeMount(() => {
           </div>
         </nav>
         <div class="flex items-center">
-          <img src="@/assets/image/vue.svg" alt="vue logo" class="w-10" />
+          <a href="/setting">
+            <img src="@/assets/image/vue.svg" alt="vue logo" class="w-10" />
+          </a>
         </div>
       </header>
       <main class="py-4">
