@@ -35,6 +35,18 @@ class UserService {
       }
     );
   }
+
+  updateProfile(type, value) {
+    return axios.put(
+      urlJoin(Store.state.domainAddress, "/api/user/updateProfile/"),
+      { type, value },
+      {
+        headers: {
+          Authorization: getAuthorization().token,
+        },
+      }
+    );
+  }
 }
 
 export default new UserService();
