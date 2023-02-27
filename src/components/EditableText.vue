@@ -1,10 +1,13 @@
 <script setup>
-import { reactive, ref, onMounted } from "vue";
+import { ref, watch } from "vue";
 import {
   EditOutlined,
   CheckOutlined,
   CloseOutlined,
 } from "@ant-design/icons-vue";
+import UserService from "@/services/user.service.js";
+
+const emit = defineEmits(["changeUserData"]);
 
 let editable = ref(false);
 let editData = ref("");
@@ -21,8 +24,7 @@ const props = defineProps({
 });
 
 let caption = {
-  name: "姓名",
-  account: "帳號",
+  username: "姓名",
   password: "密碼",
   email: "信箱",
   phone: "電話",
@@ -35,27 +37,35 @@ function cancelClick() {
   editable.value = false;
 }
 function checkClick() {
-  editable.value = false;
+  UserService.updateProfile(props.type, editData.value)
+    .then((a) => {
+      emit("changeUserData", props.type, editData.value);
+      editable.value = false;
+    })
+    .catch((b) => {
+      console.log(b);
+    });
 }
 
-onMounted(() => {
-  editData.value = props.data;
-});
+watch(
+  () => props.data,
+  (newValue) => (editData.value = newValue)
+);
 </script>
 
 <template>
   <div class="flex h-24 w-full max-w-2xl items-center px-2 py-2">
-    <div class="flex-grow gap-4 md:flex">
-      <label class="w-10">{{ caption[type] }}</label>
+    <div class="flex-1 gap-4 overflow-hidden md:flex">
+      <label class="w-10 flex-shrink-0">{{ caption[type] }}</label>
       <div class="h-8 flex-grow text-gray">
-        <div v-show="!editable" class="overflow-y-auto">
+        <div v-show="!editable" class="overflow-x-auto">
           {{ data }}
         </div>
         <a-input
           v-show="editable"
           v-model:value="editData"
-          placeholder="Please input your name."
-          class="w-[85%] text-xl"
+          :placeholder="'Please input your ' + type"
+          class="h-[90%] w-[85%] text-xl"
         />
       </div>
     </div>
