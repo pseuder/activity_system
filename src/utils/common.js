@@ -245,7 +245,7 @@ export async function fetchAndMarkActivityData() {
       registered = user_enrolledActivity.includes(activity._id);
       expired = new Date(activity.activity_time[1]) < new Date();
       liked = user_likedActivity.includes(activity._id);
-      created = activity.creator._id === userData._id;
+      created = activity.creator && activity.creator._id === userData._id;
 
       // 只留下跟使用者有關的資料
       if (registered || expired || liked || created) {
