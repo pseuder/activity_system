@@ -28,9 +28,10 @@ setLocale("zh_TW");
 
 const app = createApp(App);
 
-app.config.globalProperties["$axios"] = axios;
-app.config.globalProperties["$urlJoin"] = urlJoin;
-app.config.globalProperties["$Store"] = Store;
+// 待完成: 提供axios baseURL
+const axiosInstance = axios.create({
+  baseURL: Store.state.domainAddress,
+});
 
 app.use(router).use(store).use(Antd);
 
