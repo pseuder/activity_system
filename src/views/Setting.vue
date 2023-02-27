@@ -1,20 +1,28 @@
 <script setup>
 import { reactive, ref } from "vue";
-import ActivityService from "@/services/activity.service.js";
-import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
-import AvatarUpload from "@/components/AvatarUpload.vue";
+import ProfileSetting from "@/components/ProfileSetting.vue";
 import { messageData } from "@/utils/common.js";
 
-let avatarImg = reactive("");
+import {
+  UserOutlined,
+  SettingOutlined,
+  QuestionCircleOutlined,
+} from "@ant-design/icons-vue";
 
-let qwe = () => {
-  console.log(avatarImg);
-};
+let currentPage = ref("profile");
+
+function navigate(path) {
+  currentPage.value = path;
+}
+
+const pageMap = reactive({
+  profile: ProfileSetting,
+});
 </script>
 
 <template>
-  <div class="main-bg flex flex-col gap-4 p-8 lg:px-16">
+  <div class="main-bg p-8 lg:px-16">
     <AlertMessage
       :message-data="messageData"
       @close-message="messageData.show = false"
@@ -77,29 +85,47 @@ let qwe = () => {
         <img src="@/assets/image/vue.svg" alt="vue logo" class="w-10" />
       </div>
     </header>
-    <main>
-      <div class="flex gap-2 overflow-y-auto bg-white bg-opacity-50 text-2xl">
-        <div class="w-[10%]">nav</div>
-        <div class="flex w-1 items-center">
-          <div class="h-[400px] w-[1px] bg-gray-400"></div>
+    <main
+      class="flex h-[700px] gap-2 overflow-y-auto bg-white bg-opacity-50 p-4 text-xl"
+    >
+      <!-- left side -->
+      <div class="w-[10%] max-w-[140px] md:w-[20%]">
+        <div class="mt-[100%] flex flex-col items-center gap-14">
+          <div
+            class="flex cursor-pointer items-center"
+            @click="navigate('profile')"
+          >
+            <user-outlined />
+            <span class="hidden md:inline">個人資料</span>
+          </div>
+          <div
+            class="flex cursor-pointer items-center"
+            @click="navigate('favorite')"
+          >
+            <setting-outlined />
+            <span class="hidden md:inline">喜愛設定</span>
+          </div>
+          <div
+            class="flex cursor-pointer items-center"
+            @click="navigate('contact')"
+          >
+            <question-circle-outlined />
+            <span class="hidden md:inline">聯絡我們</span>
+          </div>
         </div>
-        <div>
-          <div class="flex w-full gap-4 p-4">
-            <AvatarUpload v-model:value="avatarImg" />
-          </div>
-          <div class="flex w-full gap-4 p-4">
-            <label class="w-28 flex-shrink-0" for="title">活動標題</label>
-          </div>
-          <div class="flex w-full gap-4 p-4">
-            <label class="w-28 flex-shrink-0" for="title">活動標題</label>
-          </div>
-          <div class="flex w-full gap-4 p-4">
-            <label class="w-28 flex-shrink-0" for="title">活動標題</label>
-          </div>
-          <div class="flex w-full gap-4 p-4">
-            <label class="w-28 flex-shrink-0" for="title">活動標題</label>
-          </div>
-        </div>
+      </div>
+      <!-- middle -->
+      <div class="flex w-1 items-center">
+        <div class="h-[90%] w-[1px] bg-gray-400"></div>
+      </div>
+      <!-- right side -->
+      <div class="flex-grow">
+        <keep-alive>
+          <component
+            :is="pageMap[currentPage]"
+            @navigate="navigate"
+          ></component>
+        </keep-alive>
       </div>
     </main>
   </div>
