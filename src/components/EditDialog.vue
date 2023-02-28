@@ -40,7 +40,7 @@ let editData_copy = reactive({
 let editDialog = ref(null);
 
 watch(props.editData, async (newData) => {
-  for (let key in editData_copy) {
+  for (let key in props.editData) {
     editData_copy[key] = newData[key];
   }
 });
@@ -207,7 +207,7 @@ function submitClick() {
                 <label class="w-28 flex-shrink-0">活動時間</label>
                 <VeeField
                   v-slot="{ field }"
-                  v-model="editData_copy.activity_time"
+                  v-model="editData_copy.activity_time_editable"
                   name="activity_time"
                   rules="required"
                 >
@@ -227,7 +227,7 @@ function submitClick() {
                 <label class="w-28 flex-shrink-0">報名時間</label>
                 <VeeField
                   v-slot="{ field }"
-                  v-model="editData_copy.enroll_time"
+                  v-model="editData_copy.enroll_time_editable"
                   name="enroll_time"
                   rules="required"
                 >
