@@ -40,6 +40,8 @@ export let activityData = reactive({
   location: "",
   activity_time: [],
   enroll_time: [],
+  activity_time_editable: [],
+  enroll_time_editable: [],
   fee: 0,
   manager: "",
   manager_contact: "",
@@ -120,15 +122,11 @@ export function exploreActivityFiltering(argc) {
   userSetting.selectedTag = option.name;
 
   if (option.name === "全部") {
-    return reactive(JSON.parse(JSON.stringify(activityData)));
+    return JSON.parse(JSON.stringify(activityData));
   } else {
-    return reactive(
-      JSON.parse(
-        JSON.stringify(
-          activityData.filter((activity) =>
-            activity.object.includes(option.name)
-          )
-        )
+    return JSON.parse(
+      JSON.stringify(
+        activityData.filter((activity) => activity.object.includes(option.name))
       )
     );
   }
@@ -208,7 +206,7 @@ export async function fetchGroupData() {
       authority: [],
       createTime: "",
       member: [],
-      name: "全部",
+      name: "所有人",
       updateTime: "",
     });
   });
@@ -251,22 +249,63 @@ export async function fetchAndMarkActivityData() {
       if (registered || expired || liked || created) {
         activity.object_display = activity.object.join("  ");
 
-        //utc時間轉換
+        // utc時間轉Date
         activity.activity_time[0] = new Date(activity.activity_time[0]);
         activity.activity_time[1] = new Date(activity.activity_time[1]);
 
+        activity.enroll_time[0] = new Date(activity.enroll_time[0]);
+        activity.enroll_time[1] = new Date(activity.enroll_time[1]);
+
+        // Date for display
         activity.activity_time_display = [
           activity.activity_time[0].toLocaleDateString(),
           activity.activity_time[1].toLocaleDateString(),
         ].join("~");
 
-        activity.enroll_time[0] = new Date(activity.enroll_time[0]);
-        activity.enroll_time[1] = new Date(activity.enroll_time[1]);
-
         activity.enroll_time_display = [
           activity.enroll_time[0].toLocaleDateString(),
           activity.enroll_time[1].toLocaleDateString(),
         ].join("~");
+
+        // Date for editDialog
+        let date, year, month, day, dateString1, dateString2;
+        date = activity.activity_time[0];
+        year = date.getFullYear();
+        month = date.getMonth() + 1; // 取得月份，注意要加 1
+        day = date.getDate();
+
+        dateString1 = `${year}-${month.toString().padStart(2, "0")}-${day
+          .toString()
+          .padStart(2, "0")}`;
+
+        date = activity.activity_time[1];
+        year = date.getFullYear();
+        month = date.getMonth() + 1;
+        day = date.getDate();
+        dateString2 = `${year}-${month.toString().padStart(2, "0")}-${day
+          .toString()
+          .padStart(2, "0")}`;
+
+        activity.activity_time_editable = [dateString1, dateString2];
+
+        date = activity.enroll_time[0];
+        year = date.getFullYear();
+        month = date.getMonth() + 1; // 取得月份，注意要加 1
+        day = date.getDate();
+
+        dateString1 = `${year}-${month.toString().padStart(2, "0")}-${day
+          .toString()
+          .padStart(2, "0")}`;
+
+        date = activity.enroll_time[1];
+        year = date.getFullYear();
+        month = date.getMonth() + 1;
+        day = date.getDate();
+        dateString2 = `${year}-${month.toString().padStart(2, "0")}-${day
+          .toString()
+          .padStart(2, "0")}`;
+
+        activity.enroll_time_editable = [dateString1, dateString2];
 
         activity.enrollment_display = activity.enrollment.length;
 
