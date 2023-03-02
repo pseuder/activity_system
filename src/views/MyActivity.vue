@@ -8,11 +8,11 @@ import DetailDialog from "@/components/DetailDialog.vue";
 import EditDialog from "@/components/EditDialog.vue";
 
 import {
-  sortStatus,
-  sortOptions,
-  messageData,
-  activityData as editDialogData,
-  userSetting,
+  sortStatusTemplete,
+  sortOptionTemplete,
+  messageDataTemplete,
+  activityDataTemplete as editDialogData,
+  userSettingTemplete,
   sorting,
   myActivityFiltering,
   liking,
@@ -39,6 +39,10 @@ let groupData = [];
 let activityData = reactive([]);
 let activityData_display = reactive([]);
 let detialDialogData = ref({});
+let sortOptions = reactive(sortOptionTemplete);
+let sortStatus = reactive(sortStatusTemplete);
+let messageData = reactive(messageDataTemplete);
+let userSetting = reactive(userSettingTemplete);
 let loading = ref(true);
 
 userSetting.displayMode = "list";
@@ -56,6 +60,7 @@ function filterClick(option) {
   activityData_display = myActivityFiltering({
     option,
     activityData,
+    userSetting,
   });
 }
 function detailClick(activity) {

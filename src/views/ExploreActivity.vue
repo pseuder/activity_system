@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, onBeforeMount, onMounted, watch } from "vue";
+import { reactive, ref, onBeforeMount, watch } from "vue";
 import "tw-elements";
 
 import AlertMessage from "@/components/AlertMessage.vue";
@@ -13,13 +13,12 @@ import MainTag from "@/components/MainTag.vue";
 import UserService from "@/services/user.service.js";
 
 import {
-  sortStatus,
-  sortOptions,
-  messageData,
-  activityData as editDialogData,
-  userSetting,
+  sortStatusTemplete,
+  sortOptionTemplete,
+  messageDataTemplete,
+  userSettingTemplete,
+  activityDataTemplete,
   sorting,
-  exploreActivityFiltering,
   liking,
   detailing,
   enrolling,
@@ -34,14 +33,18 @@ import {
 /* data */
 
 let groupData = [];
-let activityData = reactive([]);
+let activityData = [];
 let activityData_display = ref([]);
+let editDialogData = ref({});
 let detialDialogData = ref({});
 let userData = ref({});
+let sortOptions = reactive(sortOptionTemplete);
+let sortStatus = reactive(sortStatusTemplete);
+let messageData = reactive(messageDataTemplete);
+let userSetting = reactive(userSettingTemplete);
 let loading = ref(true);
 
 userSetting.displayMode = "list";
-userSetting.selectedTag = "";
 
 // 根據標籤過濾
 watch(
@@ -56,6 +59,7 @@ watch(
 /* functions */
 function sortClick(option) {
   sorting({
+    sortOptions,
     option,
     activityData,
     activityData_display,
@@ -70,29 +74,17 @@ function displayClick(type) {
 function detailClick(activity) {
   detailing({ activity, detialDialogData });
 }
+function editClick(activity) {
+  fillEditData({ editDialogData, activity });
+}
 function enrollClick(activity) {
   enrolling({ activity });
 }
-
 function cancelClick(activity) {
   canceling({ activity, activityData_display });
 }
 
-function editClick(activity) {
-  fillEditData({ editDialogData, activity });
-}
-
-function fetchData() {
-  // 獲取群組資料
-  return fetchGroupData().then((res) => {
-    groupData = res;
-    // 獲取標記後活動資料
-    return fetchAndMarkActivityData().then((res) => {
-      activityData = res;
-    });
-  });
-}
-
+// 刪除活動後將其移除
 function removeActivityDisplay(activity) {
   activityData_display.value.splice(
     activityData_display.value.indexOf(activity),
@@ -100,16 +92,27 @@ function removeActivityDisplay(activity) {
   );
   activityData.splice(activityData.indexOf(activity), 1);
 }
-
-// hook
-onBeforeMount(() => {
-  UserService.getUserInfo().then((res) => {
+async function fetchData() {
+  // 獲取當前使用者資料
+  await UserService.getUserInfo().then((res) => {
     userData.value = res.data;
   });
 
+  // 獲取全部群組資料
+  await fetchGroupData().then((res) => {
+    groupData = res;
+  });
+
+  // 獲取標記後活動資料
+  await fetchAndMarkActivityData().then((res) => {
+    activityData = res;
+  });
+}
+
+// hook
+onBeforeMount(() => {
   fetchData()
     .then(() => {
-      // 將原始資料過濾成"已報名"的資料
       userSetting.selectedTag = "所有人";
       loading.value = false;
     })
@@ -168,7 +171,7 @@ onBeforeMount(() => {
         <div class="lg:flex">
           <!-- tag過濾 -->
           <div class="flex flex-wrap font-semibold lg:w-1/5 lg:flex-col">
-            <template v-for="(item, index) in groupData" :key="item._id">
+            <template v-for="item in groupData" :key="item._id">
               <MainTag
                 :item="item"
                 :user-setting="userSetting"

@@ -39,11 +39,14 @@ let editData_copy = reactive({
 
 let editDialog = ref(null);
 
-watch(props.editData, async (newData) => {
-  for (let key in props.editData) {
-    editData_copy[key] = newData[key];
+watch(
+  () => props.editData,
+  () => {
+    for (let key in props.editData) {
+      editData_copy[key] = props.editData[key];
+    }
   }
-});
+);
 
 function deleteClick() {
   ActivityService.delete(editData_copy)

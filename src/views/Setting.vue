@@ -2,7 +2,7 @@
 import { reactive, ref } from "vue";
 import AlertMessage from "@/components/AlertMessage.vue";
 import ProfileSetting from "@/components/ProfileSetting.vue";
-import { messageData } from "@/utils/common.js";
+import { messageDataTemplete } from "@/utils/common.js";
 
 import {
   UserOutlined,
@@ -11,6 +11,7 @@ import {
 } from "@ant-design/icons-vue";
 
 let currentPage = ref("profile");
+let messageData = reactive(messageDataTemplete);
 
 function navigate(path) {
   currentPage.value = path;

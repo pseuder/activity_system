@@ -12,7 +12,7 @@ import {
   handleHTTPResponse,
   fileToBase64ByQuality,
   convertBase64UrlToBlob,
-  messageData,
+  messageDataTemplete,
 } from "@/utils/common.js";
 
 /* data */
@@ -21,6 +21,7 @@ let createFormData;
 let groupData = ref([]);
 
 const antUpload = ref(null);
+let messageData = reactive(messageDataTemplete);
 
 /* functions */
 
@@ -80,7 +81,7 @@ onBeforeMount(() => {
       groupData.value = res.data;
     })
     .catch((err) => {
-      if (err.name === "AxiosError") handleHTTPResponse({ err, messageData });
+      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
       else console.error(err);
     });
 

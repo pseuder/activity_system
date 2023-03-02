@@ -4,36 +4,44 @@ import UserService from "@/services/user.service.js";
 import GroupService from "@/services/group.service.js";
 
 // data
-export let sortStatus = {
+export const sortStatusTemplete = {
   UP: 0,
   DOWN: 1,
   None: 2,
 };
 
-export let sortOptions = reactive([
-  { name: "活動時間", status: sortStatus.None, attribute: "activity_time" },
-  { name: "報名時間", status: sortStatus.None, attribute: "enroll_time" },
-  { name: "報名價格", status: sortStatus.None, attribute: "fee" },
-  { name: "查看人數", status: sortStatus.None, attribute: "watch" },
+export let sortOptionTemplete = [
+  {
+    name: "活動時間",
+    status: sortStatusTemplete.None,
+    attribute: "activity_time",
+  },
+  {
+    name: "報名時間",
+    status: sortStatusTemplete.None,
+    attribute: "enroll_time",
+  },
+  { name: "報名價格", status: sortStatusTemplete.None, attribute: "fee" },
+  { name: "查看人數", status: sortStatusTemplete.None, attribute: "watch" },
   {
     name: "參加人數",
-    status: sortStatus.None,
+    status: sortStatusTemplete.None,
     attribute: "enrollment_display",
   },
-]);
+];
 
-export let userSetting = reactive({
+export let userSettingTemplete = reactive({
   displayMode: "list",
   selectedTag: "已報名",
 });
 
-export let messageData = reactive({
+export let messageDataTemplete = {
   show: false,
   state: "success",
   message: "成功!",
-});
+};
 
-export let activityData = reactive({
+export let activityDataTemplete = {
   _id: "",
   title: "",
   object: [],
@@ -48,48 +56,51 @@ export let activityData = reactive({
   quota: 0,
   activity_imgs: [],
   description: "",
-});
+};
 
 // functions
 export function handleHTTPResponse(err, messageData) {
-  if (err.code === "ERR_NETWORK") {
-    // 無法連接至伺服器
-    messageData.message = "無法連接至伺服器";
-    messageData.state = "error";
-  } else {
-    let { message, state, error } = err.response.data;
-    console.error(error);
-    // 伺服器預期的錯誤
-    if (err.response.status == 401) {
-      messageData.message = "請登入後再試!";
-      messageData.state = "unauthorized";
-    } else {
-      messageData.message = message;
-      messageData.state = state;
+  console.error(err);
+  if (err.name === "AxiosError") {
+    // Axios問題
+    if (err.code === "ERR_NETWORK") {
+      messageData.message = "無法連接至伺服器";
+      messageData.state = "error";
+    } else if (err.code === "ERR_BAD_REQUEST") {
+      if (err.response && err.response.status == 401) {
+        messageData.message = "請登入後再試!";
+        messageData.state = "unauthorized";
+      }
     }
+  } else {
+    // 其他問題
+    messageData.message = "意外的錯誤";
+    messageData.state = "error";
   }
   messageData.show = true;
 }
 
 export function sorting(argc) {
-  let { option, activityData_display, activityData } = argc;
+  let { sortOptions, option, activityData_display, activityData } = argc;
 
   // 將其他排序選項重置
   sortOptions.map((opt) => {
-    if (opt.name != option.name) opt.status = sortStatus.None;
+    if (opt.name != option.name) opt.status = sortStatusTemplete.None;
   });
 
   // status於0, 1, 2循環, 用於控制箭頭顯示和判斷遞增遞減
-  if (option.status == sortStatus.DOWN) {
-    activityData_display = reactive(JSON.parse(JSON.stringify(activityData)));
+  if (option.status == sortStatusTemplete.DOWN) {
+    activityData_display.value = reactive(
+      JSON.parse(JSON.stringify(activityData))
+    );
   } else if (option.name === "活動時間" || option.name === "報名時間") {
-    activityData_display.sort(function (pre, next) {
+    activityData_display.value.sort(function (pre, next) {
       return pre[option.attribute][0] > next[option.attribute][0]
         ? (option.status - 1) * 1
         : (option.status - 1) * -1;
     });
   } else {
-    activityData_display.sort(function (pre, next) {
+    activityData_display.value.sort(function (pre, next) {
       return pre[option.attribute] > next[option.attribute]
         ? (option.status - 1) * 1
         : (option.status - 1) * -1;
@@ -99,7 +110,7 @@ export function sorting(argc) {
 }
 
 export function myActivityFiltering(argc) {
-  let { option, activityData } = argc;
+  let { option, activityData, userSetting } = argc;
   userSetting.selectedTag = option.name;
 
   if (option.attribute === "all") {
@@ -135,13 +146,6 @@ export function exploreActivityFiltering(argc) {
 export function liking(activity) {
   UserService.likeActivity(activity._id);
   activity.liked = !activity.liked;
-}
-
-export function detailing(argc) {
-  let { activity, detialDialogData } = argc;
-  ActivityService.watch(activity._id);
-  activity.watch += 1;
-  detialDialogData.value = activity;
 }
 
 export function enrolling(argc) {
@@ -180,9 +184,16 @@ export function canceling(argc) {
     });
 }
 
+export function detailing(argc) {
+  let { activity, detialDialogData } = argc;
+  ActivityService.watch(activity._id);
+  activity.watch += 1;
+  detialDialogData.value = activity;
+}
+
 export function fillEditData(argc) {
-  let { editDialogData, activity } = argc;
-  for (let key in editDialogData) editDialogData[key] = activity[key];
+  let { activity, editDialogData } = argc;
+  editDialogData.value = activity;
 }
 
 export function showAlert(data) {
