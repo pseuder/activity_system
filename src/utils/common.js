@@ -212,14 +212,6 @@ export async function fetchGroupData() {
   let groupData;
   await GroupService.getAllGroups().then((res) => {
     groupData = res.data;
-    groupData.unshift({
-      _id: "0",
-      authority: [],
-      createTime: "",
-      member: [],
-      name: "所有人",
-      updateTime: "",
-    });
   });
   return groupData;
 }

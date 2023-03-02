@@ -4,7 +4,7 @@ import ImageCarousel from "@/components/ImageCarousel.vue";
 
 import "tw-elements";
 
-let mImages = reactive([
+let mImages = ref([
   "https://source.unsplash.com/random/1",
   "https://source.unsplash.com/random/2",
 ]);

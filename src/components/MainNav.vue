@@ -6,7 +6,21 @@ defineProps({
       return {};
     },
   },
+  currentPage: {
+    type: String,
+    default() {
+      return "";
+    },
+  },
 });
+
+defineEmits(["navigate"]);
+
+let pageMap = {
+  explore: "探索活動",
+  create: "建立活動",
+  my: "我的活動",
+};
 </script>
 
 <template>
@@ -24,7 +38,7 @@ defineProps({
         data-bs-toggle="dropdown"
         aria-expanded="false"
       >
-        探索活動
+        {{ pageMap[currentPage] }}
         <svg
           aria-hidden="true"
           focusable="false"
@@ -43,22 +57,34 @@ defineProps({
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <li>
-          <a class="dropdown-item text-primary" href="/explore">探索活動</a>
+          <a class="dropdown-item text-primary" href="/main?page=explore"
+            >探索活動</a
+          >
         </li>
         <li>
-          <a class="dropdown-item" href="/create">建立活動</a>
+          <a class="dropdown-item" href="/main?page=create">建立活動</a>
         </li>
         <li>
-          <a class="dropdown-item" href="/myactivity">我的活動</a>
+          <a class="dropdown-item" href="/main?page=my">我的活動</a>
         </li>
       </ul>
     </div>
 
     <div class="hidden lg:flex">
       <div class="flex flex-shrink-0 gap-20 pl-[10vw] font-bold">
-        <a class="" href="/explore">探索活動</a>
-        <a class="text-black" href="/create">建立活動</a>
-        <a class="text-black" href="/myactivity">我的活動</a>
+        <a
+          :class="{ 'text-black': currentPage !== 'explore' }"
+          href="/main?page=explore"
+          >探索活動</a
+        >
+        <a
+          :class="{ 'text-black': currentPage !== 'create' }"
+          href="/main?page=create"
+          >建立活動</a
+        >
+        <a :class="{ 'text-black': currentPage !== 'my' }" href="/main?page=my"
+          >我的活動</a
+        >
       </div>
     </div>
   </nav>
