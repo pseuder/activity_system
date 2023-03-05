@@ -1,15 +1,12 @@
 import { createWebHistory, createRouter } from "vue-router";
-import Splash from "@/views/SplashView.vue";
-import Trial from "@/Trial.vue";
+import SplashView from "@/views/SplashView.vue";
 import MainView from "@/views/MainView.vue";
-import ExploreActivity from "@/views/ExploreActivity.vue";
-import CreateActivity from "@/views/CreateActivity.vue";
-import MyActivity from "@/views/MyActivity.vue";
-import Setting from "@/views/Setting.vue";
+import SettingView from "@/views/SettingView.vue";
+import Trial from "@/Trial.vue";
 const routes = [
   {
     path: "/",
-    component: Splash,
+    component: SplashView,
   },
   {
     path: "/main",
@@ -17,16 +14,8 @@ const routes = [
     query: true,
   },
   {
-    path: "/create",
-    component: CreateActivity,
-  },
-  {
-    path: "/myactivity",
-    component: MyActivity,
-  },
-  {
     path: "/setting",
-    component: Setting,
+    component: SettingView,
   },
   {
     path: "/trial",

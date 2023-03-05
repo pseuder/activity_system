@@ -4,28 +4,29 @@ import UserService from "@/services/user.service.js";
 import GroupService from "@/services/group.service.js";
 
 // data
+
 export const sortStatusTemplete = {
-  UP: 0,
-  DOWN: 1,
-  None: 2,
+  unsorted: 0,
+  ascending: 1,
+  descending: -1,
 };
 
 export let sortOptionTemplete = [
   {
     name: "活動時間",
-    status: sortStatusTemplete.None,
+    status: sortStatusTemplete.unsorted,
     attribute: "activity_time",
   },
   {
     name: "報名時間",
-    status: sortStatusTemplete.None,
+    status: sortStatusTemplete.unsorted,
     attribute: "enroll_time",
   },
-  { name: "報名價格", status: sortStatusTemplete.None, attribute: "fee" },
-  { name: "查看人數", status: sortStatusTemplete.None, attribute: "watch" },
+  { name: "報名價格", status: sortStatusTemplete.unsorted, attribute: "fee" },
+  { name: "查看人數", status: sortStatusTemplete.unsorted, attribute: "watch" },
   {
     name: "參加人數",
-    status: sortStatusTemplete.None,
+    status: sortStatusTemplete.unsorted,
     attribute: "enrollment_display",
   },
 ];
@@ -33,6 +34,7 @@ export let sortOptionTemplete = [
 export let userSettingTemplete = reactive({
   displayMode: "list",
   selectedTag: "已報名",
+  sortOption: undefined,
 });
 
 export let messageDataTemplete = {
@@ -59,17 +61,26 @@ export let activityDataTemplete = {
 };
 
 // functions
-export function handleHTTPResponse(err, messageData) {
-  console.error(err);
-  if (err.name === "AxiosError") {
+export function handleHTTPResponse(myError, messageData) {
+  if (myError.name === "AxiosError") {
     // Axios問題
-    if (err.code === "ERR_NETWORK") {
+    if (myError.code === "ERR_NETWORK") {
       messageData.message = "無法連接至伺服器";
       messageData.state = "error";
-    } else if (err.code === "ERR_BAD_REQUEST") {
-      if (err.response && err.response.status == 401) {
+    } else if (myError.code === "ERR_BAD_REQUEST") {
+      if (myError.response && myError.response.status == 401) {
         messageData.message = "請登入後再試!";
         messageData.state = "unauthorized";
+      }
+    } else if (myError.code === "ERR_BAD_RESPONSE") {
+      let { error, expected, message, state } = myError.response.data;
+      if (expected) {
+        messageData.message = message;
+        messageData.state = state;
+      } else {
+        console.error(error);
+        messageData.message = "意外的錯誤";
+        messageData.state = "error";
       }
     }
   } else {
@@ -81,32 +92,26 @@ export function handleHTTPResponse(err, messageData) {
 }
 
 export function sorting(argc) {
-  let { sortOptions, option, activityData_display, activityData } = argc;
+  let { activityData_filtered, option } = argc;
 
-  // 將其他排序選項重置
-  sortOptions.map((opt) => {
-    if (opt.name != option.name) opt.status = sortStatusTemplete.None;
-  });
+  if (!option) return activityData_filtered.value;
+  let tempData = JSON.parse(JSON.stringify(activityData_filtered.value));
 
-  // status於0, 1, 2循環, 用於控制箭頭顯示和判斷遞增遞減
-  if (option.status == sortStatusTemplete.DOWN) {
-    activityData_display.value = reactive(
-      JSON.parse(JSON.stringify(activityData))
-    );
+  if (option.status == sortStatusTemplete.unsorted) {
+    return tempData;
   } else if (option.name === "活動時間" || option.name === "報名時間") {
-    activityData_display.value.sort(function (pre, next) {
+    return tempData.sort(function (pre, next) {
       return pre[option.attribute][0] > next[option.attribute][0]
-        ? (option.status - 1) * 1
-        : (option.status - 1) * -1;
+        ? option.status * 1
+        : option.status * -1;
     });
   } else {
-    activityData_display.value.sort(function (pre, next) {
+    return tempData.sort(function (pre, next) {
       return pre[option.attribute] > next[option.attribute]
-        ? (option.status - 1) * 1
-        : (option.status - 1) * -1;
+        ? option.status * 1
+        : option.status * -1;
     });
   }
-  option.status = (option.status + 1) % 3;
 }
 
 export function myActivityFiltering(argc) {

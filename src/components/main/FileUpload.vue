@@ -25,11 +25,11 @@
   </div>
 </template>
 <script lang="ts">
-import { PlusOutlined } from "@ant-design/icons-vue";
 import { defineComponent, ref } from "vue";
+import { PlusOutlined } from "@ant-design/icons-vue";
 import type { UploadProps } from "ant-design-vue";
-import Store from "../store";
 import urlJoin from "url-join";
+import Store from "@/store";
 
 function getBase64(file: File) {
   return new Promise((resolve, reject) => {

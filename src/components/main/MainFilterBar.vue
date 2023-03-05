@@ -1,4 +1,5 @@
 <script setup>
+/* props */
 defineProps({
   item: {
     type: Object,
@@ -14,6 +15,7 @@ defineProps({
   },
 });
 
+/* emits */
 defineEmits(["filterClick"]);
 </script>
 

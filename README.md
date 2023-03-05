@@ -7,11 +7,17 @@ vee-validate
 ```
 錯誤訊息
 
-@param { Object } err - 原錯誤訊息, 用於 log
+
+
+@param {
+    message: "伺服器錯誤，新活動建立失敗!",
+    state: "error",
+    error: err,
+ } myError - 原錯誤訊息, 用於 log
 @param { Object } messageData - 訊息提示組件
 
 @example
-handleHTTPResponse(err, messageData);
+handleHTTPResponse(myError, messageData);
 ```
 
 # 上傳照片壓縮
@@ -24,6 +30,7 @@ handleHTTPResponse(err, messageData);
 
 - alertMessage 2000
 - dialog 1055
+- loading 1060
 
 # AI Commit
 

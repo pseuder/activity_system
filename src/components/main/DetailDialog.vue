@@ -1,7 +1,8 @@
 <script setup>
 import { HeartOutlined, HeartFilled, EyeFilled } from "@ant-design/icons-vue";
-import ImageCarousel from "@/components/ImageCarousel.vue";
-// props
+import ImageCarousel from "@/components/main/ImageCarousel.vue";
+
+/* props */
 const props = defineProps({
   detailData: {
     type: Object,
@@ -11,14 +12,16 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["likeClick", "enrollClick", "cancelClick"]);
-
+/* methods */
 function enrollClick() {
   emit("enrollClick", props.detailData);
 }
 function cancelClick() {
   emit("cancelClick", props.detailData);
 }
+
+/* emits */
+const emit = defineEmits(["likeClick", "enrollClick", "cancelClick"]);
 </script>
 
 <template>
@@ -99,7 +102,13 @@ function cancelClick() {
                 </div>
               </div>
               <div class="flex w-full justify-center gap-2">
-                <ImageCarousel :images="detailData.activity_imgs" />
+                <ImageCarousel
+                  v-show="
+                    detailData.activity_imgs &&
+                    detailData.activity_imgs.length > 0
+                  "
+                  :images="detailData.activity_imgs"
+                />
               </div>
             </div>
 
@@ -129,7 +138,6 @@ function cancelClick() {
 </template>
 
 <style scoped>
-/* For demo */
 .ant-carousel :deep(.slick-slide) {
   text-align: center;
   background: #364d79;

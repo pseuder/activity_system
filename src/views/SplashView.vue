@@ -1,38 +1,34 @@
 <script setup>
-// import { qq, AuthService } from "@/services/auth.service.js";
-
-import AuthService from "@/services/auth.service.js";
-import router from "@/router";
-
-import LoginView from "@/views/LoginView.vue";
-import SignupView from "@/views/SignupView.vue";
 import { ref, reactive, onMounted } from "vue";
+import router from "@/router";
+import AuthService from "@/services/auth.service.js";
+import SplashLogin from "@/views/SplashLogin.vue";
+import SplashSignup from "@/views/SplashSignup.vue";
 
-// data
+/* data */
 let currentPage = ref("login");
-
 const pageMap = reactive({
-  login: LoginView,
-  signup: SignupView,
+  login: SplashLogin,
+  signup: SplashSignup,
 });
 
+/* methods */
 function checkAuthorization() {
   AuthService.sessionAuth()
     .then(() => {
-      router.push("/explore");
+      router.push("/main");
     })
     .catch(() => {});
 }
 
-// hooks
-onMounted(() => {
-  checkAuthorization();
-});
-
-// functions
 function navigate(path) {
   currentPage.value = path;
 }
+
+/* hook */
+onMounted(() => {
+  checkAuthorization();
+});
 </script>
 
 <template>

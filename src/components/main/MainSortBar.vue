@@ -1,4 +1,5 @@
 <script setup>
+/* props */
 defineProps({
   item: {
     type: Object,
@@ -14,6 +15,7 @@ defineProps({
   },
 });
 
+/* emits */
 defineEmits(["sortClick"]);
 </script>
 
@@ -25,7 +27,7 @@ defineEmits(["sortClick"]);
     <span
       class="cursor-pointer select-none font-semibold"
       :class="{
-        '  text-blue-500': item.status != sortStatus.None,
+        '  text-blue-500': item.status != sortStatus.unsorted,
       }"
       >{{ item.name }}</span
     >
@@ -36,7 +38,7 @@ defineEmits(["sortClick"]);
         viewBox="0 0 12 9"
         xmlns="http://www.w3.org/2000/svg"
         :class="{
-          ' fill-blue-500': item.status === sortStatus.UP,
+          ' fill-blue-500': item.status === sortStatus.ascending,
         }"
       >
         <path
@@ -49,7 +51,7 @@ defineEmits(["sortClick"]);
         viewBox="0 0 12 9"
         xmlns="http://www.w3.org/2000/svg"
         :class="{
-          ' fill-blue-500': item.status === sortStatus.DOWN,
+          ' fill-blue-500': item.status === sortStatus.descending,
         }"
       >
         <path

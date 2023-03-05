@@ -1,4 +1,5 @@
 <script setup>
+import { ref, watch } from "vue";
 import {
   PlusOutlined,
   LoadingOutlined,
@@ -7,13 +8,12 @@ import {
   CloseOutlined,
 } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
-import { ref, watch } from "vue";
-import Store from "../store";
 import urlJoin from "url-join";
+
+import Store from "@/store";
 import UserService from "@/services/user.service.js";
 
-const emit = defineEmits(["changeUserData"]);
-
+/* props */
 const props = defineProps({
   userImg: {
     type: String,
@@ -21,11 +21,19 @@ const props = defineProps({
   },
 });
 
+/* data */
 const fileList = ref([]);
 const loading = ref(false);
 const imageUrl = ref("");
 let editable = ref(false);
 
+/* computed, watch */
+watch(
+  () => props.userImg,
+  (newValue) => (imageUrl.value = newValue)
+);
+
+/* methods */
 function getBase64(img, callback) {
   const reader = new FileReader();
   reader.addEventListener("load", () => callback(reader.result));
@@ -37,7 +45,6 @@ const handleChange = (info) => {
     return;
   }
   if (info.file.status === "done") {
-    // Get this url from response in real world.
     getBase64(info.file.originFileObj, (base64Url) => {
       imageUrl.value = base64Url;
       loading.value = false;
@@ -66,27 +73,27 @@ function cancelClick() {
   editable.value = false;
 }
 function checkClick() {
-  UserService.updateProfile("avatar", imageUrl.value)
-    .then((a) => {
-      emit("changeUserData", "avatar", imageUrl.value);
-      editable.value = false;
-    })
-    .catch((b) => {
-      console.log(b);
-    });
+  UserService.updateProfile("avatar", imageUrl.value).then(() => {
+    emit("changeUserData", "avatar", imageUrl.value);
+    editable.value = false;
+  });
 }
 
-watch(
-  () => props.userImg,
-  (newValue) => (imageUrl.value = newValue)
-);
+/* emits */
+const emit = defineEmits(["changeUserData"]);
 </script>
+
 <template>
   <div class="flex max-w-2xl px-4 py-2">
     <div v-show="!editable">
       <!-- 使用者原照片 -->
-      <div class="h-[150px] w-[150px] bg-white">
-        <img :src="userImg" alt="no img here" class="rounded-full" />
+      <div class="h-[150px] w-[150px]">
+        <img
+          v-if="userImg === ''"
+          src="@\assets\image\default user.png"
+          class="rounded-full"
+        />
+        <img v-else :src="userImg" alt="no img here" class="rounded-full" />
       </div>
     </div>
     <a-upload
@@ -118,7 +125,7 @@ watch(
     <div class="self-center">
       <span
         v-show="!editable"
-        class="flex h-8 w-8 items-center justify-center"
+        class="flex h-8 w-8 cursor-pointer items-center justify-center"
         @click="editClick"
       >
         <edit-outlined />

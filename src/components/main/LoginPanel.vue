@@ -3,12 +3,12 @@ import { reactive } from "vue";
 import { MailOutlined, LockOutlined } from "@ant-design/icons-vue";
 import { googleTokenLogin } from "vue3-google-login";
 
-import AuthService from "@/services/auth.service.js";
 import router from "@/router";
-import CustomInput from "./CustomInput.vue";
-import LoginPanelAlertMessage from "./LoginPanelAlertMessage.vue";
+import AuthService from "@/services/auth.service.js";
+import LoginPanelInput from "@/components/main/LoginPanelInput.vue";
+import LoginPanelMessage from "@/components/main/LoginPanelMessage.vue";
 
-// props
+/* props */
 let props = defineProps({
   title: {
     type: String,
@@ -31,7 +31,7 @@ let alertData = reactive({
 // functions
 function authorize() {
   AuthService.localAuth(props.title, formData, alertData).then((res) => {
-    if (res) router.push("/explore");
+    if (res) router.push("/main?page=explore");
   });
 }
 
@@ -40,7 +40,7 @@ function clickSSO(type) {
     googleTokenLogin()
       .then((res) => {
         AuthService.googleAuth(res);
-        router.push("/explore");
+        router.push("/main?page=explore");
       })
       .catch((err) => {
         console.log(err);
@@ -73,32 +73,32 @@ function clickSSO(type) {
         切換提示訊息
       </button> -->
       <!-- 提示訊息 -->
-      <LoginPanelAlertMessage
+      <LoginPanelMessage
         :alert-data="alertData"
         @close-alert="alertData.show = false"
-      ></LoginPanelAlertMessage>
+      ></LoginPanelMessage>
 
       <!-- 信箱&密碼 -->
       <div>
         <!-- <input :value="formData.email" type="text" @input="updateValue" /> -->
         <!-- 信箱輸入 -->
-        <custom-input
+        <LoginPanelInput
           v-model="formData.email"
           placeholder="Email address"
           type="email"
           class="my-2 h-14"
         >
           <mail-outlined />
-        </custom-input>
+        </LoginPanelInput>
         <!-- 密碼輸入 -->
-        <custom-input
+        <LoginPanelInput
           v-model="formData.password"
           placeholder="Password"
           input-type="password"
           class="my-2 h-14"
         >
           <lock-outlined />
-        </custom-input>
+        </LoginPanelInput>
       </div>
       <!-- help bar -->
       <slot name="helpbar"></slot>

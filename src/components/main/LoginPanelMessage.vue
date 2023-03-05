@@ -1,6 +1,7 @@
 <script setup>
 import { InfoCircleOutlined, CloseOutlined } from "@ant-design/icons-vue";
 
+/* props */
 defineProps({
   alertData: {
     type: Object,
@@ -15,6 +16,7 @@ defineProps({
   },
 });
 
+/* emits */
 defineEmits(["closeAlert"]);
 </script>
 

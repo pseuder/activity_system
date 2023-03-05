@@ -1,16 +1,13 @@
 <script setup>
-import { reactive, ref, onBeforeMount, watch } from "vue";
-import "tw-elements";
+import { reactive, ref, onBeforeMount, watch, computed } from "vue";
 
 import AlertMessage from "@/components/AlertMessage.vue";
-import ActivityCard from "@/components/ActivityCard.vue";
-import DetailDialog from "@/components/DetailDialog.vue";
-import EditDialog from "@/components/EditDialog.vue";
-import MainSort from "@/components/MainSort.vue";
-import MainDisplay from "@/components/MainDisplay.vue";
-import MainTag from "@/components/MainTag.vue";
-import UserService from "@/services/user.service.js";
-
+import ActivityCard from "@/components/main/ActivityCard.vue";
+import DetailDialog from "@/components/main/DetailDialog.vue";
+import EditDialog from "@/components/main/EditDialog.vue";
+import MainSortBar from "@/components/main/MainSortBar.vue";
+import MainOrientationSwitch from "@/components/main/MainOrientationSwitch.vue";
+import MainFilterBar from "@/components/main/MainFilterBar.vue";
 import {
   sortStatusTemplete,
   sortOptionTemplete,
@@ -23,16 +20,35 @@ import {
   canceling,
   fillEditData,
   showAlert,
-  handleHTTPResponse,
-  fetchGroupData,
-  fetchAndMarkActivityData,
 } from "@/utils/common.js";
 
-/* data */
+/* props */
+const props = defineProps({
+  activityData: {
+    type: Array,
+    required: true,
+  },
+  groupData: {
+    type: Array,
+    required: true,
+  },
+});
 
-let tagData = [];
-let activityData = [];
-let activityData_display = ref([]);
+/* data */
+let filterMap = {
+  已報名: "registered",
+  已截止: "expired",
+  已收藏: "liked",
+  已建立: "created",
+  全部: "all",
+};
+let filterOptions = ref([
+  { name: "已報名", attribute: "registered" },
+  { name: "已截止", attribute: "expired" },
+  { name: "已收藏", attribute: "liked" },
+  { name: "已建立", attribute: "created" },
+  { name: "全部", attribute: "all" },
+]);
 let editDialogData = ref({});
 let detialDialogData = ref({});
 let sortOptions = reactive(sortOptionTemplete);
@@ -40,26 +56,37 @@ let sortStatus = reactive(sortStatusTemplete);
 let messageData = reactive(messageDataTemplete);
 let userSetting = reactive(userSettingTemplete);
 
-userSetting.displayMode = "list";
-
-// 根據標籤過濾
-watch(
-  () => userSetting.selectedTag,
-  () => {
-    activityData_display.value = activityData.filter((activity) =>
-      activity.object.includes(userSetting.selectedTag)
+/* computed, watch */
+let activityData_filtered = computed(() => {
+  // 過濾條件
+  if (userSetting.selectedTag == "全部") return props.activityData;
+  else
+    return props.activityData.filter(
+      (activity) => activity[filterMap[userSetting.selectedTag]]
     );
+});
+
+let activityData_display = computed(() => {
+  // 排序條件
+  let option = userSetting.sortOption;
+  return sorting({ activityData_filtered, option });
+});
+
+watch(
+  () => props.activityData,
+  () => {
+    emit("stopLoading");
   }
 );
 
-/* functions */
+/* methods */
 function sortClick(option) {
-  sorting({
-    sortOptions,
-    option,
-    activityData,
-    activityData_display,
+  sortOptions.map((opt) => {
+    if (opt.name != option.name) opt.status = sortStatusTemplete.unsorted;
   });
+  option.status = option.status + 1;
+  if (option.status >= 2) option.status = -1;
+  userSetting.sortOption = option;
 }
 function filterClick(option) {
   userSetting.selectedTag = option.name;
@@ -79,47 +106,17 @@ function enrollClick(activity) {
 function cancelClick(activity) {
   canceling({ activity, activityData_display });
 }
-
-// 刪除活動後將其移除
 function removeActivityDisplay(activity) {
-  activityData_display.value.splice(
-    activityData_display.value.indexOf(activity),
-    1
-  );
-  activityData.splice(activityData.indexOf(activity), 1);
-}
-async function fetchData() {
-  // 獲取全部群組資料
-  await fetchGroupData().then((res) => {
-    tagData = res;
-    tagData.unshift({
-      _id: "0",
-      authority: [],
-      createTime: "",
-      member: [],
-      name: "所有人",
-      updateTime: "",
-    });
-  });
-
-  // 獲取標記後活動資料
-  await fetchAndMarkActivityData().then((res) => {
-    activityData = res;
-  });
+  emit("removeActivity", activity);
 }
 
-const emit = defineEmits(["navigate", "stopLoading"]);
+/* emits */
+const emit = defineEmits(["navigate", "stopLoading", "removeActivity"]);
 
-// hook
+/* hook */
 onBeforeMount(() => {
-  fetchData()
-    .then(() => {
-      userSetting.selectedTag = "所有人";
-      emit("stopLoading");
-    })
-    .catch((err) => {
-      handleHTTPResponse(err, messageData);
-    });
+  userSetting.displayMode = "list";
+  userSetting.selectedTag = "已報名";
 });
 </script>
 
@@ -141,12 +138,11 @@ onBeforeMount(() => {
     @remove-activity-display="removeActivityDisplay"
   />
   <div>
-    <!-- sort bar -->
     <div class="flex py-2 lg:py-4 lg:pl-[16vw]">
       <!-- 條件排序 -->
       <div class="flex flex-grow flex-wrap text-xl">
         <template v-for="(item, index) in sortOptions" :key="index">
-          <MainSort
+          <MainSortBar
             :item="item"
             :sort-status="sortStatus"
             @sort-click="sortClick"
@@ -155,7 +151,7 @@ onBeforeMount(() => {
       </div>
       <!-- 排序模式 -->
       <div class="hidden justify-center gap-4 self-center lg:flex">
-        <MainDisplay
+        <MainOrientationSwitch
           :user-setting="userSetting"
           @display-click="displayClick"
         />
@@ -165,8 +161,8 @@ onBeforeMount(() => {
     <div class="lg:flex">
       <!-- tag過濾 -->
       <div class="flex flex-wrap font-semibold lg:w-1/5 lg:flex-col">
-        <template v-for="item in tagData" :key="item._id">
-          <MainTag
+        <template v-for="item in filterOptions" :key="item._id">
+          <MainFilterBar
             :item="item"
             :user-setting="userSetting"
             @filter-click="filterClick"

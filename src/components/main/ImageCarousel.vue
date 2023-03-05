@@ -12,7 +12,7 @@ onMounted(() => {
     // 避免props還沒準備好時導致計算結果為null
     if (state.running && props.images.length > 1)
       state.currentIndex = (state.currentIndex + 1) % props.images.length;
-  }, 1000);
+  }, 2500);
 });
 
 const currentImage = computed(() => {

@@ -1,51 +1,76 @@
 <script setup>
-import { ref, reactive, onBeforeMount } from "vue";
+import { ref, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
-const route = useRoute();
 
 import UserService from "@/services/user.service.js";
-
-import ExploreActivity from "@/views/ExploreActivity.vue";
-import CreateActivity from "@/views/CreateActivity.vue";
-import MyActivity from "@/views/MyActivity.vue";
-
-import MainNav from "@/components/MainNav.vue";
-
-// data
+import MainExplore from "@/views/MainExplore.vue";
+import MainCreate from "@/views/MainCreate.vue";
+import MainMine from "@/views/MainMine.vue";
+import SettingView from "@/views/SettingView.vue";
+import MainNavBar from "@/components/main/MainNavBar.vue";
+import { fetchGroupData, fetchAndMarkActivityData } from "@/utils/common.js";
+/* data */
+const route = useRoute();
 let userData = ref({});
+let groupData = ref([]);
+let activityData = ref([]);
 let loading = ref(true);
 let currentPage = ref("explore");
 let componentMap = {
-  explore: ExploreActivity,
-  create: CreateActivity,
-  my: MyActivity,
+  explore: MainExplore,
+  create: MainCreate,
+  mine: MainMine,
+  setting: SettingView,
 };
 
-// functions
+/* methods */
+// 切換component
 function navigate(path) {
   currentPage.value = path;
 }
 
+// 停止轉圈圈
 function stopLoading() {
   loading.value = false;
 }
 
-onBeforeMount(async () => {
-  if (route.query) {
-    currentPage.value = route.query.page;
-  }
+// 刪除活動後將其移除
+function removeActivity(activity) {
+  activityData.value.splice(activityData.value.indexOf(activity), 1);
+}
 
+async function fetchData() {
+  // 獲取當前使用者資料
   await UserService.getUserInfo().then((res) => {
     userData.value = res.data;
   });
+
+  // 獲取全部群組資料
+  await fetchGroupData().then((res) => {
+    groupData.value = res;
+  });
+
+  // 獲取標記後活動資料
+  await fetchAndMarkActivityData().then((res) => {
+    activityData.value = res;
+  });
+}
+
+/* hook */
+onBeforeMount(() => {
+  fetchData();
 });
 </script>
 
 <template>
-  <div class="main-bg p-8 lg:px-16">
-    <a-spin v-show="loading" size="large" class="absolute left-1/2 top-1/2" />
+  <a-spin
+    v-show="loading"
+    size="large"
+    class="main-bg fixed z-[1060] flex h-[100vh] w-[100vw] items-center justify-center"
+  />
+  <div class="main-bg h-[100vh] w-[100vw] p-8 lg:px-16">
     <header class="flex justify-between text-3xl font-medium lg:pt-6">
-      <MainNav
+      <MainNavBar
         :user-data="userData"
         :current-page="currentPage"
         @navigate="navigate"
@@ -54,7 +79,10 @@ onBeforeMount(async () => {
     <main class="py-4">
       <component
         :is="componentMap[currentPage]"
+        :group-data="groupData"
+        :activity-data="activityData"
         @stop-loading="stopLoading"
+        @remove-activity="removeActivity"
       ></component>
     </main>
   </div>

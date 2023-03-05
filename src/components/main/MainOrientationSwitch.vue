@@ -1,4 +1,5 @@
 <script setup>
+/* props */
 defineProps({
   userSetting: {
     type: Object,
@@ -8,6 +9,7 @@ defineProps({
   },
 });
 
+/* emits */
 defineEmits(["displayClick"]);
 </script>
 

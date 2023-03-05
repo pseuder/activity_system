@@ -1,13 +1,11 @@
 <script setup>
-import { reactive, onBeforeMount, ref, onMounted } from "vue";
-import "tw-elements";
+import { reactive, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
-const router = useRouter();
-
+import "tw-elements";
 import ActivityService from "@/services/activity.service.js";
 import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
-import FileUpload from "@/components/FileUpload.vue";
+import FileUpload from "@/components/main/FileUpload.vue";
 import {
   handleHTTPResponse,
   fileToBase64ByQuality,
@@ -16,23 +14,19 @@ import {
 } from "@/utils/common.js";
 
 /* data */
+const router = useRouter();
 let createFormData;
-
 let groupData = ref([]);
-
 const antUpload = ref(null);
 let messageData = reactive(messageDataTemplete);
 
-/* functions */
-
+/* methods */
 function resetClick(handleReset) {
   antUpload.value.resetFileList();
   handleReset();
 }
-
 async function submitClick() {
   const formData = new FormData();
-
   for (let key in createFormData) {
     if (createFormData[key] != undefined || createFormData[key] != null) {
       if (key === "activity_imgs") {
@@ -61,22 +55,33 @@ async function submitClick() {
       else console.error(err);
     });
 }
-
 function autoFill() {
   createFormData.title = "title";
   createFormData.object = ["所有人"];
   createFormData.quota = 1;
   createFormData.location = "location";
-  createFormData.activity_time = ["2023/01/29", "2023/01/30"];
-  createFormData.enroll_time = ["2023/01/29", "2023/01/30"];
+  let date, year, month, day, dateString1, dateString2;
+
+  date = new Date();
+  year = date.getFullYear();
+  month = date.getMonth() + 1; // 取得月份，注意要加 1
+  day = date.getDate();
+
+  dateString1 = `${year}-${month.toString().padStart(2, "0")}-${day
+    .toString()
+    .padStart(2, "0")}`;
+
+  createFormData.activity_time = [dateString1, dateString1];
+  createFormData.enroll_time = [dateString1, dateString1];
   createFormData.manager = "manager";
   createFormData.manager_contact = "manager_contact";
   createFormData.description = "description";
 }
 
+/* emits */
 const emit = defineEmits(["navigate", "stopLoading"]);
 
-// hook
+/* hook */
 onBeforeMount(() => {
   GroupService.getAllGroups()
     .then((res) => {

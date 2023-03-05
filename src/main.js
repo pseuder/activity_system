@@ -8,7 +8,6 @@ import store from "./store";
 import "./style.css";
 import Antd from "ant-design-vue";
 import axios from "axios";
-import urlJoin from "url-join";
 import Store from "./store";
 
 import { Field, Form, ErrorMessage, defineRule, configure } from "vee-validate";

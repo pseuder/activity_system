@@ -1,6 +1,7 @@
 <script setup>
-import LoginPanel from "@/components/LoginPanel.vue";
+import LoginPanel from "@/components/main/LoginPanel.vue";
 
+/* emits */
 defineEmits(["navigate"]);
 </script>
 

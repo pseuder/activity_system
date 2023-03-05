@@ -5,14 +5,10 @@ import {
   EyeFilled,
   UserOutlined,
 } from "@ant-design/icons-vue";
+
+/* props */
 defineProps({
   formData: {
-    type: Array,
-    default() {
-      return [];
-    },
-  },
-  groupData: {
     type: Array,
     default() {
       return [];
@@ -26,6 +22,7 @@ defineProps({
   },
 });
 
+/* emits */
 defineEmits([
   "likeClick",
   "detailClick",

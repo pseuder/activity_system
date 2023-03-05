@@ -1,4 +1,5 @@
 <script setup>
+/* props */
 defineProps({
   placeholder: {
     type: String,
@@ -15,6 +16,7 @@ defineProps({
   },
 });
 
+/* emits */
 defineEmits(["update:modelValue"]);
 </script>
 

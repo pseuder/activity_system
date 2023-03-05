@@ -1,9 +1,10 @@
 <script setup>
 import { reactive, watch, ref } from "vue";
 import ActivityService from "@/services/activity.service.js";
-import FileUpload from "@/components/FileUpload.vue";
+import FileUpload from "@/components/main/FileUpload.vue";
+import { activityDataTemplete } from "@/utils/common.js";
 
-// props
+/* props */
 let props = defineProps({
   editData: {
     type: Object,
@@ -19,35 +20,14 @@ let props = defineProps({
   },
 });
 
+/* emits */
 const emit = defineEmits(["showAlert", "removeActivityDisplay"]);
 
 // data
-let editData_copy = reactive({
-  _id: "",
-  title: "",
-  object: [],
-  location: "",
-  activity_time: [],
-  enroll_time: [],
-  fee: 0,
-  manager: "",
-  manager_contact: "",
-  quota: 0,
-  activity_imgs: [],
-  description: "",
-});
-
+let editData_copy = reactive(activityDataTemplete);
 let editDialog = ref(null);
 
-watch(
-  () => props.editData,
-  () => {
-    for (let key in props.editData) {
-      editData_copy[key] = props.editData[key];
-    }
-  }
-);
-
+/* methods */
 function deleteClick() {
   ActivityService.delete(editData_copy)
     .then((res) => {
@@ -75,6 +55,16 @@ function submitClick() {
       emit("showAlert", { err: err, state: "error", show: true });
     });
 }
+
+/* computed, watch */
+watch(
+  () => props.editData,
+  () => {
+    for (let key in props.editData) {
+      editData_copy[key] = props.editData[key];
+    }
+  }
+);
 </script>
 
 <template>

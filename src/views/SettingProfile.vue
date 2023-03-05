@@ -1,9 +1,10 @@
 <script setup>
 import { reactive, onBeforeMount } from "vue";
-import AvatarUpload from "@/components/AvatarUpload.vue";
-import EditableText from "@/components/EditableText.vue";
 import UserService from "@/services/user.service.js";
+import ProfileAvatarUpload from "@/components/setting/ProfileAvatarUpload.vue";
+import ProfileEditableText from "@/components/setting/ProfileEditableText.vue";
 
+/* data */
 let userData = reactive({
   _id: "",
   avatar: "",
@@ -14,6 +15,12 @@ let userData = reactive({
   phone: "",
 });
 
+/* methods */
+function changeUserData(key, val) {
+  userData[key] = val;
+}
+
+/* hook */
 onBeforeMount(async () => {
   await UserService.getUserInfo().then((res) => {
     for (let key in userData) {
@@ -21,34 +28,30 @@ onBeforeMount(async () => {
     }
   });
 });
-
-function changeUserData(key, val) {
-  userData[key] = val;
-}
 </script>
 
 <template>
   <div class="flex flex-col items-center">
-    <AvatarUpload
+    <ProfileAvatarUpload
       :user-img="userData.avatar"
       @change-user-data="changeUserData"
     />
-    <EditableText
+    <ProfileEditableText
       type="username"
       :data="userData.username"
       @change-user-data="changeUserData"
     />
-    <EditableText
+    <ProfileEditableText
       type="email"
       :data="userData.email"
       @change-user-data="changeUserData"
     />
-    <EditableText
+    <ProfileEditableText
       type="password"
       :data="userData.password"
       @change-user-data="changeUserData"
     />
-    <EditableText
+    <ProfileEditableText
       type="phone"
       :data="userData.phone"
       @change-user-data="changeUserData"
