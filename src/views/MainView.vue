@@ -8,7 +8,12 @@ import MainCreate from "@/views/MainCreate.vue";
 import MainMine from "@/views/MainMine.vue";
 import SettingView from "@/views/SettingView.vue";
 import MainNavBar from "@/components/main/MainNavBar.vue";
-import { fetchGroupData, fetchAndMarkActivityData } from "@/utils/common.js";
+import AlertMessage from "@/components/AlertMessage.vue";
+import {
+  fetchGroupData,
+  fetchAndMarkActivityData,
+  handleAxiosResponse,
+} from "@/utils/common.js";
 /* data */
 const route = useRoute();
 let userData = ref({});
@@ -51,9 +56,11 @@ async function fetchData() {
   });
 
   // 獲取標記後活動資料
-  await fetchAndMarkActivityData().then((res) => {
-    activityData.value = res;
-  });
+  await fetchAndMarkActivityData()
+    .then((res) => {
+      activityData.value = res;
+    })
+    .catch((err) => handleAxiosResponse(err, AlertMessage));
 }
 
 /* hook */

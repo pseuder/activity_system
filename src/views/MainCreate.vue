@@ -1,13 +1,13 @@
 <script setup>
 import { reactive, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
-import "tw-elements";
 import ActivityService from "@/services/activity.service.js";
 import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
 import FileUpload from "@/components/main/FileUpload.vue";
+import { debounce } from "lodash";
 import {
-  handleHTTPResponse,
+  handleAxiosResponse,
   fileToBase64ByQuality,
   convertBase64UrlToBlob,
   messageDataTemplete,
@@ -25,7 +25,12 @@ function resetClick(handleReset) {
   antUpload.value.resetFileList();
   handleReset();
 }
-async function submitClick() {
+
+function submitClick() {
+  submitDebounce();
+}
+
+let submitDebounce = debounce(async function () {
   const formData = new FormData();
   for (let key in createFormData) {
     if (createFormData[key] != undefined || createFormData[key] != null) {
@@ -46,15 +51,13 @@ async function submitClick() {
 
   ActivityService.create(formData)
     .then((res) => {
-      messageData.show = true;
-      messageData.state = "success";
-      messageData.message = res.data;
+      handleAxiosResponse(res, messageData);
     })
     .catch((err) => {
-      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
-      else console.error(err);
+      handleAxiosResponse(err, messageData);
     });
-}
+}, 2000);
+
 function autoFill() {
   createFormData.title = "title";
   createFormData.object = ["所有人"];
@@ -89,7 +92,7 @@ onBeforeMount(() => {
       emit("stopLoading");
     })
     .catch((err) => {
-      handleHTTPResponse(err, messageData);
+      handleAxiosResponse(err, messageData);
     });
 
   createFormData = reactive({

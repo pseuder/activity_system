@@ -60,34 +60,41 @@ export let activityDataTemplete = {
   description: "",
 };
 
-// functions
-export function handleHTTPResponse(myError, messageData) {
-  if (myError.name === "AxiosError") {
-    // Axios問題
-    if (myError.code === "ERR_NETWORK") {
-      messageData.message = "無法連接至伺服器";
-      messageData.state = "error";
-    } else if (myError.code === "ERR_BAD_REQUEST") {
-      if (myError.response && myError.response.status == 401) {
-        messageData.message = "請登入後再試!";
-        messageData.state = "unauthorized";
-      }
-    } else if (myError.code === "ERR_BAD_RESPONSE") {
-      let { error, expected, message, state } = myError.response.data;
-      if (expected) {
-        messageData.message = message;
-        messageData.state = state;
-      } else {
-        console.error(error);
-        messageData.message = "意外的錯誤";
+// 處理所有由Axios接收的訊息
+export function handleAxiosResponse(res, messageData) {
+  // 成功
+  if (res.status === 200) {
+    let { message, state, show } = res.data;
+    messageData.message = res.data;
+    messageData.state = "success";
+    messageData.show = true;
+  } else if (res.name === "AxiosError") {
+    console.error(res);
+    switch (res.code) {
+      case "ERR_NETWORK":
+        messageData.message = "無法連接至伺服器";
         messageData.state = "error";
-      }
+        break;
+      case "ERR_BAD_REQUEST":
+        if (res.response && res.response.status == 401) {
+          // 未授權
+          messageData.message = "請登入後再試!";
+          messageData.state = "unauthorized";
+        } else {
+          // 其他錯誤(Caught)
+          let { message, state } = res.response.data;
+          messageData.message = message;
+          messageData.state = state;
+        }
+        break;
     }
   } else {
-    // 其他問題
+    // 其他問題(Uncaught)
+    console.error(res);
     messageData.message = "意外的錯誤";
     messageData.state = "error";
   }
+
   messageData.show = true;
 }
 
@@ -166,7 +173,7 @@ export function enrolling(argc) {
       activity.enrollment_display += 1;
     })
     .catch((err) => {
-      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
+      if (err.name === "AxiosError") handleAxiosResponse(err, messageData);
       else console.error(err);
     });
 }
@@ -184,7 +191,7 @@ export function canceling(argc) {
       activity.registered = false;
     })
     .catch((err) => {
-      if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
+      if (err.name === "AxiosError") handleAxiosResponse(err, messageData);
       else console.error(err);
     });
 }
@@ -201,16 +208,12 @@ export function fillEditData(argc) {
   editDialogData.value = activity;
 }
 
-export function showAlert(data) {
-  if (data.state === "success") {
-    messageData.message = data.message;
-    messageData.state = "success";
-    messageData.show = true;
-  } else {
-    let err = data.err;
-    if (err.name === "AxiosError") handleHTTPResponse(err, messageData);
-    else console.error(err);
-  }
+// @param {state, message} data
+// @param {component} messageData
+export function showMessageData(data, messageData) {
+  messageData.message = data.message;
+  messageData.state = "success";
+  messageData.show = true;
 }
 
 export async function fetchGroupData() {

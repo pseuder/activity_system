@@ -5,7 +5,7 @@ import {
   EyeFilled,
   UserOutlined,
 } from "@ant-design/icons-vue";
-
+import "tw-elements"; //用於觸發 data-bs-toggle, data-bs-target
 /* props */
 defineProps({
   formData: {

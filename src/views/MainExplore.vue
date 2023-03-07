@@ -19,7 +19,7 @@ import {
   enrolling,
   canceling,
   fillEditData,
-  showAlert,
+  showMessageData,
 } from "@/utils/common.js";
 
 /* props */
@@ -132,7 +132,7 @@ onBeforeMount(() => {
   <EditDialog
     :edit-data="editDialogData"
     :group-data="groupData"
-    @show-alert="showAlert"
+    @show-alert="showMessageData"
     @remove-activity-display="removeActivityDisplay"
   />
   <div>

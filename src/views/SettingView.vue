@@ -1,26 +1,30 @@
 <script setup>
 import { reactive, ref } from "vue";
 import AlertMessage from "@/components/AlertMessage.vue";
-import MainNavBar from "@/components/main/MainNavBar.vue";
 import SettingProfile from "@/views/SettingProfile.vue";
 import { messageDataTemplete } from "@/utils/common.js";
-
+import router from "@/router";
 import {
   UserOutlined,
   SettingOutlined,
   QuestionCircleOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons-vue";
 
 let currentPage = ref("profile");
 let messageData = reactive(messageDataTemplete);
+const pageMap = reactive({
+  profile: SettingProfile,
+});
 
 function navigate(path) {
   currentPage.value = path;
 }
 
-const pageMap = reactive({
-  profile: SettingProfile,
-});
+function logoutClick() {
+  localStorage.clear();
+  router.push("/");
+}
 </script>
 
 <template>
@@ -57,6 +61,13 @@ const pageMap = reactive({
           >
             <question-circle-outlined />
             <span class="hidden lg:inline">聯絡我們</span>
+          </div>
+          <div
+            class="flex cursor-pointer items-center text-red-500"
+            @click="logoutClick"
+          >
+            <logout-outlined />
+            <span class="hidden lg:inline">登出</span>
           </div>
         </div>
       </div>

@@ -2,13 +2,23 @@
 
 vee-validate
 
+# axios response
+
+- 成功  
+  ![axiosSuccess](src\assets\readme\axiosSuccess.png)
+- 無法連接至伺服器  
+  ![axiosNetworkError](src\assets\readme\axiosNetworkError.png)
+- 未授權  
+  ![axiosInAuthorized](src\assets\readme\axiosInAuthorized.png)
+- 預期的錯誤  
+  ![expectedError](src\assets\readme\expectedError.png)
+- 伺服器內部錯誤  
+  ![serverError](src\assets\readme\serverError.png)
+
 # 錯誤訊息參數規範
 
 ```
-錯誤訊息
-
-
-
+@name handleAxiosResponse
 @param {
     message: "伺服器錯誤，新活動建立失敗!",
     state: "error",
@@ -17,7 +27,7 @@ vee-validate
 @param { Object } messageData - 訊息提示組件
 
 @example
-handleHTTPResponse(myError, messageData);
+handleAxiosResponse(myError, messageData);
 ```
 
 # 上傳照片壓縮
