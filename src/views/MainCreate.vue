@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
+import { LoadingOutlined } from "@ant-design/icons-vue";
 import ActivityService from "@/services/activity.service.js";
 import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
@@ -11,14 +12,16 @@ import {
   fileToBase64ByQuality,
   convertBase64UrlToBlob,
   messageDataTemplete,
+  showMessageData,
 } from "@/utils/common.js";
 
 /* data */
-const router = useRouter();
+let router = useRouter();
 let createFormData;
 let groupData = ref([]);
-const antUpload = ref(null);
+let antUpload = ref(null);
 let messageData = reactive(messageDataTemplete);
+let submitLoading = ref(true);
 
 /* methods */
 function resetClick(handleReset) {
@@ -27,6 +30,7 @@ function resetClick(handleReset) {
 }
 
 function submitClick() {
+  submitLoading.value = true;
   submitDebounce();
 }
 
@@ -51,10 +55,12 @@ let submitDebounce = debounce(async function () {
 
   ActivityService.create(formData)
     .then((res) => {
-      handleAxiosResponse(res, messageData);
+      showMessageData({ message: res.data, state: "success" }, messageData);
+      submitLoading.value = false;
     })
     .catch((err) => {
       handleAxiosResponse(err, messageData);
+      submitLoading.value = false;
     });
 }, 2000);
 
@@ -63,7 +69,7 @@ function autoFill() {
   createFormData.object = ["所有人"];
   createFormData.quota = 1;
   createFormData.location = "location";
-  let date, year, month, day, dateString1, dateString2;
+  let date, year, month, day, dateString1;
 
   date = new Date();
   year = date.getFullYear();
@@ -315,9 +321,17 @@ onBeforeMount(() => {
         清空
       </button>
       <button
+        v-show="!submitLoading"
         class="w-24 rounded-md text-base font-semibold text-white bg-primary"
         @click="handleSubmit($event, submitClick)"
       >
+        建立
+      </button>
+      <button
+        v-show="submitLoading"
+        class="w-24 cursor-not-allowed rounded-md bg-blue-900 text-base font-semibold text-white"
+      >
+        <loading-outlined />
         建立
       </button>
     </div>

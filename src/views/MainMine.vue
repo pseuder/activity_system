@@ -59,11 +59,26 @@ let userSetting = reactive(userSettingTemplete);
 /* computed, watch */
 let activityData_filtered = computed(() => {
   // 過濾條件
-  if (userSetting.selectedTag == "全部") return props.activityData;
-  else
-    return props.activityData.filter(
-      (activity) => activity[filterMap[userSetting.selectedTag]]
-    );
+  switch (userSetting.selectedTag) {
+    case "已報名":
+      return props.activityData.filter(
+        (activity) => activity.registered && !activity.expired
+      );
+    case "已截止":
+      return props.activityData.filter(
+        (activity) => activity.registered && activity.expired
+      );
+    case "已收藏":
+      return props.activityData.filter((activity) => activity.liked);
+    case "已建立":
+      return props.activityData.filter((activity) => activity.created);
+    case "全部":
+      return props.activityData.filter(
+        (activity) => activity.registered || activity.liked || activity.created
+      );
+    default:
+      return [];
+  }
 });
 
 let activityData_display = computed(() => {
@@ -101,7 +116,7 @@ function editClick(activity) {
   fillEditData({ editDialogData, activity });
 }
 function enrollClick(activity) {
-  enrolling({ activity });
+  enrolling({ activity, messageData });
 }
 function cancelClick(activity) {
   canceling({ activity, activityData_display });
@@ -141,13 +156,11 @@ onBeforeMount(() => {
     <div class="flex py-2 lg:py-4 lg:pl-[16vw]">
       <!-- 條件排序 -->
       <div class="flex flex-grow flex-wrap text-xl">
-        <template v-for="(item, index) in sortOptions" :key="index">
-          <MainSortBar
-            :item="item"
-            :sort-status="sortStatus"
-            @sort-click="sortClick"
-          />
-        </template>
+        <MainSortBar
+          :sort-options="sortOptions"
+          :sort-status="sortStatus"
+          @sort-click="sortClick"
+        />
       </div>
       <!-- 排序模式 -->
       <div class="hidden justify-center gap-4 self-center lg:flex">
@@ -161,13 +174,11 @@ onBeforeMount(() => {
     <div class="lg:flex">
       <!-- tag過濾 -->
       <div class="flex flex-wrap font-semibold lg:w-1/5 lg:flex-col">
-        <template v-for="item in filterOptions" :key="item._id">
-          <MainFilterBar
-            :item="item"
-            :user-setting="userSetting"
-            @filter-click="filterClick"
-          />
-        </template>
+        <MainFilterBar
+          :filter-options="filterOptions"
+          :user-setting="userSetting"
+          @filter-click="filterClick"
+        />
       </div>
       <!-- 活動顯示 -->
       <div

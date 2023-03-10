@@ -89,7 +89,7 @@ function sortClick(option) {
 function filterClick(option) {
   userSetting.selectedTag = option.name;
 }
-function displayClick(type) {
+function orientationClick(type) {
   userSetting.displayMode = type;
 }
 function detailClick(activity) {
@@ -99,7 +99,7 @@ function editClick(activity) {
   fillEditData({ editDialogData, activity });
 }
 function enrollClick(activity) {
-  enrolling({ activity });
+  enrolling({ activity, messageData });
 }
 function cancelClick(activity) {
   canceling({ activity, activityData_display });
@@ -139,19 +139,17 @@ onBeforeMount(() => {
     <div class="flex py-2 lg:py-4 lg:pl-[16vw]">
       <!-- 條件排序 -->
       <div class="flex flex-grow flex-wrap text-xl">
-        <template v-for="(item, index) in sortOptions" :key="index">
-          <MainSortBar
-            :item="item"
-            :sort-status="sortStatus"
-            @sort-click="sortClick"
-          />
-        </template>
+        <MainSortBar
+          :sort-options="sortOptions"
+          :sort-status="sortStatus"
+          @sort-click="sortClick"
+        />
       </div>
       <!-- 排序模式 -->
       <div class="hidden justify-center gap-4 self-center lg:flex">
         <MainOrientationSwitch
           :user-setting="userSetting"
-          @display-click="displayClick"
+          @orientation-click="orientationClick"
         />
       </div>
     </div>
@@ -159,13 +157,11 @@ onBeforeMount(() => {
     <div class="lg:flex">
       <!-- tag過濾 -->
       <div class="flex flex-wrap font-semibold lg:w-1/5 lg:flex-col">
-        <template v-for="item in filterOptions" :key="item._id">
-          <MainFilterBar
-            :item="item"
-            :user-setting="userSetting"
-            @filter-click="filterClick"
-          />
-        </template>
+        <MainFilterBar
+          :filter-options="filterOptions"
+          :user-setting="userSetting"
+          @filter-click="filterClick"
+        />
       </div>
       <!-- 活動顯示 -->
       <div
@@ -178,6 +174,7 @@ onBeforeMount(() => {
         <template v-for="item in activityData_display" :key="item._id">
           <!-- 每個活動 -->
           <ActivityCard
+            v-if="!item.expired"
             :form-data="item"
             :group-data="groupData"
             :user-setting="userSetting"

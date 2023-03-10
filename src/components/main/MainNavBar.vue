@@ -134,8 +134,7 @@ const emits = defineEmits(["navigate"]);
     </div>
   </nav>
   <div class="flex items-center">
-    <!-- <a @click="navClick('setting')"> -->
-    <a @click="handleClick">
+    <a @click="navClick('setting')">
       <img
         v-if="userData.avatar === ''"
         src="@\assets\image\default user.png"

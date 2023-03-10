@@ -60,36 +60,40 @@ export let activityDataTemplete = {
   description: "",
 };
 
-// 處理所有由Axios接收的訊息
+// 處理Axios的錯誤訊息
 export function handleAxiosResponse(res, messageData) {
-  // 成功
-  if (res.status === 200) {
-    let { message, state, show } = res.data;
-    messageData.message = res.data;
-    messageData.state = "success";
-    messageData.show = true;
-  } else if (res.name === "AxiosError") {
-    console.error(res);
+  if (res.name === "AxiosError") {
     switch (res.code) {
       case "ERR_NETWORK":
         messageData.message = "無法連接至伺服器";
         messageData.state = "error";
         break;
       case "ERR_BAD_REQUEST":
+        // status 400 系列
         if (res.response && res.response.status == 401) {
           // 未授權
           messageData.message = "請登入後再試!";
           messageData.state = "unauthorized";
         } else {
-          // 其他錯誤(Caught)
-          let { message, state } = res.response.data;
+          let { error, message, state } = res.response.data;
+          console.error(error);
           messageData.message = message;
           messageData.state = state;
+          break;
         }
         break;
+      case "ERR_BAD_RESPONSE": {
+        // status 500 系列
+        // Caught error
+        let { error, message, state } = res.response.data;
+        console.error(error);
+        messageData.message = message;
+        messageData.state = state;
+        break;
+      }
     }
   } else {
-    // 其他問題(Uncaught)
+    // Uncaught error
     console.error(res);
     messageData.message = "意外的錯誤";
     messageData.state = "error";
@@ -161,7 +165,7 @@ export function liking(activity) {
 }
 
 export function enrolling(argc) {
-  let { activity } = argc;
+  let { activity, messageData } = argc;
 
   ActivityService.enroll(activity._id)
     .then((res) => {
@@ -173,8 +177,7 @@ export function enrolling(argc) {
       activity.enrollment_display += 1;
     })
     .catch((err) => {
-      if (err.name === "AxiosError") handleAxiosResponse(err, messageData);
-      else console.error(err);
+      handleAxiosResponse(err, messageData);
     });
 }
 
@@ -212,7 +215,7 @@ export function fillEditData(argc) {
 // @param {component} messageData
 export function showMessageData(data, messageData) {
   messageData.message = data.message;
-  messageData.state = "success";
+  messageData.state = data.state;
   messageData.show = true;
 }
 
@@ -319,11 +322,6 @@ export async function fetchAndMarkActivityData() {
         activity.enroll_time_editable = [dateString1, dateString2];
 
         activity.enrollment_display = activity.enrollment.length;
-
-        // 如果自己是創立者, 從已報名, 已截止中排除, 便於分類
-        if (created) registered = expired = false;
-        // 如果過期了, 從已報名中排除, 便於分類
-        if (expired) registered = false;
 
         activity["registered"] = registered;
         activity["expired"] = expired;

@@ -38,7 +38,9 @@ const emit = defineEmits(["likeClick", "enrollClick", "cancelClick"]);
       >
         <div class="modal-body h-full text-base font-normal">
           <div class="flex h-full flex-col p-6">
-            <div class="flex flex-wrap justify-between gap-6 overflow-y-auto">
+            <div
+              class="flex flex-grow flex-wrap justify-between gap-6 overflow-y-auto"
+            >
               <div class="flex w-full justify-between">
                 <div class="flex items-center gap-2 text-xl">
                   <eye-filled />{{ detailData.watch }}

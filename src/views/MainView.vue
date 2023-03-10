@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, reactive } from "vue";
 import { useRoute } from "vue-router";
 
 import UserService from "@/services/user.service.js";
@@ -13,6 +13,7 @@ import {
   fetchGroupData,
   fetchAndMarkActivityData,
   handleAxiosResponse,
+  messageDataTemplete,
 } from "@/utils/common.js";
 /* data */
 const route = useRoute();
@@ -21,6 +22,7 @@ let groupData = ref([]);
 let activityData = ref([]);
 let loading = ref(true);
 let currentPage = ref("explore");
+let messageData = reactive(messageDataTemplete);
 let componentMap = {
   explore: MainExplore,
   create: MainCreate,
@@ -46,21 +48,25 @@ function removeActivity(activity) {
 
 async function fetchData() {
   // 獲取當前使用者資料
-  await UserService.getUserInfo().then((res) => {
-    userData.value = res.data;
-  });
+  await UserService.getUserInfo()
+    .then((res) => {
+      userData.value = res.data;
+    })
+    .catch((err) => handleAxiosResponse(err, messageData));
 
   // 獲取全部群組資料
-  await fetchGroupData().then((res) => {
-    groupData.value = res;
-  });
+  await fetchGroupData()
+    .then((res) => {
+      groupData.value = res;
+    })
+    .catch((err) => handleAxiosResponse(err, messageData));
 
   // 獲取標記後活動資料
   await fetchAndMarkActivityData()
     .then((res) => {
       activityData.value = res;
     })
-    .catch((err) => handleAxiosResponse(err, AlertMessage));
+    .catch((err) => handleAxiosResponse(err, messageData));
 }
 
 /* hook */
@@ -74,6 +80,10 @@ onBeforeMount(() => {
     v-show="loading"
     size="large"
     class="main-bg fixed z-[1060] flex h-[100vh] w-[100vw] items-center justify-center"
+  />
+  <AlertMessage
+    :message-data="messageData"
+    @close-message="messageData.show = false"
   />
   <div class="main-bg h-[100vh] w-[100vw] p-8 lg:px-16">
     <header class="flex justify-between text-3xl font-medium lg:pt-6">

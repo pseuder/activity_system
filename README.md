@@ -46,3 +46,14 @@ handleAxiosResponse(myError, messageData);
 
 根據修改內容自動產生 commmit message
 https://github.com/Nutlope/aicommits
+
+# 規則
+
+每項活動有四種標記
+
+- registered -> 已報名: 出現取消報名按鈕
+- expired -> 已過期: 只出現出現在我的活動頁面
+- liked -> 喜愛的活動
+- created -> 由當前使用者建立的活動
+
+建立者不能參加自己建立的活動

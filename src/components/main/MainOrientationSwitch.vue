@@ -10,7 +10,7 @@ defineProps({
 });
 
 /* emits */
-defineEmits(["displayClick"]);
+defineEmits(["orientationClick"]);
 </script>
 
 <template>
@@ -21,7 +21,7 @@ defineEmits(["displayClick"]);
     :class="{
       'border-2': userSetting.displayMode == 'list',
     }"
-    @click="$emit('displayClick', 'list')"
+    @click="$emit('orientationClick', 'list')"
   />
   <img
     src="@/assets/image/exploreBlock.svg"
@@ -30,6 +30,6 @@ defineEmits(["displayClick"]);
     :class="{
       'border-2 ': userSetting.displayMode == 'block',
     }"
-    @click="$emit('displayClick', 'block')"
+    @click="$emit('orientationClick', 'block')"
   />
 </template>
