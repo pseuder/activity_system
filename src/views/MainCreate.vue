@@ -21,7 +21,7 @@ let createFormData;
 let groupData = ref([]);
 let antUpload = ref(null);
 let messageData = reactive(messageDataTemplete);
-let submitLoading = ref(true);
+let submitLoading = ref(false);
 
 /* methods */
 function resetClick(handleReset) {
@@ -329,7 +329,7 @@ onBeforeMount(() => {
       </button>
       <button
         v-show="submitLoading"
-        class="w-24 cursor-not-allowed rounded-md bg-blue-900 text-base font-semibold text-white"
+        class="w-24 cursor-not-allowed rounded-md text-base font-semibold text-white bg-primary"
       >
         <loading-outlined />
         建立
