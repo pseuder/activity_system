@@ -57,3 +57,27 @@ https://github.com/Nutlope/aicommits
 - created -> 由當前使用者建立的活動
 
 建立者不能參加自己建立的活動
+
+針對此活動
+pending: 尚未開放報名 - explore 可以看到但不能報名
+ongoing - 開放報名期間 - explore 可以看到且可以報名
+finished - 超過報名期間 - explore 不能看到, 但 mine 可以查看
+
+針對使用者
+enrolled
+liked
+created
+
+- explore view
+  只留下 pending, ongoing
+
+- mine view
+  全部顯示
+
+- activity card
+  pending - 報名按鈕+詳細資訊
+  ongoing - 詳細資訊
+  finished - 詳細資訊
+
+created - (修改按鈕)+詳細資訊
+liked - (報名按鈕)+詳細資訊
