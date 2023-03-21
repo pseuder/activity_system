@@ -144,21 +144,6 @@ export function myActivityFiltering(argc) {
   }
 }
 
-export function exploreActivityFiltering(argc) {
-  let { option, activityData } = argc;
-  userSetting.selectedTag = option.name;
-
-  if (option.name === "全部") {
-    return JSON.parse(JSON.stringify(activityData));
-  } else {
-    return JSON.parse(
-      JSON.stringify(
-        activityData.filter((activity) => activity.object.includes(option.name))
-      )
-    );
-  }
-}
-
 export function liking(activity) {
   UserService.likeActivity(activity._id);
   activity.liked = !activity.liked;
@@ -173,7 +158,7 @@ export function enrolling(argc) {
       messageData.state = "success";
       messageData.show = true;
 
-      activity.registered = true;
+      activity.enrolled = true;
       activity.enrollment_display += 1;
     })
     .catch((err) => {
@@ -182,7 +167,7 @@ export function enrolling(argc) {
 }
 
 export function canceling(argc) {
-  let { activity } = argc;
+  let { activity, messageData } = argc;
 
   ActivityService.cancel(activity._id)
     .then((res) => {
@@ -191,7 +176,7 @@ export function canceling(argc) {
       messageData.show = true;
 
       activity.enrollment_display -= 1;
-      activity.registered = false;
+      activity.enrolled = false;
     })
     .catch((err) => {
       if (err.name === "AxiosError") handleAxiosResponse(err, messageData);
@@ -249,87 +234,98 @@ export async function fetchAndMarkActivityData() {
   // 獲取活動資料並標記
   await ActivityService.explore().then((res) => {
     res.data.map((activity) => {
-      let registered = false,
-        expired = false,
+      let pending = false,
+        ongoing = false,
+        finished = false,
+        enrolled = false,
         liked = false,
         created = false;
 
-      registered = user_enrolledActivity.includes(activity._id);
-      expired = new Date(activity.activity_time[1]) < new Date();
+      // 尚未開放報名
+      pending = new Date(activity.enroll_time[0]) > new Date();
+
+      // 開放報名期間
+      ongoing =
+        new Date(activity.enroll_time[0]) <= new Date() &&
+        new Date(activity.enroll_time[1]) >= new Date();
+
+      // 超過報名期間
+      finished = new Date() > new Date(activity.enroll_time[1]);
+
+      enrolled = user_enrolledActivity.includes(activity._id);
       liked = user_likedActivity.includes(activity._id);
       created = activity.creator && activity.creator._id === userData._id;
 
-      // 只留下跟使用者有關的資料
-      if (registered || expired || liked || created) {
-        activity.object_display = activity.object.join("  ");
+      activity.object_display = activity.object.join("  ");
 
-        // utc時間轉Date
-        activity.activity_time[0] = new Date(activity.activity_time[0]);
-        activity.activity_time[1] = new Date(activity.activity_time[1]);
+      // utc時間轉Date
+      activity.activity_time[0] = new Date(activity.activity_time[0]);
+      activity.activity_time[1] = new Date(activity.activity_time[1]);
 
-        activity.enroll_time[0] = new Date(activity.enroll_time[0]);
-        activity.enroll_time[1] = new Date(activity.enroll_time[1]);
+      activity.enroll_time[0] = new Date(activity.enroll_time[0]);
+      activity.enroll_time[1] = new Date(activity.enroll_time[1]);
 
-        // Date for display
-        activity.activity_time_display = [
-          activity.activity_time[0].toLocaleDateString(),
-          activity.activity_time[1].toLocaleDateString(),
-        ].join("~");
+      // Date for display
+      activity.activity_time_display = [
+        activity.activity_time[0].toLocaleDateString(),
+        activity.activity_time[1].toLocaleDateString(),
+      ].join("~");
 
-        activity.enroll_time_display = [
-          activity.enroll_time[0].toLocaleDateString(),
-          activity.enroll_time[1].toLocaleDateString(),
-        ].join("~");
+      activity.enroll_time_display = [
+        activity.enroll_time[0].toLocaleDateString(),
+        activity.enroll_time[1].toLocaleDateString(),
+      ].join("~");
 
-        // Date for editDialog
-        let date, year, month, day, dateString1, dateString2;
-        date = activity.activity_time[0];
-        year = date.getFullYear();
-        month = date.getMonth() + 1; // 取得月份，注意要加 1
-        day = date.getDate();
+      // Date for editDialog
+      let date, year, month, day, dateString1, dateString2;
+      date = activity.activity_time[0];
+      year = date.getFullYear();
+      month = date.getMonth() + 1; // 取得月份，注意要加 1
+      day = date.getDate();
 
-        dateString1 = `${year}-${month.toString().padStart(2, "0")}-${day
-          .toString()
-          .padStart(2, "0")}`;
+      dateString1 = `${year}-${month.toString().padStart(2, "0")}-${day
+        .toString()
+        .padStart(2, "0")}`;
 
-        date = activity.activity_time[1];
-        year = date.getFullYear();
-        month = date.getMonth() + 1;
-        day = date.getDate();
-        dateString2 = `${year}-${month.toString().padStart(2, "0")}-${day
-          .toString()
-          .padStart(2, "0")}`;
+      date = activity.activity_time[1];
+      year = date.getFullYear();
+      month = date.getMonth() + 1;
+      day = date.getDate();
+      dateString2 = `${year}-${month.toString().padStart(2, "0")}-${day
+        .toString()
+        .padStart(2, "0")}`;
 
-        activity.activity_time_editable = [dateString1, dateString2];
+      activity.activity_time_editable = [dateString1, dateString2];
 
-        date = activity.enroll_time[0];
-        year = date.getFullYear();
-        month = date.getMonth() + 1; // 取得月份，注意要加 1
-        day = date.getDate();
+      date = activity.enroll_time[0];
+      year = date.getFullYear();
+      month = date.getMonth() + 1; // 取得月份，注意要加 1
+      day = date.getDate();
 
-        dateString1 = `${year}-${month.toString().padStart(2, "0")}-${day
-          .toString()
-          .padStart(2, "0")}`;
+      dateString1 = `${year}-${month.toString().padStart(2, "0")}-${day
+        .toString()
+        .padStart(2, "0")}`;
 
-        date = activity.enroll_time[1];
-        year = date.getFullYear();
-        month = date.getMonth() + 1;
-        day = date.getDate();
-        dateString2 = `${year}-${month.toString().padStart(2, "0")}-${day
-          .toString()
-          .padStart(2, "0")}`;
+      date = activity.enroll_time[1];
+      year = date.getFullYear();
+      month = date.getMonth() + 1;
+      day = date.getDate();
+      dateString2 = `${year}-${month.toString().padStart(2, "0")}-${day
+        .toString()
+        .padStart(2, "0")}`;
 
-        activity.enroll_time_editable = [dateString1, dateString2];
+      activity.enroll_time_editable = [dateString1, dateString2];
 
-        activity.enrollment_display = activity.enrollment.length;
+      activity.enrollment_display = activity.enrollment.length;
 
-        activity["registered"] = registered;
-        activity["expired"] = expired;
-        activity["liked"] = liked;
-        activity["created"] = created;
+      activity["pending"] = pending;
+      activity["ongoing"] = ongoing;
+      activity["finished"] = finished;
+      activity["enrolled"] = enrolled;
+      activity["liked"] = liked;
+      activity["created"] = created;
 
-        activityData.push(activity);
-      }
+      activityData.push(activity);
     });
   });
   return activityData;
