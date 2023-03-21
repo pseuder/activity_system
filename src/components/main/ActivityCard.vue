@@ -121,8 +121,9 @@ defineEmits([
           </button>
         </div>
 
+        <!-- 修改活動按鈕 -->
         <div
-          v-if="!formData.expired && formData.created"
+          v-if="!formData.finished && formData.created"
           data-bs-toggle="modal"
           data-bs-target="#editDialog"
         >
@@ -133,16 +134,19 @@ defineEmits([
             修改活動
           </button>
         </div>
+
+        <!-- 取消報名按鈕 -->
         <button
-          v-else-if="!formData.expired && formData.registered"
+          v-if="formData.ongoing && formData.enrolled"
           class="w-[150px] bg-cancel"
           @click.prevent="$emit('cancelClick', formData)"
         >
           取消報名
         </button>
-        <!-- 過期的不 顯示下面的按鈕 -->
+
+        <!-- 報名活動按鈕 -->
         <button
-          v-else-if="!formData.expired"
+          v-if="formData.ongoing && !formData.enrolled && !formData.created"
           class="w-[150px] bg-blue-500"
           @click="$emit('enrollClick', formData)"
         >
