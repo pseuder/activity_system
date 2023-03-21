@@ -102,7 +102,7 @@ function enrollClick(activity) {
   enrolling({ activity, messageData });
 }
 function cancelClick(activity) {
-  canceling({ activity, activityData_display });
+  canceling({ activity, messageData });
 }
 function removeActivityDisplay(activity) {
   emit("removeActivity", activity);
@@ -174,7 +174,7 @@ onBeforeMount(() => {
         <template v-for="item in activityData_display" :key="item._id">
           <!-- 每個活動 -->
           <ActivityCard
-            v-if="!item.expired"
+            v-if="!item.finished"
             :form-data="item"
             :group-data="groupData"
             :user-setting="userSetting"
