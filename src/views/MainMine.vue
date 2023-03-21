@@ -36,15 +36,15 @@ const props = defineProps({
 
 /* data */
 let filterMap = {
-  已報名: "registered",
-  已截止: "expired",
+  已報名: "enrolled",
+  已結束: "finished",
   已收藏: "liked",
   已建立: "created",
   全部: "all",
 };
 let filterOptions = ref([
-  { name: "已報名", attribute: "registered" },
-  { name: "已截止", attribute: "expired" },
+  { name: "已報名", attribute: "enrolled" },
+  { name: "已結束", attribute: "finished" },
   { name: "已收藏", attribute: "liked" },
   { name: "已建立", attribute: "created" },
   { name: "全部", attribute: "all" },
@@ -62,11 +62,11 @@ let activityData_filtered = computed(() => {
   switch (userSetting.selectedTag) {
     case "已報名":
       return props.activityData.filter(
-        (activity) => activity.registered && !activity.expired
+        (activity) => activity.enrolled && activity.ongoing
       );
-    case "已截止":
+    case "已結束":
       return props.activityData.filter(
-        (activity) => activity.registered && activity.expired
+        (activity) => activity.enrolled && activity.finished
       );
     case "已收藏":
       return props.activityData.filter((activity) => activity.liked);
@@ -74,7 +74,7 @@ let activityData_filtered = computed(() => {
       return props.activityData.filter((activity) => activity.created);
     case "全部":
       return props.activityData.filter(
-        (activity) => activity.registered || activity.liked || activity.created
+        (activity) => activity.enrolled || activity.liked || activity.created
       );
     default:
       return [];
