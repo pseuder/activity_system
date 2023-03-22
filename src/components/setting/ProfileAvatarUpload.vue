@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, reactive, inject, watch } from "vue";
 import {
   PlusOutlined,
   LoadingOutlined,
@@ -9,9 +9,13 @@ import {
 } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import urlJoin from "url-join";
-
 import Store from "@/store";
 import UserService from "@/services/user.service.js";
+import {
+  showMessageData,
+  messageDataTemplete,
+  handleAxiosResponse,
+} from "@/utils/common.js";
 
 /* props */
 const props = defineProps({
@@ -26,12 +30,16 @@ const fileList = ref([]);
 const loading = ref(false);
 const imageUrl = ref("");
 let editable = ref(false);
+let messageData = reactive(messageDataTemplete);
 
 /* computed, watch */
 watch(
   () => props.userImg,
   (newValue) => (imageUrl.value = newValue)
 );
+
+/* inject */
+const updateUserData = inject("updateUserData");
 
 /* methods */
 function getBase64(img, callback) {
@@ -73,14 +81,16 @@ function cancelClick() {
   editable.value = false;
 }
 function checkClick() {
-  UserService.updateProfile("avatar", imageUrl.value).then(() => {
-    emit("changeUserData", "avatar", imageUrl.value);
-    editable.value = false;
-  });
+  UserService.updateProfile("avatar", imageUrl.value)
+    .then((res) => {
+      showMessageData({ message: res.data, state: "success" }, messageData);
+      updateUserData({ key: "avatar", val: imageUrl.value });
+      editable.value = false;
+    })
+    .catch((err) => {
+      handleAxiosResponse(err, messageData);
+    });
 }
-
-/* emits */
-const emit = defineEmits(["changeUserData"]);
 </script>
 
 <template>
