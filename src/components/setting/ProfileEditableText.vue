@@ -23,7 +23,7 @@ const props = defineProps({
 let editable = ref(false);
 let editData = ref(props.data);
 let caption = {
-  username: "姓名",
+  username: "名稱",
   password: "密碼",
   email: "信箱",
   phone: "電話",
@@ -51,7 +51,10 @@ function checkClick() {
   <div class="flex h-24 w-full max-w-2xl items-center px-2 py-2">
     <div class="flex-1 gap-4 overflow-hidden md:flex">
       <label class="w-10 flex-shrink-0">{{ caption[type] }}</label>
-      <div class="flex-grow text-gray">
+      <div
+        v-if="type === 'username' || type === 'email' || type === 'phone'"
+        class="flex-grow text-gray"
+      >
         <a-input
           v-model:value="editData"
           :placeholder="'Please input your ' + type"
@@ -60,8 +63,22 @@ function checkClick() {
           size="large"
         />
       </div>
+
+      <div
+        v-if="type === 'password'"
+        class="flex-grow"
+        data-bs-toggle="modal"
+        data-bs-target="#resetPasswordDialog"
+      >
+        <span class="flex h-8 w-8 cursor-pointer items-center justify-center">
+          <edit-outlined />
+        </span>
+      </div>
     </div>
-    <div class="w-[65px]">
+    <div
+      v-if="type === 'username' || type === 'email' || type === 'phone'"
+      class="w-[65px]"
+    >
       <span
         v-show="!editable"
         class="flex h-8 w-8 cursor-pointer items-center justify-center"

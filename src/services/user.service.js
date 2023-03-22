@@ -47,6 +47,18 @@ class UserService {
       }
     );
   }
+
+  resetPassword(passwords) {
+    return axios.post(
+      urlJoin(Store.state.domainAddress, "/api/user/resetPassword/"),
+      { passwords },
+      {
+        headers: {
+          Authorization: getAuthorization().token,
+        },
+      }
+    );
+  }
 }
 
 export default new UserService();
