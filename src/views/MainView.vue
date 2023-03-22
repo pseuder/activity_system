@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, reactive } from "vue";
+import { ref, onBeforeMount, reactive, provide } from "vue";
 import { useRoute } from "vue-router";
 
 import UserService from "@/services/user.service.js";
@@ -30,6 +30,8 @@ let componentMap = {
   setting: SettingView,
 };
 
+provide("updateUserData", updateUserData);
+
 /* methods */
 // 切換component
 function navigate(path) {
@@ -44,6 +46,12 @@ function stopLoading() {
 // 刪除活動後將其移除
 function removeActivity(activity) {
   activityData.value.splice(activityData.value.indexOf(activity), 1);
+}
+
+// 使用者更改照片後同步導航列照片
+function updateUserData(newData) {
+  let { key, val } = newData;
+  userData.value[key] = val;
 }
 
 async function fetchData() {
@@ -98,8 +106,11 @@ onBeforeMount(() => {
         :is="componentMap[currentPage]"
         :group-data="groupData"
         :activity-data="activityData"
+        :user-data="userData"
+        @navigate="navigate"
         @stop-loading="stopLoading"
         @remove-activity="removeActivity"
+        @update-user-data="updateUserData"
       ></component>
     </main>
   </div>

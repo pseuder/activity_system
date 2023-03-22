@@ -11,12 +11,22 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons-vue";
 
+/* props */
+defineProps({
+  userData: {
+    type: Object,
+    required: true,
+  },
+});
+
+/* data */
 let currentPage = ref("profile");
 let messageData = reactive(messageDataTemplete);
 const pageMap = reactive({
   profile: SettingProfile,
 });
 
+/* methods */
 function navigate(path) {
   currentPage.value = path;
 }
@@ -80,6 +90,7 @@ function logoutClick() {
         <keep-alive>
           <component
             :is="pageMap[currentPage]"
+            :user-data="userData"
             @navigate="navigate"
           ></component>
         </keep-alive>

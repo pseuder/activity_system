@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, inject } from "vue";
 import {
   EditOutlined,
   CheckOutlined,
@@ -21,7 +21,7 @@ const props = defineProps({
 
 /* data */
 let editable = ref(false);
-let editData = ref("");
+let editData = ref(props.data);
 let caption = {
   username: "姓名",
   password: "密碼",
@@ -29,11 +29,8 @@ let caption = {
   phone: "電話",
 };
 
-/* computed, watch */
-watch(
-  () => props.data,
-  (newValue) => (editData.value = newValue)
-);
+/* inject */
+const updateUserData = inject("updateUserData");
 
 /* methods */
 function editClick() {
@@ -44,13 +41,10 @@ function cancelClick() {
 }
 function checkClick() {
   UserService.updateProfile(props.type, editData.value).then(() => {
-    emit("changeUserData", props.type, editData.value);
+    updateUserData({ key: props.type, val: editData.value });
     editable.value = false;
   });
 }
-
-/* emits */
-const emit = defineEmits(["changeUserData"]);
 </script>
 
 <template>
