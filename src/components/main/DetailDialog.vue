@@ -129,21 +129,21 @@ const emit = defineEmits([
                 尚未開放報名
               </button>
               <button
-                v-if="detailData.ongoing && detailData.enrolled"
+                v-else-if="detailData.ongoing && detailData.enrolled"
                 class="w-full bg-cancel"
                 @click.prevent="cancelClick"
               >
                 取消報名
               </button>
               <button
-                v-if="detailData.ongoing && !detailData.enrolled"
+                v-else-if="detailData.ongoing && !detailData.enrolled"
                 class="w-full bg-primary"
                 @click.prevent="enrollClick"
               >
                 報名活動
               </button>
               <div
-                v-if="!detailData.finished && detailData.created"
+                v-else-if="!detailData.finished && detailData.created"
                 data-bs-toggle="modal"
                 data-bs-target="#editDialog"
               >
@@ -154,6 +154,12 @@ const emit = defineEmits([
                   修改活動
                 </button>
               </div>
+              <button
+                v-if="detailData.finished"
+                class="w-full cursor-not-allowed bg-gray-300"
+              >
+                活動已結束
+              </button>
             </div>
           </div>
         </div>

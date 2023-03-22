@@ -119,7 +119,7 @@ function enrollClick(activity) {
   enrolling({ activity, messageData });
 }
 function cancelClick(activity) {
-  canceling({ activity, activityData_display });
+  canceling({ activity, messageData });
 }
 function removeActivityDisplay(activity) {
   emit("removeActivity", activity);
