@@ -145,6 +145,7 @@ onBeforeMount(() => {
     @like-click="liking"
     @enroll-click="enrollClick"
     @cancel-click="cancelClick"
+    @edit-click="editClick"
   />
   <EditDialog
     :edit-data="editDialogData"

@@ -21,7 +21,12 @@ function cancelClick() {
 }
 
 /* emits */
-const emit = defineEmits(["likeClick", "enrollClick", "cancelClick"]);
+const emit = defineEmits([
+  "likeClick",
+  "enrollClick",
+  "cancelClick",
+  "editClick",
+]);
 </script>
 
 <template>
@@ -118,19 +123,37 @@ const emit = defineEmits(["likeClick", "enrollClick", "cancelClick"]);
               <!-- 分隔線 -->
               <hr class="my-3 w-[98%] border-2" />
               <button
-                v-if="detailData.registered"
+                v-if="detailData.pending && !detailData.created"
+                class="w-full cursor-not-allowed bg-gray-300"
+              >
+                尚未開放報名
+              </button>
+              <button
+                v-if="detailData.ongoing && detailData.enrolled"
                 class="w-full bg-cancel"
                 @click.prevent="cancelClick"
               >
                 取消報名
               </button>
               <button
-                v-else
+                v-if="detailData.ongoing && !detailData.enrolled"
                 class="w-full bg-primary"
                 @click.prevent="enrollClick"
               >
                 報名活動
               </button>
+              <div
+                v-if="!detailData.finished && detailData.created"
+                data-bs-toggle="modal"
+                data-bs-target="#editDialog"
+              >
+                <button
+                  class="w-full bg-edit"
+                  @click="$emit('editClick', detailData)"
+                >
+                  修改活動
+                </button>
+              </div>
             </div>
           </div>
         </div>
