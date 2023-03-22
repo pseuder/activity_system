@@ -1,9 +1,7 @@
 <script setup>
-import { reactive, onBeforeMount, ref } from "vue";
-import { useRouter } from "vue-router";
+import { reactive, ref } from "vue";
 import { LoadingOutlined } from "@ant-design/icons-vue";
 import ActivityService from "@/services/activity.service.js";
-import GroupService from "@/services/group.service.js";
 import AlertMessage from "@/components/AlertMessage.vue";
 import FileUpload from "@/components/main/FileUpload.vue";
 import { debounce } from "lodash";
@@ -15,10 +13,28 @@ import {
   showMessageData,
 } from "@/utils/common.js";
 
+/* props */
+defineProps({
+  groupData: {
+    type: Array,
+    required: true,
+  },
+});
+
 /* data */
-let router = useRouter();
-let createFormData;
-let groupData = ref([]);
+let createFormData = reactive({
+  title: "",
+  object: [],
+  location: "",
+  activity_time: [],
+  enroll_time: [],
+  fee: 0,
+  manager: "",
+  manager_contact: "",
+  quota: 0,
+  activity_imgs: [],
+  description: "",
+});
 let antUpload = ref(null);
 let messageData = reactive(messageDataTemplete);
 let submitLoading = ref(false);
@@ -88,33 +104,7 @@ function autoFill() {
 }
 
 /* emits */
-const emit = defineEmits(["navigate", "stopLoading"]);
-
-/* hook */
-onBeforeMount(() => {
-  GroupService.getAllGroups()
-    .then((res) => {
-      groupData.value = res.data;
-      emit("stopLoading");
-    })
-    .catch((err) => {
-      handleAxiosResponse(err, messageData);
-    });
-
-  createFormData = reactive({
-    title: "",
-    object: [],
-    location: "",
-    activity_time: [],
-    enroll_time: [],
-    fee: 0,
-    manager: "",
-    manager_contact: "",
-    quota: 0,
-    activity_imgs: [],
-    description: "",
-  });
-});
+defineEmits(["navigate", "stopLoading"]);
 </script>
 
 <template>
@@ -309,7 +299,7 @@ onBeforeMount(() => {
       </button>
       <button
         class="w-24 rounded-md text-base font-semibold text-gray bg-lightgray"
-        @click.prevent="router.push('explore')"
+        @click.prevent="$emit('navigate', 'explore')"
       >
         取消
       </button>
