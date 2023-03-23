@@ -115,3 +115,13 @@ onBeforeMount(() => {
     </main>
   </div>
 </template>
+
+<style scope>
+.ant-modal-mask {
+  z-index: 1080;
+}
+
+.ant-modal-wrap {
+  z-index: 1081;
+}
+</style>

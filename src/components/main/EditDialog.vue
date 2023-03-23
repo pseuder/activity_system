@@ -238,10 +238,29 @@ watch(
               </div>
               <div class="flex w-full gap-4 p-4">
                 <label class="w-28 flex-shrink-0">活動照片<br />(限8張)</label>
-                <FileUpload
-                  ref="antUpload"
-                  v-model:value="editData_copy.activity_imgs"
-                />
+                <div class="flex flex-col self-center md:flex-row">
+                  <div class="text-sm">
+                    <template
+                      v-for="(img, index) in editData_copy.activity_imgs"
+                      :key="index"
+                    >
+                      <div
+                        class="m-1 h-[102px] w-[102px] rounded-md border border-gray-300"
+                      >
+                        <a-image
+                          :src="'data:image/png;base64,' + img"
+                          :preview="false"
+                        />
+                      </div>
+                    </template>
+                  </div>
+
+                  <FileUpload
+                    ref="antUpload"
+                    :value="editData_copy.activity_imgs"
+                    :origin-images="editData_copy.activity_imgs"
+                  />
+                </div>
               </div>
               <div class="flex w-full gap-4 p-4">
                 <label class="w-28 flex-shrink-0">活動介紹</label>
@@ -291,3 +310,9 @@ watch(
     </div>
   </div>
 </template>
+
+<style scope>
+.myPreviewMask {
+  background: red;
+}
+</style>
