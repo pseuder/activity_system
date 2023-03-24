@@ -55,7 +55,7 @@ let submitDebounce = debounce(async function () {
   for (let key in createFormData) {
     if (createFormData[key] != undefined || createFormData[key] != null) {
       if (key === "activity_imgs") {
-        for (let activity_img of createFormData[key]) {
+        for (let activity_img of createFormData["activity_imgs"]) {
           let file = activity_img.originFileObj;
           await fileToBase64ByQuality(file, 90).then((base64) => {
             let myBlob = convertBase64UrlToBlob(base64, file.type);
@@ -79,6 +79,10 @@ let submitDebounce = debounce(async function () {
       submitLoading.value = false;
     });
 }, 2000);
+
+function uploadChange(val) {
+  createFormData["activity_imgs"] = val;
+}
 
 function autoFill() {
   createFormData.title = "title";
@@ -263,10 +267,7 @@ defineEmits(["navigate", "stopLoading"]);
     </div>
     <div class="flex w-full gap-4 p-4">
       <label class="w-28 flex-shrink-0">活動照片<br />(限8張)</label>
-      <FileUpload
-        ref="antUpload"
-        v-model:value="createFormData.activity_imgs"
-      />
+      <FileUpload ref="antUpload" @upload-change="uploadChange" />
     </div>
     <div class="flex w-full gap-4 p-4">
       <label class="w-28 flex-shrink-0">活動介紹</label>

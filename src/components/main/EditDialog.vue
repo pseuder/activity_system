@@ -3,6 +3,7 @@ import { reactive, watch, ref } from "vue";
 import ActivityService from "@/services/activity.service.js";
 import FileUpload from "@/components/main/FileUpload.vue";
 import { activityDataTemplete } from "@/utils/common.js";
+import { DeleteFilled } from "@ant-design/icons-vue";
 
 /* props */
 let props = defineProps({
@@ -25,7 +26,9 @@ const emit = defineEmits(["showAlert", "removeActivityDisplay"]);
 
 // data
 let editData_copy = reactive(activityDataTemplete);
+editData_copy["uploadedImages"] = [];
 let editDialog = ref(null);
+let antUpload = ref(null);
 
 /* methods */
 function deleteClick() {
@@ -42,7 +45,7 @@ function deleteClick() {
 
 function resetClick() {
   for (let key in editData_copy) {
-    editData_copy[key] = props.editData[key];
+    editData_copy[key] = JSON.parse(JSON.stringify(props.editData[key]));
   }
 }
 
@@ -50,10 +53,22 @@ function submitClick() {
   ActivityService.edit(editData_copy)
     .then((res) => {
       emit("showAlert", { message: res.data, state: "success", show: true });
+      editDialog.value.click();
     })
     .catch((err) => {
       emit("showAlert", { err: err, state: "error", show: true });
     });
+}
+
+function uploadChange(val) {
+  editData_copy["uploadedImages"] = val;
+}
+
+function removeImgClick(img) {
+  editData_copy.activity_imgs.splice(
+    editData_copy.activity_imgs.indexOf(img),
+    1
+  );
 }
 
 /* computed, watch */
@@ -61,8 +76,9 @@ watch(
   () => props.editData,
   () => {
     for (let key in props.editData) {
-      editData_copy[key] = props.editData[key];
+      editData_copy[key] = JSON.parse(JSON.stringify(props.editData[key]));
     }
+    antUpload.value.resetFileList();
   }
 );
 </script>
@@ -239,27 +255,33 @@ watch(
               <div class="flex w-full gap-4 p-4">
                 <label class="w-28 flex-shrink-0">活動照片<br />(限8張)</label>
                 <div class="flex flex-col self-center md:flex-row">
-                  <div class="text-sm">
+                  <div class="text-sm md:flex md:self-end">
                     <template
                       v-for="(img, index) in editData_copy.activity_imgs"
                       :key="index"
                     >
                       <div
-                        class="m-1 h-[102px] w-[102px] rounded-md border border-gray-300"
+                        class="relative mb-2 mr-2 h-[104px] w-[104px] rounded-md border border-gray-300"
                       >
+                        <div
+                          class="absolute right-[-10px] top-[-10px] z-[1] h-6 w-6 cursor-pointer rounded-full border bg-red-500 text-center leading-4"
+                          @click="removeImgClick(img)"
+                        >
+                          <delete-filled class="text-white" />
+                        </div>
                         <a-image
-                          :src="'data:image/png;base64,' + img"
+                          :src="
+                            img.includes('data:image')
+                              ? img
+                              : 'data:image/png;base64,' + img
+                          "
                           :preview="false"
                         />
                       </div>
                     </template>
                   </div>
 
-                  <FileUpload
-                    ref="antUpload"
-                    :value="editData_copy.activity_imgs"
-                    :origin-images="editData_copy.activity_imgs"
-                  />
+                  <FileUpload ref="antUpload" @upload-change="uploadChange" />
                 </div>
               </div>
               <div class="flex w-full gap-4 p-4">

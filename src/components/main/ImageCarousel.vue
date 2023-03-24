@@ -16,7 +16,12 @@ onMounted(() => {
 });
 
 const currentImage = computed(() => {
-  return "data:image/png;base64," + props.images[state.currentIndex];
+  if (props.images.length > 0) {
+    if (props.images[state.currentIndex].includes("data:image/png"))
+      return props.images[state.currentIndex];
+    else return "data:image/png;base64," + props.images[state.currentIndex];
+  }
+  return "";
 });
 
 function mouseenter() {

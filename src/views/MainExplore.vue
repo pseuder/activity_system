@@ -107,7 +107,10 @@ function cancelClick(activity) {
 function removeActivityDisplay(activity) {
   emit("removeActivity", activity);
 }
-
+function showAlert(data) {
+  console.log(data);
+  showMessageData(data, messageData);
+}
 /* emit */
 const emit = defineEmits(["navigate", "stopLoading", "removeActivity"]);
 
@@ -133,7 +136,7 @@ onBeforeMount(() => {
   <EditDialog
     :edit-data="editDialogData"
     :group-data="groupData"
-    @show-alert="showMessageData"
+    @show-alert="showAlert"
     @remove-activity-display="removeActivityDisplay"
   />
   <div>
