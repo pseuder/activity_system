@@ -7,12 +7,16 @@ import router from "@/router";
 import AuthService from "@/services/auth.service.js";
 import LoginPanelInput from "@/components/main/LoginPanelInput.vue";
 import LoginPanelMessage from "@/components/main/LoginPanelMessage.vue";
-
+import { messageDataTemplete } from "@/utils/common.js";
 /* props */
 let props = defineProps({
   title: {
     type: String,
     default: "",
+  },
+  remember: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -22,17 +26,23 @@ let formData = reactive({
   password: "",
 });
 
-let alertData = reactive({
-  show: false,
-  state: "warning",
-  message: "帳號密碼錯誤!",
-});
+let messageData = reactive(messageDataTemplete);
 
 // functions
 function authorize() {
-  AuthService.localAuth(props.title, formData, alertData).then((res) => {
-    if (res) router.push("/main?page=explore");
-  });
+  AuthService.localAuth(props.title, formData)
+    .then((res) => {
+      if (props.remember)
+        localStorage.setItem("authorization", JSON.stringify(res.data));
+      else sessionStorage.setItem("authorization", JSON.stringify(res.data));
+      router.push("/main");
+    })
+    .catch((err) => {
+      console.log(err);
+      messageData.state = "warning";
+      messageData.message = err.response.data;
+      messageData.show = true;
+    });
 }
 
 function clickSSO(type) {
@@ -40,7 +50,7 @@ function clickSSO(type) {
     googleTokenLogin()
       .then((res) => {
         AuthService.googleAuth(res);
-        router.push("/main?page=explore");
+        router.push("/main");
       })
       .catch((err) => {
         console.log(err);
@@ -69,13 +79,10 @@ function clickSSO(type) {
           <img src="@/assets/image/Linkedin.svg" />
         </button>
       </div>
-      <!-- <button @click="alertData.show = !alertData.show" class=" bg-primary">
-        切換提示訊息
-      </button> -->
       <!-- 提示訊息 -->
       <LoginPanelMessage
-        :alert-data="alertData"
-        @close-alert="alertData.show = false"
+        :alert-data="messageData"
+        @close-alert="messageData.show = false"
       ></LoginPanelMessage>
 
       <!-- 信箱&密碼 -->

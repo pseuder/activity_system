@@ -33,6 +33,7 @@ function navigate(path) {
 
 function logoutClick() {
   localStorage.clear();
+  sessionStorage.clear();
   router.push("/");
 }
 </script>

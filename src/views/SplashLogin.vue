@@ -1,8 +1,15 @@
 <script setup>
+import { ref, reactive } from "vue";
 import LoginPanel from "@/components/main/LoginPanel.vue";
+
+let remember = ref(false);
 
 /* emits */
 defineEmits(["navigate"]);
+
+function forgetClick() {
+  console.log(remember.value);
+}
 </script>
 
 <template>
@@ -28,16 +35,25 @@ defineEmits(["navigate"]);
     <main class="flex flex-grow items-center justify-center">
       <div class="w-0 md:w-1/2"></div>
       <div class="md:w-1/2">
-        <LoginPanel class="mx-auto my-4 w-11/12 max-w-lg" title="Login">
+        <LoginPanel
+          class="mx-auto my-4 w-11/12 max-w-lg"
+          title="Login"
+          :remember="remember"
+        >
           <template #helpbar>
             <div class="flex flex-wrap justify-center md:justify-between">
               <!-- 記住資訊 -->
               <div class="flex-shrink-0">
-                <input id="remember" type="checkbox" class="m-2" />
-                <label for="remember">Remember Me</label>
+                <input
+                  id="remember"
+                  v-model="remember"
+                  type="checkbox"
+                  class="m-2"
+                />
+                <label for="remember">Keep me signed in</label>
               </div>
               <!-- 忘記密碼 -->
-              <a class="flex-shrink-0">Forget Password?</a>
+              <a class="flex-shrink-0" @click="forgetClick">Forget Password?</a>
             </div>
           </template>
 

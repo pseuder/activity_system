@@ -13,36 +13,13 @@ export function getAuthorization() {
 }
 
 class AuthService {
-  localAuth(title, formData, alertData) {
-    return new Promise(function (resolve) {
-      axios
-        .post(
-          urlJoin(Store.state.domainAddress, "api/auth/", title.toLowerCase()),
-          {
-            formData,
-          }
-        )
-        .then((res) => {
-          if (res.data) {
-            localStorage.setItem("authorization", JSON.stringify(res.data));
-          }
-          resolve(true);
-        })
-        .catch((err) => {
-          if (err.code === "ERR_BAD_REQUEST") {
-            alertData.message = err.response.data;
-            alertData.state = "warning";
-          } else if (err.code === "ERR_NETWORK") {
-            alertData.message = "伺服器錯誤";
-            alertData.state = "error";
-          } else {
-            alertData.message = "非預期的錯誤";
-            alertData.state = "error";
-          }
-          alertData.show = true;
-          resolve(false);
-        });
-    });
+  localAuth(title, formData) {
+    return axios.post(
+      urlJoin(Store.state.domainAddress, "api/auth/", title.toLowerCase()),
+      {
+        formData,
+      }
+    );
   }
 
   googleAuth(response) {
