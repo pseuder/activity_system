@@ -53,7 +53,7 @@ function submitClick() {
         class="modal-content main-bg pointer-events-auto h-full rounded-md bg-clip-padding"
       >
         <div class="modal-body h-full p-4 text-base font-normal">
-          <div class="flex justify-center gap-2 self-center text-3xl">
+          <div class="flex justify-center gap-2 self-center text-2xl">
             <edit-outlined />修改密碼
           </div>
           <div class="my-4">

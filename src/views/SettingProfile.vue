@@ -21,6 +21,10 @@ let prop = defineProps({
     <ProfileEditableText type="username" :data="prop.userData.username" />
     <ProfileEditableText type="email" :data="prop.userData.email" />
     <ProfileEditableText type="phone" :data="prop.userData.phone" />
-    <ProfileEditableText type="password" :data="prop.userData.password" />
+    <ProfileEditableText
+      v-if="prop.userData.signupType === 'emailAndPassword'"
+      type="password"
+      :data="prop.userData.password"
+    />
   </div>
 </template>

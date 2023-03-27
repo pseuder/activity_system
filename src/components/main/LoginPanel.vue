@@ -1,13 +1,13 @@
 <script setup>
-import { reactive } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import { MailOutlined, LockOutlined } from "@ant-design/icons-vue";
 import { googleTokenLogin } from "vue3-google-login";
+import vueRecaptcha from "vue3-recaptcha2";
 
 import router from "@/router";
 import AuthService from "@/services/auth.service.js";
 import LoginPanelInput from "@/components/main/LoginPanelInput.vue";
 import LoginPanelMessage from "@/components/main/LoginPanelMessage.vue";
-import { messageDataTemplete } from "@/utils/common.js";
 /* props */
 let props = defineProps({
   title: {
@@ -26,11 +26,24 @@ let formData = reactive({
   password: "",
 });
 
-let messageData = reactive(messageDataTemplete);
+let alertData = reactive({
+  state: "",
+  message: "",
+  show: false,
+});
+
+let captcha = ref("");
+let captchaRef = ref("");
 
 // functions
-function authorize() {
-  AuthService.localAuth(props.title, formData)
+async function authorize() {
+  if (captcha.value === "") {
+    alertData.state = "warning";
+    alertData.message = "請先通過機器人驗證";
+    alertData.show = true;
+    return;
+  }
+  AuthService.localAuth(props.title, formData, captcha.value)
     .then((res) => {
       if (props.remember)
         localStorage.setItem("authorization", JSON.stringify(res.data));
@@ -39,9 +52,12 @@ function authorize() {
     })
     .catch((err) => {
       console.log(err);
-      messageData.state = "warning";
-      messageData.message = err.response.data;
-      messageData.show = true;
+      alertData.state = "warning";
+      alertData.message = err.response.data;
+      alertData.show = true;
+
+      captcha.value = "";
+      captchaRef.value.reset();
     });
 }
 
@@ -49,14 +65,41 @@ function clickSSO(type) {
   if (type == "google") {
     googleTokenLogin()
       .then((res) => {
-        AuthService.googleAuth(res);
-        router.push("/main");
+        AuthService.googleAuth(res)
+          .then((res) => {
+            sessionStorage.setItem("authorization", JSON.stringify(res.data));
+            router.push("/main");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       })
       .catch((err) => {
         console.log(err);
       });
   }
 }
+
+// 回傳一組 token，並把 token 傳給後端驗證
+const recaptchaVerified = (res) => {
+  console.log(res);
+  captcha.value = res;
+};
+
+const recaptchaExpired = (res) => {
+  // 過期後執行動作
+  console.log(res);
+};
+
+const recaptchaFailed = (res) => {
+  // 失敗執行動作
+  console.log(res);
+};
+
+onMounted(() => {
+  const elem = document.getElementById("rc-anchor-container");
+  console.log(elem);
+});
 </script>
 
 <template>
@@ -81,8 +124,8 @@ function clickSSO(type) {
       </div>
       <!-- 提示訊息 -->
       <LoginPanelMessage
-        :alert-data="messageData"
-        @close-alert="messageData.show = false"
+        :alert-data="alertData"
+        @close-alert="alertData.show = false"
       ></LoginPanelMessage>
 
       <!-- 信箱&密碼 -->
@@ -109,6 +152,16 @@ function clickSSO(type) {
       </div>
       <!-- help bar -->
       <slot name="helpbar"></slot>
+      <vue-recaptcha
+        ref="captchaRef"
+        class="overflow-auto"
+        sitekey="6LdbAi4lAAAAABIdPfcUvVRzaPfs2TsqQJ8N1vpu"
+        size="normal"
+        @verify="recaptchaVerified"
+        @expire="recaptchaExpired"
+        @fail="recaptchaFailed"
+      >
+      </vue-recaptcha>
       <!-- 登入按鈕 -->
       <button
         class="h-12 font-bold"
@@ -125,3 +178,5 @@ function clickSSO(type) {
     </div>
   </div>
 </template>
+
+<style scoped></style>

@@ -13,30 +13,24 @@ export function getAuthorization() {
 }
 
 class AuthService {
-  localAuth(title, formData) {
+  localAuth(title, formData, captcha) {
     return axios.post(
       urlJoin(Store.state.domainAddress, "api/auth/", title.toLowerCase()),
+      // urlJoin(Store.state.domainAddress, "api/auth/wwww"),
       {
         formData,
+        captcha,
       }
     );
   }
 
   googleAuth(response) {
-    axios
-      .post(urlJoin(Store.state.domainAddress, "api/auth/googleAuth"), {
+    return axios.post(
+      urlJoin(Store.state.domainAddress, "api/auth/googleAuth"),
+      {
         accessToken: response.access_token,
-      })
-      .then((res) => {
-        if (res.data.token) {
-          localStorage.setItem("authorization", JSON.stringify(res.data));
-          return true;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        return false;
-      });
+      }
+    );
   }
 
   sessionAuth() {
