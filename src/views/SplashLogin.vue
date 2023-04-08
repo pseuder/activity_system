@@ -22,13 +22,13 @@ function forgetClick() {
       </div>
       <div class="flex items-center gap-2">
         <button class="h-10 bg-primary" @click="$emit('navigate', 'login')">
-          Login
+          {{ $t("login") }}
         </button>
         <button
           class="h-10 text-primary border-primary"
           @click="$emit('navigate', 'signup')"
         >
-          Signup
+          {{ $t("signup") }}
         </button>
       </div>
     </header>
@@ -37,11 +37,11 @@ function forgetClick() {
       <div class="md:w-1/2">
         <LoginPanel
           class="mx-auto my-4 w-11/12 max-w-lg"
-          title="Login"
+          title="login"
           :remember="remember"
         >
           <template #helpbar>
-            <div class="flex flex-wrap justify-center md:justify-between">
+            <div class="flex flex-wrap justify-between">
               <!-- 記住資訊 -->
               <div class="flex-shrink-0">
                 <input
@@ -50,17 +50,21 @@ function forgetClick() {
                   type="checkbox"
                   class="m-2"
                 />
-                <label for="remember">Keep me signed in</label>
+                <label for="remember">{{ $t("remember") }}</label>
               </div>
               <!-- 忘記密碼 -->
-              <a class="flex-shrink-0" @click="forgetClick">Forget Password?</a>
+              <div class="self-center">
+                <a class="flex-shrink-0" @click="forgetClick">{{
+                  $t("forgetPassword")
+                }}</a>
+              </div>
             </div>
           </template>
 
           <template #navbar>
             <div class="flex flex-wrap justify-center gap-2">
-              No acount yet?
-              <a @click="$emit('navigate', 'signup')">Signup</a>
+              {{ $t("noAccount") }}
+              <a @click="$emit('navigate', 'signup')">{{ $t("signup") }}</a>
             </div>
           </template>
         </LoginPanel>

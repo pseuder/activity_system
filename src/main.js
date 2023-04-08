@@ -9,6 +9,7 @@ import "./style.css";
 import Antd from "ant-design-vue";
 import axios from "axios";
 import Store from "./store";
+import i18n from "./i18n";
 
 import { Field, Form, ErrorMessage, defineRule, configure } from "vee-validate";
 import { required, email, min } from "@vee-validate/rules";
@@ -32,7 +33,7 @@ const axiosInstance = axios.create({
   baseURL: Store.state.domainAddress,
 });
 
-app.use(router).use(store).use(Antd);
+app.use(router).use(store).use(Antd).use(i18n);
 
 app.component("VeeForm", Form);
 app.component("VeeField", Field);

@@ -1,0 +1,13 @@
+{
+  "login": "Login",
+  "logout": "Logout",
+  "signup": "Signup",
+  "remember": "Keep me signed in",
+  "noAccount": "No account yet?",
+  "forgetPassword": "Forget Password?",
+  "inputPlaceholderEmail": "Please enter your email.",
+  "inputPlaceholderPassword": "Please enter your password.",
+  "alreadyHaveAccount": "Already have account?",
+  "agree": "I’m agree with the",
+  "terms": "terms & conditions"
+}

@@ -1,0 +1,13 @@
+{
+  "login": "登入",
+  "logout": "登出",
+  "signup": "註冊",
+  "remember": "保持登入",
+  "noAccount": "尚未擁有帳號？",
+  "forgetPassword": "忘記密碼？",
+  "inputPlaceholderEmail": "請輸入信箱",
+  "inputPlaceholderPassword": "請輸入密碼",
+  "alreadyHaveAccount": "已經擁有帳號？",
+  "agree": "我同意",
+  "terms": "條款和條件"
+}

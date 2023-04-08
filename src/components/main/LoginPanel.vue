@@ -96,10 +96,7 @@ const recaptchaFailed = (res) => {
   console.log(res);
 };
 
-onMounted(() => {
-  const elem = document.getElementById("rc-anchor-container");
-  console.log(elem);
-});
+onMounted(() => {});
 </script>
 
 <template>
@@ -134,7 +131,7 @@ onMounted(() => {
         <!-- 信箱輸入 -->
         <LoginPanelInput
           v-model="formData.email"
-          placeholder="Email address"
+          :placeholder="$t('inputPlaceholderEmail')"
           type="email"
           class="my-2 h-14"
         >
@@ -143,7 +140,7 @@ onMounted(() => {
         <!-- 密碼輸入 -->
         <LoginPanelInput
           v-model="formData.password"
-          placeholder="Password"
+          :placeholder="$t('inputPlaceholderPassword')"
           input-type="password"
           class="my-2 h-14"
         >
@@ -154,7 +151,7 @@ onMounted(() => {
       <slot name="helpbar"></slot>
       <vue-recaptcha
         ref="captchaRef"
-        class="overflow-auto"
+        class="self-center overflow-auto"
         sitekey="6LdbAi4lAAAAABIdPfcUvVRzaPfs2TsqQJ8N1vpu"
         size="normal"
         @verify="recaptchaVerified"
@@ -166,12 +163,12 @@ onMounted(() => {
       <button
         class="h-12 font-bold"
         :class="{
-          'bg-primary': title === 'Login',
-          'bg-[#6836DD]': title === 'Signup',
+          'bg-primary': title === 'login',
+          'bg-[#6836DD]': title === 'signup',
         }"
         @click="authorize"
       >
-        {{ title }}
+        {{ $t(title) }}
       </button>
       <!-- nav bar -->
       <slot name="navbar"></slot>

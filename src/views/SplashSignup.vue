@@ -18,31 +18,32 @@ defineEmits(["navigate"]);
           class="h-10 text-primary border-primary"
           @click="$emit('navigate', 'login')"
         >
-          Login
+          {{ $t("login") }}
         </button>
         <button class="h-10 bg-primary" @click="$emit('navigate', 'signup')">
-          Signup
+          {{ $t("signup") }}
         </button>
       </div>
     </header>
     <main class="flex flex-grow items-center justify-center">
       <div class="w-0 md:w-1/2"></div>
       <div class="md:w-1/2">
-        <LoginPanel class="mx-auto my-4 w-11/12 max-w-lg" title="Signup">
+        <LoginPanel class="mx-auto my-4 w-11/12 max-w-lg" title="signup">
           <template #helpbar>
             <!-- 同意條款 -->
             <div class="flex items-center">
               <input id="remember" type="checkbox" class="m-2" />
               <label for="agree" class=""
-                >I’m agree with the <a href="">terms & conditions</a>.</label
+                >{{ $t("agree") }}<a href="">{{ $t("terms") }}</a
+                >.</label
               >
             </div>
           </template>
 
           <template #navbar>
             <div class="flex flex-wrap justify-center gap-2">
-              Already have account?
-              <a @click="$emit('navigate', 'login')">Login</a>
+              {{ $t("alreadyHaveAccount") }}
+              <a @click="$emit('navigate', 'login')">{{ $t("login") }}</a>
             </div>
           </template>
         </LoginPanel>
