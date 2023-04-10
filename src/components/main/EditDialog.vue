@@ -105,14 +105,16 @@ watch(
               class="flex flex-wrap justify-between gap-6 overflow-y-auto bg-white bg-opacity-50 text-2xl"
             >
               <div class="flex w-full gap-4 p-4 lg:w-2/5">
-                <label class="w-28 flex-shrink-0" for="title">活動標題</label>
+                <label class="w-28 flex-shrink-0" for="title">{{
+                  $t("editDialog_title")
+                }}</label>
                 <VeeField
                   id="title"
                   v-model="editData_copy.title"
                   name="title"
                   type="text"
                   rules="required"
-                  placeholder="活動標題"
+                  :placeholder="$t('editDialog_title')"
                   class="ant-input form-control w-full lg:max-w-md"
                   :class="{
                     'is-invalid': errors['title'],
@@ -120,16 +122,16 @@ watch(
                 />
               </div>
               <div class="flex w-full gap-4 p-4 lg:w-2/5">
-                <label class="w-28 flex-shrink-0" for="location"
-                  >活動地點</label
-                >
+                <label class="w-28 flex-shrink-0" for="location">{{
+                  $t("editDialog_location")
+                }}</label>
                 <VeeField
                   id="location"
                   v-model="editData_copy.location"
                   name="location"
                   type="text"
                   rules="required"
-                  placeholder="活動地點"
+                  :placeholder="$t('editDialog_location')"
                   class="ant-input form-control w-full lg:max-w-md"
                   :class="{
                     'is-invalid': errors['location'],
@@ -137,7 +139,9 @@ watch(
                 />
               </div>
               <div class="flex w-full gap-4 p-4 lg:w-2/5">
-                <label class="w-28 flex-shrink-0">對象(多選)</label>
+                <label class="w-28 flex-shrink-0">{{
+                  $t("editDialog_object")
+                }}</label>
                 <VeeField
                   v-slot="{ field }"
                   v-model="editData_copy.object"
@@ -165,32 +169,38 @@ watch(
                 </VeeField>
               </div>
               <div class="flex w-full min-w-[300px] gap-4 p-4 lg:w-[24%]">
-                <label class="w-28 flex-shrink-0">參加名額</label>
+                <label class="w-28 flex-shrink-0">{{
+                  $t("editDialog_quota")
+                }}</label>
                 <a-input-number
                   v-model:value="editData_copy.quota"
                   :min="0"
                   class="w-full lg:max-w-md"
-                  placeholder="參加名額"
+                  :placeholder="$t('editDialog_quota')"
                 />
               </div>
               <div class="flex w-full min-w-[300px] gap-4 p-4 lg:w-[24%]">
-                <label class="w-28 flex-shrink-0">參加費用</label>
+                <label class="w-28 flex-shrink-0">{{
+                  $t("editDialog_fee")
+                }}</label>
                 <a-input-number
                   v-model:value="editData_copy.fee"
                   :min="0"
                   class="w-full lg:max-w-md"
-                  placeholder="參加費用"
+                  :placeholder="$t('editDialog_fee')"
                 />
               </div>
               <div class="flex w-full gap-4 p-4 lg:w-2/5">
-                <label class="w-28 flex-shrink-0">負責人</label>
+                <label class="w-28 flex-shrink-0">{{
+                  $t("editDialog_manager")
+                }}</label>
                 <VeeField
                   id="manager"
                   v-model="editData_copy.manager"
                   name="manager"
                   type="text"
                   rules="required"
-                  placeholder="負責人"
+                  :placeholder="$t('editDialog_manager')"
                   class="ant-input form-control w-full lg:max-w-md"
                   :class="{
                     'is-invalid': errors['manager'],
@@ -198,14 +208,16 @@ watch(
                 />
               </div>
               <div class="flex w-full gap-4 p-4 lg:w-2/5">
-                <label class="w-28 flex-shrink-0">聯絡方式</label>
+                <label class="w-28 flex-shrink-0">{{
+                  $t("editDialog_manager_contact")
+                }}</label>
                 <VeeField
                   id="manager_contact"
                   v-model="editData_copy.manager_contact"
                   name="manager_contact"
                   type="text"
                   rules="required"
-                  placeholder="聯絡方式"
+                  :placeholder="$t('editDialog_manager_contact')"
                   class="ant-input form-control w-full lg:max-w-md"
                   :class="{
                     'is-invalid': errors['manager_contact'],
@@ -213,7 +225,9 @@ watch(
                 />
               </div>
               <div class="flex w-full gap-4 p-4 lg:w-2/5">
-                <label class="w-28 flex-shrink-0">活動時間</label>
+                <label class="w-28 flex-shrink-0">{{
+                  $t("editDialog_activity_time")
+                }}</label>
                 <VeeField
                   v-slot="{ field }"
                   v-model="editData_copy.activity_time_editable"
@@ -222,7 +236,10 @@ watch(
                 >
                   <a-range-picker
                     value-format="YYYY-MM-DD"
-                    :placeholder="['開始時間', '結束時間']"
+                    :placeholder="[
+                      $t('editDialog_startTime'),
+                      $t('editDialog_startTime'),
+                    ]"
                     v-bind="field"
                     class="w-full lg:max-w-md"
                     :class="{
@@ -233,7 +250,9 @@ watch(
                 </VeeField>
               </div>
               <div class="flex h-16 w-full gap-4 p-4 lg:w-2/5">
-                <label class="w-28 flex-shrink-0">報名時間</label>
+                <label class="w-28 flex-shrink-0">{{
+                  $t("editDialog_enroll_time")
+                }}</label>
                 <VeeField
                   v-slot="{ field }"
                   v-model="editData_copy.enroll_time_editable"
@@ -242,7 +261,10 @@ watch(
                 >
                   <a-range-picker
                     value-format="YYYY-MM-DD"
-                    :placeholder="['開始時間', '結束時間']"
+                    :placeholder="[
+                      $t('editDialog_startTime'),
+                      $t('editDialog_startTime'),
+                    ]"
                     v-bind="field"
                     class="w-full lg:max-w-md"
                     :class="{
@@ -253,7 +275,9 @@ watch(
                 </VeeField>
               </div>
               <div class="flex w-full gap-4 p-4">
-                <label class="w-28 flex-shrink-0">活動照片<br />(限8張)</label>
+                <label class="w-28 flex-shrink-0">{{
+                  $t("editDialog_activity_imgs")
+                }}</label>
                 <div class="flex flex-col self-center md:flex-row">
                   <div class="text-sm md:flex md:self-end">
                     <template
@@ -285,7 +309,9 @@ watch(
                 </div>
               </div>
               <div class="flex w-full gap-4 p-4">
-                <label class="w-28 flex-shrink-0">活動介紹</label>
+                <label class="w-28 flex-shrink-0">{{
+                  $t("editDialog_description")
+                }}</label>
                 <VeeField
                   id="description"
                   v-slot="{ field }"
@@ -313,16 +339,16 @@ watch(
               <hr class="my-3 w-[98%] border-2" />
               <div class="flex gap-6">
                 <button class="w-full bg-error" @click.prevent="deleteClick">
-                  刪除活動
+                  {{ $t("editDialog_delete") }}
                 </button>
                 <button
                   class="w-full bg-yellow-600"
                   @click.prevent="resetClick"
                 >
-                  重置資料
+                  {{ $t("editDialog_reset") }}
                 </button>
                 <button class="w-full bg-primary" @click.prevent="submitClick">
-                  修改活動
+                  {{ $t("editDialog_modify") }}
                 </button>
               </div>
             </div>

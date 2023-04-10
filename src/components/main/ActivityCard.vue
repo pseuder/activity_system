@@ -56,28 +56,28 @@ defineEmits([
           class="flex"
           :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
         >
-          <div class="w-20">標題</div>
+          <div class="w-20">{{ $t("title") }}</div>
           <div class="text-gray">{{ formData.title }}</div>
         </div>
         <div
           class="flex"
           :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
         >
-          <div class="w-20">對象</div>
+          <div class="w-20">{{ $t("object") }}</div>
           <div class="text-gray">{{ formData.object_display }}</div>
         </div>
         <div
           class="flex"
           :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
         >
-          <div class="w-20">地點</div>
+          <div class="w-20">{{ $t("location") }}</div>
           <div class="text-gray">{{ formData.location }}</div>
         </div>
         <div
           class="flex"
           :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
         >
-          <div class="w-20">活動時間</div>
+          <div class="w-20">{{ $t("activity_time") }}</div>
           <div class="text-gray">
             {{ formData.activity_time_display }}
           </div>
@@ -86,7 +86,7 @@ defineEmits([
           class="flex"
           :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
         >
-          <div class="w-20">報名時間</div>
+          <div class="w-20">{{ $t("enroll_time") }}</div>
           <div class="text-gray">
             {{ formData.enroll_time_display }}
           </div>
@@ -117,7 +117,7 @@ defineEmits([
             class="w-[150px] bg-gray-500"
             @click="$emit('detailClick', formData)"
           >
-            詳細資訊
+            {{ $t("detailActivity") }}
           </button>
         </div>
 
@@ -131,7 +131,7 @@ defineEmits([
             class="w-[150px] bg-edit"
             @click="$emit('editClick', formData)"
           >
-            修改活動
+            {{ $t("modifyActivity") }}
           </button>
         </div>
 
@@ -141,7 +141,7 @@ defineEmits([
           class="w-[150px] bg-cancel"
           @click.prevent="$emit('cancelClick', formData)"
         >
-          取消報名
+          {{ $t("cancelRegistration") }}
         </button>
 
         <!-- 報名活動按鈕 -->
@@ -150,7 +150,7 @@ defineEmits([
           class="w-[150px] bg-blue-500"
           @click="$emit('enrollClick', formData)"
         >
-          報名活動
+          {{ $t("signUpForActivities") }}
         </button>
       </div>
     </div>

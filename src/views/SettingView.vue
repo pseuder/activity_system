@@ -2,6 +2,7 @@
 import { reactive, ref } from "vue";
 import AlertMessage from "@/components/AlertMessage.vue";
 import SettingProfile from "@/views/SettingProfile.vue";
+import SettingFavorite from "@/views/SettingFavorite.vue";
 import { messageDataTemplete } from "@/utils/common.js";
 import router from "@/router";
 import {
@@ -24,6 +25,7 @@ let currentPage = ref("profile");
 let messageData = reactive(messageDataTemplete);
 const pageMap = reactive({
   profile: SettingProfile,
+  favorite: SettingFavorite,
 });
 
 /* methods */
@@ -51,34 +53,34 @@ function logoutClick() {
     >
       <!-- left side -->
       <div class="w-[10%] max-w-[140px] md:w-[20%]">
-        <div class="mt-[100%] flex flex-col items-center gap-14">
+        <div class="mt-[100%] flex flex-col items-center gap-14 lg:items-start">
           <div
-            class="flex cursor-pointer items-center"
+            class="flex cursor-pointer items-center gap-2"
             @click="navigate('profile')"
           >
             <user-outlined />
-            <span class="hidden lg:inline">個人資料</span>
+            <span class="hidden lg:inline">{{ $t("setting_profile") }}</span>
           </div>
           <div
-            class="flex cursor-pointer items-center"
+            class="flex cursor-pointer items-center gap-2"
             @click="navigate('favorite')"
           >
             <setting-outlined />
-            <span class="hidden lg:inline">喜愛設定</span>
+            <span class="hidden lg:inline">{{ $t("setting_favorite") }}</span>
           </div>
           <div
-            class="flex cursor-pointer items-center"
+            class="flex cursor-pointer items-center gap-2"
             @click="navigate('contact')"
           >
             <question-circle-outlined />
-            <span class="hidden lg:inline">聯絡我們</span>
+            <span class="hidden lg:inline">{{ $t("setting_contact") }}</span>
           </div>
           <div
-            class="flex cursor-pointer items-center text-red-500"
+            class="flex cursor-pointer items-center gap-2 text-red-500"
             @click="logoutClick"
           >
             <logout-outlined />
-            <span class="hidden lg:inline">登出</span>
+            <span class="hidden lg:inline">{{ $t("setting_logout") }}</span>
           </div>
         </div>
       </div>

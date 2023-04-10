@@ -59,51 +59,51 @@ const emit = defineEmits([
                 </div>
               </div>
               <div class="flex w-full lg:w-2/5">
-                <div class="w-20">標題</div>
+                <div class="w-20">{{ $t("title") }}</div>
                 <div class="text-gray">{{ detailData.title }}</div>
               </div>
               <div class="flex w-full lg:w-2/5">
-                <div class="w-20">對象</div>
+                <div class="w-20">{{ $t("object") }}</div>
                 <div class="text-gray">{{ detailData.object_display }}</div>
               </div>
               <div class="flex w-full lg:w-2/5">
-                <div class="w-20">地點</div>
+                <div class="w-20">{{ $t("location") }}</div>
                 <div class="text-gray">
                   {{ detailData.location }}
                 </div>
               </div>
               <div class="flex w-full lg:w-2/5">
-                <div class="w-20">名額</div>
+                <div class="w-20">{{ $t("enrollment") }}</div>
                 <div class="text-gray">
                   {{ detailData.enrollment_display }}/{{ detailData.quota }}
                 </div>
               </div>
               <div class="flex w-full lg:w-2/5">
-                <div class="w-20">價格</div>
+                <div class="w-20">{{ $t("fee") }}</div>
                 <div class="text-gray">{{ detailData.fee }}</div>
               </div>
               <div class="flex w-full lg:w-2/5">
-                <div class="w-20">活動時間</div>
+                <div class="w-20">{{ $t("activity_time") }}</div>
                 <div class="text-gray">
                   {{ detailData.activity_time_display }}
                 </div>
               </div>
               <div class="flex w-full">
-                <div class="w-20">報名時間</div>
+                <div class="w-20">{{ $t("enroll_time") }}</div>
                 <div class="text-gray">
                   {{ detailData.enroll_time_display }}
                 </div>
               </div>
               <div class="flex w-full lg:w-2/5">
-                <div class="w-20">負責人</div>
+                <div class="w-20">{{ $t("manager") }}</div>
                 <div class="text-gray">{{ detailData.manager }}</div>
               </div>
               <div class="flex w-full lg:w-2/5">
-                <div class="w-20">聯絡方式</div>
+                <div class="w-20">{{ $t("title") }}</div>
                 <div class="text-gray">{{ detailData.manager_contact }}</div>
               </div>
               <div class="flex w-full">
-                <div class="w-20 flex-shrink-0">介紹</div>
+                <div class="w-20 flex-shrink-0">{{ $t("description") }}</div>
                 <div class="text-gray">
                   {{ detailData.description }}
                 </div>
@@ -126,21 +126,21 @@ const emit = defineEmits([
                 v-if="detailData.pending && !detailData.created"
                 class="w-full cursor-not-allowed bg-gray-300"
               >
-                尚未開放報名
+                {{ $t("notYetRegistration") }}
               </button>
               <button
                 v-else-if="detailData.ongoing && detailData.enrolled"
                 class="w-full bg-cancel"
                 @click.prevent="cancelClick"
               >
-                取消報名
+                {{ $t("cancelRegistration") }}
               </button>
               <button
                 v-else-if="detailData.ongoing && !detailData.enrolled"
                 class="w-full bg-primary"
                 @click.prevent="enrollClick"
               >
-                報名活動
+                {{ $t("signUpForActivities") }}
               </button>
               <div
                 v-else-if="!detailData.finished && detailData.created"
@@ -151,14 +151,14 @@ const emit = defineEmits([
                   class="w-full bg-edit"
                   @click="$emit('editClick', detailData)"
                 >
-                  修改活動
+                  {{ $t("modifyActivity") }}
                 </button>
               </div>
               <button
                 v-if="detailData.finished"
                 class="w-full cursor-not-allowed bg-gray-300"
               >
-                活動已結束
+                {{ $t("eventOver") }}
               </button>
             </div>
           </div>

@@ -30,8 +30,8 @@ defineEmits(["sortClick"]);
         :class="{
           '  text-blue-500': item.status != sortStatus.unsorted,
         }"
-        >{{ item.name }}</span
-      >
+        >{{ $t(item.attribute) }}
+      </span>
       <div class="flex cursor-pointer flex-col gap-1">
         <svg
           width="12"

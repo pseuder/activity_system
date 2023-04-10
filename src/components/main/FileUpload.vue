@@ -11,7 +11,7 @@
     >
       <div v-if="fileList.length < 8">
         <plus-outlined />
-        <div style="margin-top: 8px">上傳照片</div>
+        <div style="margin-top: 8px">{{ $t("fileUpload_upload") }}</div>
       </div>
     </a-upload>
     <a-modal

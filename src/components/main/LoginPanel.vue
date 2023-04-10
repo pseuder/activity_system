@@ -82,7 +82,6 @@ function clickSSO(type) {
 
 // 回傳一組 token，並把 token 傳給後端驗證
 const recaptchaVerified = (res) => {
-  console.log(res);
   captcha.value = res;
 };
 
@@ -103,7 +102,7 @@ onMounted(() => {});
   <!-- 外框: 內縮, 圓角, 最大寬度 -->
   <div class="rounded-md bg-white px-10 py-6 md:rounded-2xl md:py-10">
     <!-- 內框-->
-    <div class="flex flex-col gap-2 lg:gap-4 xl:gap-6 2xl:gap-10">
+    <div class="flex flex-col gap-2 lg:gap-4 xl:gap-6">
       <!-- 標題: 居中, 粗體, h1 -->
       <h1 class="text-center text-shadow">{{ title }}</h1>
       <!-- 第三方登入: flex排列 -->
@@ -127,7 +126,6 @@ onMounted(() => {});
 
       <!-- 信箱&密碼 -->
       <div>
-        <!-- <input :value="formData.email" type="text" @input="updateValue" /> -->
         <!-- 信箱輸入 -->
         <LoginPanelInput
           v-model="formData.email"
@@ -151,7 +149,7 @@ onMounted(() => {});
       <slot name="helpbar"></slot>
       <vue-recaptcha
         ref="captchaRef"
-        class="self-center overflow-auto"
+        class="scale-90 transform self-center overflow-auto md:scale-100 md:self-start"
         sitekey="6LdbAi4lAAAAABIdPfcUvVRzaPfs2TsqQJ8N1vpu"
         size="normal"
         @verify="recaptchaVerified"

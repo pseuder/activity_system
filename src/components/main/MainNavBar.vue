@@ -18,15 +18,17 @@ const props = defineProps({
 
 /* data */
 let pageMap = {
-  explore: "探索活動",
-  create: "建立活動",
-  mine: "我的活動",
+  explore: "exploreAactivity",
+  create: "createActivity",
+  mine: "mineActivity",
 };
 
 /* computed */
 let currentPage_display = computed(() => {
   // 過濾條件
-  return pageMap[props.currentPage] ? pageMap[props.currentPage] : "探索活動";
+  return pageMap[props.currentPage]
+    ? pageMap[props.currentPage]
+    : "exploreAactivity";
 });
 
 /* methods */
@@ -56,7 +58,8 @@ const emits = defineEmits(["navigate"]);
         data-bs-toggle="dropdown"
         aria-expanded="false"
       >
-        {{ currentPage_display }}
+        {{ $t(currentPage_display) }}
+
         <svg
           aria-hidden="true"
           focusable="false"
@@ -83,7 +86,7 @@ const emits = defineEmits(["navigate"]);
                 pageMap[currentPage] === currentPage_display,
             }"
             @click="navClick('explore')"
-            >探索活動</a
+            >{{ $t("exploreAactivity") }}</a
           >
         </li>
         <li>
@@ -95,7 +98,7 @@ const emits = defineEmits(["navigate"]);
                 pageMap[currentPage] === currentPage_display,
             }"
             @click="navClick('create')"
-            >建立活動</a
+            >{{ $t("createActivity") }}</a
           >
         </li>
         <li>
@@ -107,7 +110,7 @@ const emits = defineEmits(["navigate"]);
                 pageMap[currentPage] === currentPage_display,
             }"
             @click="navClick('mine')"
-            >我的活動</a
+            >{{ $t("mineActivity") }}</a
           >
         </li>
       </ul>
@@ -118,17 +121,17 @@ const emits = defineEmits(["navigate"]);
         <a
           :class="{ 'text-black': currentPage !== 'explore' }"
           @click="navClick('explore')"
-          >探索活動</a
+          >{{ $t("exploreAactivity") }}</a
         >
         <a
           :class="{ 'text-black': currentPage !== 'create' }"
           @click="navClick('create')"
-          >建立活動</a
+          >{{ $t("createActivity") }}</a
         >
         <a
           :class="{ 'text-black': currentPage !== 'mine' }"
           @click="navClick('mine')"
-          >我的活動</a
+          >{{ $t("mineActivity") }}</a
         >
       </div>
     </div>

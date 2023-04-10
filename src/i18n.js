@@ -12,6 +12,8 @@ const i18n = createI18n({
   },
 });
 
-i18n.global.locale.value = navigator.language;
+if (localStorage.getItem("language"))
+  i18n.global.locale.value = localStorage.getItem("language");
+else i18n.global.locale.value = navigator.language.split("-")[0];
 
 export default i18n;
