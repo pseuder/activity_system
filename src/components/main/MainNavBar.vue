@@ -110,7 +110,7 @@ const emits = defineEmits(["navigate"]);
     <a @click="navClick('setting')" class="">
       <img
         v-if="userData.avatar === ''"
-        src="@\assets\image\default user.png"
+        src="@\assets\image\defaultUser.png"
         class="w-16 rounded-full"
       />
       <img :src="userData.avatar" alt="" class="m-auto w-16 rounded-full" />

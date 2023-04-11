@@ -100,7 +100,7 @@ function checkClick() {
       <div class="h-[150px] w-[150px]">
         <img
           v-if="userImg === ''"
-          src="@\assets\image\default user.png"
+          src="@\assets\image\defaultUser.png"
           class="rounded-full"
         />
         <img v-else :src="userImg" alt="no img here" class="rounded-full" />

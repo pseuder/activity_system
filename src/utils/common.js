@@ -222,13 +222,15 @@ export async function fetchAndMarkActivityData() {
   await UserService.getUserInfo().then((res) => {
     userData = res.data;
 
-    userData.enrolledActivity.forEach((user_enrolled) => {
-      user_enrolledActivity.push(user_enrolled._id);
-    });
+    if (userData.enrolledActivity)
+      userData.enrolledActivity.forEach((user_enrolled) => {
+        user_enrolledActivity.push(user_enrolled._id);
+      });
 
-    userData.likedActivity.forEach((user_liked) => {
-      user_likedActivity.push(user_liked._id);
-    });
+    if (userData.likedActivity)
+      userData.likedActivity.forEach((user_liked) => {
+        user_likedActivity.push(user_liked._id);
+      });
   });
 
   // 獲取活動資料並標記
