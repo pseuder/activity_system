@@ -53,5 +53,9 @@
   "setting_profile": "個人資料",
   "setting_favorite": "喜愛設定",
   "setting_contact": "聯絡我們",
-  "setting_logout": "登出"
+  "setting_logout": "登出",
+  "profile_username": "名稱",
+  "profile_password": "密碼",
+  "profile_email": "信箱",
+  "profile_phone": "電話"
 }

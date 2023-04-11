@@ -52,5 +52,9 @@
   "setting_profile": "Profile",
   "setting_favorite": "Preference",
   "setting_contact": "Contact Us",
-  "setting_logout": "Log out"
+  "setting_logout": "Log out",
+  "profile_username": "Name",
+  "profile_password": "Password",
+  "profile_email": "Email",
+  "profile_phone": "Phone"
 }

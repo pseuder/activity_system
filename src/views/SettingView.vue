@@ -8,7 +8,7 @@ import router from "@/router";
 import {
   UserOutlined,
   SettingOutlined,
-  QuestionCircleOutlined,
+  MailOutlined,
   LogoutOutlined,
 } from "@ant-design/icons-vue";
 
@@ -72,7 +72,7 @@ function logoutClick() {
             class="flex cursor-pointer items-center gap-2"
             @click="navigate('contact')"
           >
-            <question-circle-outlined />
+            <mail-outlined />
             <span class="hidden lg:inline">{{ $t("setting_contact") }}</span>
           </div>
           <div
