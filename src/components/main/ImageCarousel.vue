@@ -17,7 +17,8 @@ onMounted(() => {
 
 const currentImage = computed(() => {
   if (props.images.length > 0) {
-    if (props.images[state.currentIndex].includes("data:image/png"))
+    console.log(props.images[state.currentIndex]);
+    if (props.images[state.currentIndex].includes("data:image"))
       return props.images[state.currentIndex];
     else return "data:image/png;base64," + props.images[state.currentIndex];
   }

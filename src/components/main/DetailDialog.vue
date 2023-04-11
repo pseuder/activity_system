@@ -99,7 +99,7 @@ const emit = defineEmits([
                 <div class="text-gray">{{ detailData.manager }}</div>
               </div>
               <div class="flex w-full lg:w-2/5">
-                <div class="w-20">{{ $t("title") }}</div>
+                <div class="w-20">{{ $t("manager_contact") }}</div>
                 <div class="text-gray">{{ detailData.manager_contact }}</div>
               </div>
               <div class="flex w-full">
