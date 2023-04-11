@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from "vue";
+import { CaretDownOutlined } from "@ant-design/icons-vue";
 /* props */
 const props = defineProps({
   userData: {
@@ -42,80 +43,48 @@ const emits = defineEmits(["navigate"]);
 
 <template>
   <div class="flex items-center">
-    <img src="@/assets/image/vite.svg" alt="" class="w-10" />
+    <img
+      src="@/assets/image/vite.svg"
+      alt=""
+      class="w-10 cursor-pointer"
+      @click="navClick('explore')"
+    />
   </div>
   <nav
     class="flex flex-grow items-center justify-center lg:ml-[10vw] lg:justify-start"
   >
-    <div class="dropdown relative">
-      <button
-        id="dropdownMenuButton"
-        class="dropdown-toggle flex items-center text-black lg:hidden"
-        :class="{
-          'text-primary': pageMap[currentPage] === currentPage_display,
-        }"
-        type="button"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-      >
+    <a-dropdown
+      :trigger="['click']"
+      class="self-center text-black lg:hidden"
+      :class="{
+        'text-primary': pageMap[currentPage] === currentPage_display,
+      }"
+    >
+      <a class="ant-dropdown-link" @click.prevent>
         {{ $t(currentPage_display) }}
+        <CaretDownOutlined class="align-middle" />
+      </a>
 
-        <svg
-          aria-hidden="true"
-          focusable="false"
-          data-prefix="fas"
-          data-icon="caret-down"
-          class="ml-2 w-4"
-          role="img"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 320 512"
-        >
-          <path
-            fill="currentColor"
-            d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
-          ></path>
-        </svg>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <li>
-          <a
-            class="dropdown-item"
-            :class="{
-              'text-primary':
-                currentPage === 'explore' &&
-                pageMap[currentPage] === currentPage_display,
-            }"
-            @click="navClick('explore')"
-            >{{ $t("exploreAactivity") }}</a
+      <template #overlay>
+        <a-menu class="rounded-md">
+          <a-menu-item key="0">
+            <a class="text-lg" @click="navClick('explore')">{{
+              $t("exploreAactivity")
+            }}</a>
+          </a-menu-item>
+          <a-menu-item key="1">
+            <a class="text-lg" @click="navClick('create')">{{
+              $t("createActivity")
+            }}</a>
+          </a-menu-item>
+          <a-menu-item key="2"
+            ><a class="text-lg" @click="navClick('mine')">{{
+              $t("mineActivity")
+            }}</a></a-menu-item
           >
-        </li>
-        <li>
-          <a
-            class="dropdown-item"
-            :class="{
-              'text-primary':
-                currentPage === 'create' &&
-                pageMap[currentPage] === currentPage_display,
-            }"
-            @click="navClick('create')"
-            >{{ $t("createActivity") }}</a
-          >
-        </li>
-        <li>
-          <a
-            class="dropdown-item"
-            :class="{
-              'text-primary':
-                currentPage === 'mine' &&
-                pageMap[currentPage] === currentPage_display,
-            }"
-            @click="navClick('mine')"
-            >{{ $t("mineActivity") }}</a
-          >
-        </li>
-      </ul>
-    </div>
-
+        </a-menu>
+      </template>
+    </a-dropdown>
     <div class="hidden lg:flex">
       <div class="flex flex-shrink-0 gap-20 pl-[10vw] font-bold">
         <a
@@ -136,7 +105,8 @@ const emits = defineEmits(["navigate"]);
       </div>
     </div>
   </nav>
-  <div class="flex items-center">
+
+  <div class="flex w-10 items-center">
     <a @click="navClick('setting')" class="">
       <img
         v-if="userData.avatar === ''"
