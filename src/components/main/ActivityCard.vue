@@ -44,7 +44,13 @@ defineEmits([
       <heart-filled v-if="formData.liked" class="text-red-600" />
       <heart-outlined v-else />
     </div>
-    <div :class="{ 'lg:flex': userSetting.displayMode == 'list' }">
+    <div
+      class="flex h-full"
+      :class="{
+        'lg:flex': userSetting.displayMode == 'list',
+        'flex-col': userSetting.displayMode == 'block',
+      }"
+    >
       <div
         class="flex flex-grow flex-col flex-wrap gap-4"
         :class="{
@@ -53,28 +59,28 @@ defineEmits([
         }"
       >
         <div
-          class="flex"
+          class="flex flex-grow"
           :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
         >
           <div class="w-20">{{ $t("title") }}</div>
           <div class="text-gray">{{ formData.title }}</div>
         </div>
         <div
-          class="flex"
+          class="flex flex-grow"
           :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
         >
           <div class="w-20">{{ $t("object") }}</div>
           <div class="text-gray">{{ formData.object_display }}</div>
         </div>
         <div
-          class="flex"
+          class="flex flex-grow"
           :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
         >
           <div class="w-20">{{ $t("location") }}</div>
           <div class="text-gray">{{ formData.location }}</div>
         </div>
         <div
-          class="flex"
+          class="flex flex-grow"
           :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
         >
           <div class="w-20">{{ $t("activity_time") }}</div>
@@ -83,7 +89,7 @@ defineEmits([
           </div>
         </div>
         <div
-          class="flex"
+          class="flex flex-grow"
           :class="{ 'lg:w-2/5': userSetting.displayMode == 'list' }"
         >
           <div class="w-20">{{ $t("enroll_time") }}</div>
