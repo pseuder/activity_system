@@ -106,7 +106,7 @@ const emits = defineEmits(["navigate"]);
     </div>
   </nav>
 
-  <div class="flex w-10 items-center">
+  <div class="flex w-12 items-center">
     <a @click="navClick('setting')" class="">
       <img
         v-if="userData.avatar === ''"
