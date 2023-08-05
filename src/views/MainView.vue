@@ -55,6 +55,9 @@ function updateUserData(newData) {
 }
 
 async function fetchData() {
+  // 重置提示訊息
+  messageData.show = false;
+
   // 獲取當前使用者資料
   await UserService.getUserInfo()
     .then((res) => {

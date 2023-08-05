@@ -108,15 +108,15 @@ onMounted(() => {});
       <!-- 第三方登入: flex排列 -->
       <div class="flex justify-center gap-5 self-center">
         <!-- 登入按鈕: 圓角, flex淡灰色背景 (hover效果) -->
-        <button class="h-10 w-10 bg-[#FAFAFA] p-2">
+        <!-- <button class="h-10 w-10 bg-[#FAFAFA] p-2">
           <img src="@/assets/image/Facebook.svg" />
-        </button>
+        </button> -->
         <button class="h-10 w-10 bg-[#FAFAFA] p-2" @click="clickSSO('google')">
           <img src="@/assets/image/Google.svg" />
         </button>
-        <button class="h-10 w-10 bg-[#FAFAFA] p-2">
+        <!-- <button class="h-10 w-10 bg-[#FAFAFA] p-2">
           <img src="@/assets/image/Linkedin.svg" />
-        </button>
+        </button> -->
       </div>
       <!-- 提示訊息 -->
       <LoginPanelMessage

@@ -31,13 +31,13 @@ defineEmits(["navigate"]);
         <LoginPanel class="mx-auto my-4 w-11/12 max-w-lg" title="signup">
           <template #helpbar>
             <!-- 同意條款 -->
-            <div class="flex items-center">
+            <!-- <div class="flex items-center">
               <input id="remember" type="checkbox" class="m-2" />
               <label for="agree" class=""
                 >{{ $t("agree") }}<a href="">{{ $t("terms") }}</a
                 >.</label
               >
-            </div>
+            </div> -->
           </template>
 
           <template #navbar>

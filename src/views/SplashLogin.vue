@@ -54,9 +54,9 @@ function forgetClick() {
               </div>
               <!-- 忘記密碼 -->
               <div class="self-center">
-                <a class="flex-shrink-0" @click="forgetClick">{{
+                <!-- <a class="flex-shrink-0" @click="forgetClick">{{
                   $t("forgetPassword")
-                }}</a>
+                }}</a> -->
               </div>
             </div>
           </template>

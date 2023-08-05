@@ -43,11 +43,11 @@ let filterMap = {
   全部: "all",
 };
 let filterOptions = ref([
-  { name: "已報名", attribute: "enrolled" },
-  { name: "已結束", attribute: "finished" },
-  { name: "已收藏", attribute: "liked" },
-  { name: "已建立", attribute: "created" },
-  { name: "全部", attribute: "all" },
+  { name: "已報名", myattribute: "enrolled" },
+  { name: "已結束", myattribute: "finished" },
+  { name: "已收藏", myattribute: "liked" },
+  { name: "已建立", myattribute: "created" },
+  { name: "全部", myattribute: "all" },
 ]);
 let editDialogData = ref({});
 let detialDialogData = ref({});
@@ -165,10 +165,10 @@ onBeforeMount(() => {
       </div>
       <!-- 排序模式 -->
       <div class="hidden justify-center gap-4 self-center lg:flex">
-        <MainOrientationSwitch
+        <!-- <MainOrientationSwitch
           :user-setting="userSetting"
           @display-click="displayClick"
-        />
+        /> -->
       </div>
     </div>
 

@@ -28,7 +28,7 @@ defineEmits(["filterClick"]);
       }"
       @click="$emit('filterClick', item)"
     >
-      {{ item.name }}
+      {{ $t(item.name) }}
     </div>
   </div>
 </template>

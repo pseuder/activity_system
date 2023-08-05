@@ -41,6 +41,7 @@ export let messageDataTemplete = {
   show: false,
   state: "success",
   message: "成功!",
+  activityInfo: {},
 };
 
 export let activityDataTemplete = {
@@ -157,6 +158,7 @@ export function enrolling(argc) {
       messageData.message = res.data;
       messageData.state = "success";
       messageData.show = true;
+      messageData.activityInfo = activity;
 
       activity.enrolled = true;
       activity.enrollment_display += 1;

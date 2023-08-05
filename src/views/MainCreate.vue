@@ -123,14 +123,16 @@ defineEmits(["navigate", "stopLoading"]);
     class="flex w-full flex-wrap justify-between gap-4 overflow-y-auto bg-white bg-opacity-50 text-2xl"
   >
     <div class="flex w-full gap-4 p-4 lg:w-2/5">
-      <label class="w-28 flex-shrink-0" for="title">活動標題</label>
+      <label class="w-28 flex-shrink-0" for="title">{{
+        $t("create_title")
+      }}</label>
       <VeeField
         id="title"
         v-model="createFormData.title"
         name="title"
         type="text"
         rules="required"
-        placeholder="活動標題"
+        :placeholder="$t('create_title_placeholder')"
         class="ant-input form-control w-full lg:max-w-md"
         :class="{
           'is-invalid': errors['title'],
@@ -138,14 +140,14 @@ defineEmits(["navigate", "stopLoading"]);
       />
     </div>
     <div class="flex w-full gap-4 p-4 lg:w-2/5">
-      <label class="w-28 flex-shrink-0">活動地點</label>
+      <label class="w-28 flex-shrink-0">{{ $t("create_location") }}</label>
       <VeeField
         id="location"
         v-model="createFormData.location"
         name="location"
         type="text"
         rules="required"
-        placeholder="活動地點"
+        :placeholder="$t('create_location_placeholder')"
         class="ant-input form-control w-full lg:max-w-md"
         :class="{
           'is-invalid': errors['location'],
@@ -153,7 +155,7 @@ defineEmits(["navigate", "stopLoading"]);
       />
     </div>
     <div class="flex w-full gap-4 p-4 lg:w-2/5">
-      <label class="w-28 flex-shrink-0">對象(多選)</label>
+      <label class="w-28 flex-shrink-0">{{ $t("create_object") }}</label>
       <VeeField
         v-slot="{ field }"
         v-model="createFormData.object"
@@ -179,7 +181,7 @@ defineEmits(["navigate", "stopLoading"]);
     </div>
 
     <div class="flex w-full gap-4 p-4 lg:w-[24%]">
-      <label class="w-28 flex-shrink-0">參加名額</label>
+      <label class="w-28 flex-shrink-0">{{ $t("create_quota") }}</label>
       <a-input-number
         v-model:value="createFormData.quota"
         :min="0"
@@ -188,7 +190,7 @@ defineEmits(["navigate", "stopLoading"]);
       />
     </div>
     <div class="flex w-full gap-4 p-4 lg:w-[24%]">
-      <label class="w-28 flex-shrink-0">參加費用</label>
+      <label class="w-28 flex-shrink-0">{{ $t("create_fee") }}</label>
       <a-input-number
         v-model:value="createFormData.fee"
         :min="0"
@@ -197,14 +199,14 @@ defineEmits(["navigate", "stopLoading"]);
       />
     </div>
     <div class="flex w-full gap-4 p-4 lg:w-2/5">
-      <label class="w-28 flex-shrink-0">負責人</label>
+      <label class="w-28 flex-shrink-0">{{ $t("create_manager") }}</label>
       <VeeField
         id="manager"
         v-model="createFormData.manager"
         name="manager"
         type="text"
         rules="required"
-        placeholder="負責人"
+        :placeholder="$t('create_manager_placeholder')"
         class="ant-input form-control w-full lg:max-w-md"
         :class="{
           'is-invalid': errors['manager'],
@@ -212,14 +214,16 @@ defineEmits(["navigate", "stopLoading"]);
       />
     </div>
     <div class="flex w-full gap-4 p-4 lg:w-2/5">
-      <label class="w-28 flex-shrink-0">聯絡方式</label>
+      <label class="w-28 flex-shrink-0">{{
+        $t("create_manager_contact")
+      }}</label>
       <VeeField
         id="manager_contact"
         v-model="createFormData.manager_contact"
         name="manager_contact"
         type="text"
         rules="required"
-        placeholder="聯絡方式"
+        :placeholder="$t('create_contact_placeholder')"
         class="ant-input form-control w-full lg:max-w-md"
         :class="{
           'is-invalid': errors['manager_contact'],
@@ -227,7 +231,7 @@ defineEmits(["navigate", "stopLoading"]);
       />
     </div>
     <div class="flex w-full gap-4 p-4 lg:w-2/5">
-      <label class="w-28 flex-shrink-0">活動時間</label>
+      <label class="w-28 flex-shrink-0">{{ $t("create_activity_time") }}</label>
       <VeeField
         v-slot="{ field }"
         v-model="createFormData.activity_time"
@@ -236,7 +240,10 @@ defineEmits(["navigate", "stopLoading"]);
       >
         <a-range-picker
           value-format="YYYY-MM-DD"
-          :placeholder="['開始時間', '結束時間']"
+          :placeholder="[
+            $t('create_starttime_placeholder'),
+            $t('create_endtime_placeholder'),
+          ]"
           v-bind="field"
           class="w-full lg:max-w-md"
           :class="{
@@ -247,7 +254,7 @@ defineEmits(["navigate", "stopLoading"]);
     </div>
 
     <div class="flex h-16 w-full gap-4 p-4 lg:w-2/5">
-      <label class="w-28 flex-shrink-0">報名時間</label>
+      <label class="w-28 flex-shrink-0">{{ $t("create_enroll_time") }}</label>
       <VeeField
         v-slot="{ field }"
         v-model="createFormData.enroll_time"
@@ -256,7 +263,10 @@ defineEmits(["navigate", "stopLoading"]);
       >
         <a-range-picker
           value-format="YYYY-MM-DD"
-          :placeholder="['開始時間', '結束時間']"
+          :placeholder="[
+            $t('create_starttime_placeholder'),
+            $t('create_endtime_placeholder'),
+          ]"
           v-bind="field"
           class="w-full lg:max-w-md"
           :class="{
@@ -266,11 +276,11 @@ defineEmits(["navigate", "stopLoading"]);
       </VeeField>
     </div>
     <div class="flex w-full gap-4 p-4">
-      <label class="w-28 flex-shrink-0">活動照片<br />(限8張)</label>
+      <label class="w-28 flex-shrink-0">{{ $t("create_activity_imgs") }}</label>
       <FileUpload ref="antUpload" @upload-change="uploadChange" />
     </div>
     <div class="flex w-full gap-4 p-4">
-      <label class="w-28 flex-shrink-0">活動介紹</label>
+      <label class="w-28 flex-shrink-0">{{ $t("create_description") }}</label>
       <VeeField
         id="description"
         v-slot="{ field }"
@@ -302,21 +312,21 @@ defineEmits(["navigate", "stopLoading"]);
         class="w-24 rounded-md text-base font-semibold text-gray bg-lightgray"
         @click.prevent="$emit('navigate', 'explore')"
       >
-        取消
+        {{ $t("create_cancel") }}
       </button>
       <button
         type="reset"
         class="alert-warning w-24 rounded-md text-base font-semibold"
         @click.prevent="resetClick(handleReset)"
       >
-        清空
+        {{ $t("create_clear") }}
       </button>
       <button
         v-show="!submitLoading"
         class="w-24 rounded-md text-base font-semibold text-white bg-primary"
         @click="handleSubmit($event, submitClick)"
       >
-        建立
+        {{ $t("create_create") }}
       </button>
       <button
         v-show="submitLoading"

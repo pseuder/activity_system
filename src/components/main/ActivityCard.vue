@@ -47,7 +47,7 @@ defineEmits([
     <div
       class="flex h-full"
       :class="{
-        'lg:flex': userSetting.displayMode == 'list',
+        'flex-col lg:flex-row': userSetting.displayMode == 'list',
         'flex-col': userSetting.displayMode == 'block',
       }"
     >

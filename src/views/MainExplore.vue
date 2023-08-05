@@ -169,7 +169,7 @@ onBeforeMount(() => {
       </div>
       <!-- 活動顯示 -->
       <div
-        class="flex w-full flex-wrap gap-4 font-medium"
+        class="flex h-fit w-full flex-wrap gap-4 font-medium"
         :class="{
           'lg:flex-row': userSetting.displayMode == 'block',
           'lg:flex-col': userSetting.displayMode == 'list',
